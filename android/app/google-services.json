@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "1070097938760",
+    "project_id": "microwins-95da4",
+    "storage_bucket": "microwins-95da4.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1070097938760:android:5a21c2e850a2cc9caedb7d",
+        "android_client_info": {
+          "package_name": "com.microwins.microwins"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1070097938760-fr3rm1kul2tooubld69kvqegrqc0mipo.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.microwins.microwins",
+            "certificate_hash": "c084c2adcadb183a1ceb48d15d915b7b9c8e030d"
+          }
+        },
+        {
+          "client_id": "1070097938760-n9sl7tm7pit3reevrtalm9bf2m2d31b0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDVI4Ja0PPppQAaI7yIA9pcveZGWCML__8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1070097938760-n9sl7tm7pit3reevrtalm9bf2m2d31b0.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1070097938760-5j76ef0uj7fi9gan5l2lide3i8h80qab.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.microwins.microwins"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
