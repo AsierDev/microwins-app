@@ -4,6 +4,7 @@ import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
 import 'package:microwins/features/habits/domain/entities/habit.dart';
 import 'package:microwins/features/habits/domain/habit_repository.dart';
+import 'package:microwins/features/habits/data/habit_provider.dart';
 import 'package:microwins/features/habits/presentation/habit_view_model.dart';
 
 // Generate mocks with: flutter pub run build_runner build

@@ -7,7 +7,6 @@ import '../../auth/data/auth_provider.dart';
 import '../../habits/presentation/habit_view_model.dart';
 import '../../settings/data/settings_provider.dart';
 import '../../../core/theme/theme_provider.dart';
-import '../../../core/notifications/notification_service.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});

@@ -1,12 +1,12 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'dart:io';
+import 'dart:io' show Platform;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:permission_handler/permission_handler.dart';
-import '../../features/habits/domain/entities/habit.dart';
 import 'habit_reminder_storage.dart';
 import 'habit_reminder_model.dart';
+import '../utils/logger.dart';
 
 class NotificationService {
   static final NotificationService _instance = NotificationService._internal();
@@ -18,30 +18,35 @@ class NotificationService {
 
   /// Check if exact alarm permission is granted
   Future<bool> hasExactAlarmPermission() async {
-    if (!Platform.isAndroid) return true; // iOS doesn't need this
+    if (kIsWeb || !Platform.isAndroid)
+      return true; // Web and iOS don't need this
 
     try {
       final status = await Permission.scheduleExactAlarm.status;
       return status.isGranted;
     } catch (e) {
-      if (kDebugMode) {
-        print('❌ Error checking exact alarm permission: $e');
-      }
+      AppLogger.error(
+        'Error checking exact alarm permission',
+        tag: 'NotificationService',
+        error: e,
+      );
       return false;
     }
   }
 
   /// Request exact alarm permission (Android 12+)
   Future<bool> requestExactAlarmPermission() async {
-    if (!Platform.isAndroid) return true;
+    if (kIsWeb || !Platform.isAndroid) return true;
 
     try {
       final status = await Permission.scheduleExactAlarm.request();
       return status.isGranted;
     } catch (e) {
-      if (kDebugMode) {
-        print('❌ Error requesting exact alarm permission: $e');
-      }
+      AppLogger.error(
+        'Error requesting exact alarm permission',
+        tag: 'NotificationService',
+        error: e,
+      );
       return false;
     }
   }
@@ -69,24 +74,23 @@ class NotificationService {
 
       await HabitReminderStorage.saveReminder(reminder);
 
-      if (kDebugMode) {
-        print(
-          '✅ Scheduled reminder for $habitName at $reminderTime (WorkManager checks every 15 min)',
-        );
-      }
+      AppLogger.info(
+        'Scheduled reminder for $habitName at $reminderTime (WorkManager checks every 15 min)',
+        tag: 'NotificationService',
+      );
     } catch (e) {
-      if (kDebugMode) {
-        print('❌ Error scheduling reminder: $e');
-      }
+      AppLogger.error(
+        'Error scheduling reminder',
+        tag: 'NotificationService',
+        error: e,
+      );
     }
   }
 
   /// Delete reminder from storage
   Future<void> deleteReminder(String habitId) async {
     await HabitReminderStorage.deleteReminder(habitId);
-    if (kDebugMode) {
-      print('🗑️ Deleted reminder: $habitId');
-    }
+    AppLogger.debug('Deleted reminder: $habitId', tag: 'NotificationService');
   }
 
   Future<void> init() async {
@@ -99,9 +103,10 @@ class NotificationService {
       tz.setLocalLocation(tz.getLocation(timeZoneName));
     } catch (e) {
       // Fallback for abbreviations like "CET", "PST" etc
-      if (kDebugMode) {
-        print('Timezone $timeZoneName not found, using default location');
-      }
+      AppLogger.debug(
+        'Timezone $timeZoneName not found, using default location',
+        tag: 'NotificationService',
+      );
       // Use a common European timezone as fallback for CET
       tz.setLocalLocation(tz.getLocation('Europe/Madrid'));
     }
@@ -121,7 +126,7 @@ class NotificationService {
     await flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
     // Create notification channel for Android 8.0+
-    if (Platform.isAndroid) {
+    if (!kIsWeb && Platform.isAndroid) {
       final AndroidFlutterLocalNotificationsPlugin? androidImplementation =
           flutterLocalNotificationsPlugin
               .resolvePlatformSpecificImplementation<
@@ -140,9 +145,10 @@ class NotificationService {
       );
     }
 
-    if (kDebugMode) {
-      print('✅ NotificationService initialized');
-    }
+    AppLogger.info(
+      'NotificationService initialized',
+      tag: 'NotificationService',
+    );
   }
 
   Future<void> scheduleDailyNotification({
@@ -172,9 +178,9 @@ class NotificationService {
       await flutterLocalNotificationsPlugin.zonedSchedule(
         id,
         'Time for $habitName! ⏰',
-        '$habitName',
+        habitName,
         scheduledDate,
-        NotificationDetails(
+        const NotificationDetails(
           android: AndroidNotificationDetails(
             'daily_habit_channel',
             'Daily Habits',
@@ -190,31 +196,31 @@ class NotificationService {
             UILocalNotificationDateInterpretation.absoluteTime,
       );
 
-      if (kDebugMode) {
-        final isToday = scheduledDate.day == now.day;
-        print(
-          '✅ Scheduled reminder for "$habitName" at $hour:${minute.toString().padLeft(2, '0')} ${isToday ? 'TODAY' : 'TOMORROW'} (${scheduledDate.day}/${scheduledDate.month})',
-        );
-      }
+      final isToday = scheduledDate.day == now.day;
+      AppLogger.info(
+        'Scheduled reminder for "$habitName" at $hour:${minute.toString().padLeft(2, '0')} ${isToday ? 'TODAY' : 'TOMORROW'} (${scheduledDate.day}/${scheduledDate.month})',
+        tag: 'NotificationService',
+      );
     } catch (e) {
-      if (kDebugMode) {
-        print('❌ Failed to schedule notification: $e');
-      }
+      AppLogger.error(
+        'Failed to schedule notification',
+        tag: 'NotificationService',
+        error: e,
+      );
     }
   }
 
   Future<void> cancelNotification(int id) async {
     await flutterLocalNotificationsPlugin.cancel(id);
-    if (kDebugMode) {
-      print('🗑️ Cancelled notification with ID: $id');
-    }
+    AppLogger.debug(
+      'Cancelled notification with ID: $id',
+      tag: 'NotificationService',
+    );
   }
 
   Future<void> cancelAllNotifications() async {
     await flutterLocalNotificationsPlugin.cancelAll();
-    if (kDebugMode) {
-      print('🗑️ Cancelled all notifications');
-    }
+    AppLogger.debug('Cancelled all notifications', tag: 'NotificationService');
   }
 
   Future<void> showImmediateNotification({
@@ -236,8 +242,9 @@ class NotificationService {
         ),
       ),
     );
-    if (kDebugMode) {
-      print('📬 Showed immediate notification: $title');
-    }
+    AppLogger.debug(
+      'Showed immediate notification: $title',
+      tag: 'NotificationService',
+    );
   }
 }

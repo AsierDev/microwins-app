@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -25,40 +24,42 @@ void main() async {
   // Initialize Hive
   await HiveSetup.init();
 
-  // Initialize Notifications
-  await NotificationService().init();
+  // Initialize Notifications (mobile only)
+  if (!kIsWeb) {
+    await NotificationService().init();
 
-  // Initialize Habit Reminder Storage
-  await HabitReminderStorage.init();
+    // Initialize Habit Reminder Storage
+    await HabitReminderStorage.init();
 
-  // Initialize WorkManager for periodic notification checks
-  await Workmanager().initialize(habitCheckWorker, isInDebugMode: kDebugMode);
+    // Initialize WorkManager for periodic notification checks
+    await Workmanager().initialize(habitCheckWorker);
 
-  // Register periodic task (runs every 15 minutes)
-  await Workmanager().registerPeriodicTask(
-    'habit-notification-check',
-    'habitCheck',
-    frequency: const Duration(minutes: 15),
-    constraints: Constraints(networkType: NetworkType.notRequired),
-  );
+    // Register periodic task (runs every 15 minutes)
+    await Workmanager().registerPeriodicTask(
+      'habit-notification-check',
+      'habitCheck',
+      frequency: const Duration(minutes: 15),
+      constraints: Constraints(networkType: NetworkType.notRequired),
+    );
 
-  // Register daily midnight reschedule (starts at 00:01, runs daily)
-  await Workmanager().registerPeriodicTask(
-    'midnight-reschedule',
-    'midnightReschedule',
-    frequency: const Duration(hours: 24),
-    initialDelay: _calculateDelayUntilMidnight(),
-    constraints: Constraints(networkType: NetworkType.notRequired),
-  );
+    // Register daily midnight reschedule (starts at 00:01, runs daily)
+    await Workmanager().registerPeriodicTask(
+      'midnight-reschedule',
+      'midnightReschedule',
+      frequency: const Duration(hours: 24),
+      initialDelay: _calculateDelayUntilMidnight(),
+      constraints: Constraints(networkType: NetworkType.notRequired),
+    );
 
-  // Reschedule all habit notifications on app start
-  // This ensures notifications stay current even if they expired
-  final container = ProviderContainer();
-  final habitRepository = container.read(habitRepositoryProvider);
-  await NotificationRescheduleService.rescheduleAllHabitNotifications(
-    habitRepository,
-  );
-  container.dispose();
+    // Reschedule all habit notifications on app start
+    // This ensures notifications stay current even if they expired
+    final container = ProviderContainer();
+    final habitRepository = container.read(habitRepositoryProvider);
+    await NotificationRescheduleService.rescheduleAllHabitNotifications(
+      habitRepository,
+    );
+    container.dispose();
+  }
 
   // Initialize Ads
   if (!kIsWeb) {

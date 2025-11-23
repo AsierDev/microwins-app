@@ -2,6 +2,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:rxdart/rxdart.dart';
 import '../../../../core/local/hive_setup.dart';
 import '../../../../core/sync/sync_manager.dart';
+import '../../../../core/utils/logger.dart';
 import '../domain/entities/habit.dart';
 import '../domain/habit_repository.dart';
 import 'models/habit_model.dart';
@@ -142,11 +143,19 @@ class HabitRepositoryImpl implements HabitRepository {
 
           await _habitBox.put(habit.id, habit);
         } catch (e) {
-          print('Error syncing habit ${data['id']}: $e');
+          AppLogger.error(
+            'Error syncing habit ${data['id']}',
+            tag: 'HabitRepository',
+            error: e,
+          );
         }
       }
     } catch (e) {
-      print('Error syncing from cloud: $e');
+      AppLogger.error(
+        'Error syncing from cloud',
+        tag: 'HabitRepository',
+        error: e,
+      );
     }
   }
 }

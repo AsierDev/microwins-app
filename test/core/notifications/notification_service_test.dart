@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
 import 'package:microwins/core/notifications/notification_service.dart';
 
@@ -30,8 +29,8 @@ void main() {
         expect(() async {
           await notificationService.scheduleDailyNotification(
             id: 1,
-            title: 'Test Habit',
-            body: 'Time to complete your habit!',
+            habitId: 'test-habit-id',
+            habitName: 'Test Habit',
             hour: 10,
             minute: 30,
           );

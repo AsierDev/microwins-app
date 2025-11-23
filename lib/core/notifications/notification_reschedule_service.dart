@@ -1,6 +1,6 @@
-import 'package:flutter/foundation.dart';
 import '../../features/habits/domain/habit_repository.dart';
 import 'notification_service.dart';
+import '../utils/logger.dart';
 
 class NotificationRescheduleService {
   /// Reschedules all active habit notifications
@@ -27,13 +27,16 @@ class NotificationRescheduleService {
         }
       }
 
-      if (kDebugMode) {
-        print('🔄 Rescheduled ${habits.length} habit notifications');
-      }
+      AppLogger.info(
+        'Rescheduled ${habits.length} habit notifications',
+        tag: 'NotificationReschedule',
+      );
     } catch (e) {
-      if (kDebugMode) {
-        print('❌ Failed to reschedule notifications: $e');
-      }
+      AppLogger.error(
+        'Failed to reschedule notifications',
+        tag: 'NotificationReschedule',
+        error: e,
+      );
     }
   }
 }

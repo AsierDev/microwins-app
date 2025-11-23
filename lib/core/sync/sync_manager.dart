@@ -2,7 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hive/hive.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'dart:async';
 import '../local/hive_setup.dart';
+import '../utils/logger.dart';
 
 class SyncManager {
   final Box _syncQueueBox = Hive.box(HiveSetup.syncQueueBoxName);
@@ -28,9 +30,11 @@ class SyncManager {
       'timestamp': DateTime.now().toIso8601String(),
     });
     // Don't await - process queue in background to avoid blocking
-    _processQueue().catchError((e) {
-      print('Background sync error: $e');
-    });
+    unawaited(
+      _processQueue().catchError((e) {
+        AppLogger.error('Background sync error', tag: 'SyncManager', error: e);
+      }),
+    );
   }
 
   Future<void> _processQueue() async {
@@ -38,7 +42,7 @@ class SyncManager {
       final user = _auth.currentUser;
       if (user == null) {
         // User not logged in, skip sync but don't block
-        print('Sync skipped: No user logged in');
+        AppLogger.debug('Sync skipped: No user logged in', tag: 'SyncManager');
         return;
       }
 
@@ -49,7 +53,10 @@ class SyncManager {
           connectivityResult.contains(ConnectivityResult.ethernet);
 
       if (!isOnline) {
-        print('Sync skipped: No internet connection');
+        AppLogger.debug(
+          'Sync skipped: No internet connection',
+          tag: 'SyncManager',
+        );
         return;
       }
 
@@ -61,7 +68,11 @@ class SyncManager {
           await _performRemoteOperation(user.uid, item);
           keysToDelete.add(_syncQueueBox.keyAt(i));
         } catch (e) {
-          print('Sync error for item $i: $e');
+          AppLogger.warning(
+            'Sync error for item $i',
+            tag: 'SyncManager',
+            error: e,
+          );
           // Don't stop processing, continue with next items
           // Items that fail will be retried on next sync
         }
@@ -70,11 +81,18 @@ class SyncManager {
       // Remove processed items
       if (keysToDelete.isNotEmpty) {
         await _syncQueueBox.deleteAll(keysToDelete);
-        print('Synced ${keysToDelete.length} items to Firestore');
+        AppLogger.info(
+          'Synced ${keysToDelete.length} items to Firestore',
+          tag: 'SyncManager',
+        );
       }
     } catch (e) {
       // Catch any unexpected errors to prevent blocking local operations
-      print('Sync queue processing error: $e');
+      AppLogger.error(
+        'Sync queue processing error',
+        tag: 'SyncManager',
+        error: e,
+      );
     }
   }
 
@@ -97,7 +115,7 @@ class SyncManager {
         await habitsCollection.doc(data['id'] as String).delete();
         break;
       default:
-        print('Unknown sync action: $action');
+        AppLogger.warning('Unknown sync action: $action', tag: 'SyncManager');
     }
   }
 
@@ -115,7 +133,11 @@ class SyncManager {
 
       return snapshot.docs.map((doc) => doc.data()).toList();
     } catch (e) {
-      print('Error fetching habits from Firestore: $e');
+      AppLogger.error(
+        'Error fetching habits from Firestore',
+        tag: 'SyncManager',
+        error: e,
+      );
       return [];
     }
   }

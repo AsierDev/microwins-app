@@ -1,10 +1,10 @@
-import 'package:flutter/foundation.dart';
 import 'package:workmanager/workmanager.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../firebase_options.dart';
+import '../utils/logger.dart';
 
 /// Background task that runs every 15 minutes to check for due notifications
 /// Uses Firestore (multi-process safe) instead of Hive
@@ -12,9 +12,10 @@ import '../../firebase_options.dart';
 void habitCheckWorker() {
   Workmanager().executeTask((task, inputData) async {
     try {
-      if (kDebugMode) {
-        print('🔔 WorkManager: Checking for due notifications...');
-      }
+      AppLogger.debug(
+        'WorkManager: Checking for due notifications...',
+        tag: 'HabitCheckWorker',
+      );
 
       // Initialize Firebase in WorkManager process
       await Firebase.initializeApp(
@@ -26,9 +27,10 @@ void habitCheckWorker() {
       final userId = prefs.getString('current_user_id');
 
       if (userId == null) {
-        if (kDebugMode) {
-          print('⚠️ No user logged in, skipping notification check');
-        }
+        AppLogger.warning(
+          'No user logged in, skipping notification check',
+          tag: 'HabitCheckWorker',
+        );
         return Future.value(true);
       }
 
@@ -40,9 +42,10 @@ void habitCheckWorker() {
           .where('isArchived', isEqualTo: false)
           .get();
 
-      if (kDebugMode) {
-        print('📦 Found ${snapshot.docs.length} habits in Firestore');
-      }
+      AppLogger.debug(
+        'Found ${snapshot.docs.length} habits in Firestore',
+        tag: 'HabitCheckWorker',
+      );
 
       final now = DateTime.now();
       final currentTime = TimeOfDay(hour: now.hour, minute: now.minute);
@@ -114,21 +117,21 @@ void habitCheckWorker() {
 
           notificationsShown++;
 
-          if (kDebugMode) {
-            print('✅ Showed notification for: $habitName');
-          }
+          AppLogger.info(
+            'Showed notification for: $habitName',
+            tag: 'HabitCheckWorker',
+          );
         }
       }
 
-      if (kDebugMode) {
-        print('✅ Showed $notificationsShown notifications');
-      }
+      AppLogger.info(
+        'Showed $notificationsShown notifications',
+        tag: 'HabitCheckWorker',
+      );
 
       return Future.value(true);
     } catch (e) {
-      if (kDebugMode) {
-        print('❌ WorkManager error: $e');
-      }
+      AppLogger.error('WorkManager error', tag: 'HabitCheckWorker', error: e);
       return Future.value(false);
     }
   });

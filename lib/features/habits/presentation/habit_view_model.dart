@@ -2,7 +2,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
 import '../domain/entities/habit.dart';
 import '../../../core/notifications/notification_service.dart';
-import '../../../core/notifications/habit_reminder_storage.dart';
 import '../data/habit_provider.dart';
 
 part 'habit_view_model.g.dart';
