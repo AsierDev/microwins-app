@@ -1,0 +1,103 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+import 'firebase_options.dart';
+import 'core/router/app_router.dart';
+import 'core/theme/theme_provider.dart';
+import 'core/local/hive_setup.dart';
+import 'core/notifications/notification_service.dart';
+import 'core/notifications/notification_reschedule_service.dart';
+import 'core/notifications/habit_reminder_storage.dart';
+import 'core/notifications/habit_check_worker.dart';
+import 'features/habits/data/habit_provider.dart';
+import 'package:workmanager/workmanager.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await dotenv.load(fileName: '.env');
+
+  // Initialize Hive
+  await HiveSetup.init();
+
+  // Initialize Notifications
+  await NotificationService().init();
+
+  // Initialize Habit Reminder Storage
+  await HabitReminderStorage.init();
+
+  // Initialize WorkManager for periodic notification checks
+  await Workmanager().initialize(habitCheckWorker, isInDebugMode: kDebugMode);
+
+  // Register periodic task (runs every 15 minutes)
+  await Workmanager().registerPeriodicTask(
+    'habit-notification-check',
+    'habitCheck',
+    frequency: const Duration(minutes: 15),
+    constraints: Constraints(networkType: NetworkType.notRequired),
+  );
+
+  // Register daily midnight reschedule (starts at 00:01, runs daily)
+  await Workmanager().registerPeriodicTask(
+    'midnight-reschedule',
+    'midnightReschedule',
+    frequency: const Duration(hours: 24),
+    initialDelay: _calculateDelayUntilMidnight(),
+    constraints: Constraints(networkType: NetworkType.notRequired),
+  );
+
+  // Reschedule all habit notifications on app start
+  // This ensures notifications stay current even if they expired
+  final container = ProviderContainer();
+  final habitRepository = container.read(habitRepositoryProvider);
+  await NotificationRescheduleService.rescheduleAllHabitNotifications(
+    habitRepository,
+  );
+  container.dispose();
+
+  // Initialize Ads
+  if (!kIsWeb) {
+    await MobileAds.instance.initialize();
+  }
+
+  runApp(const ProviderScope(child: MyApp()));
+}
+
+/// Calculate delay until next midnight (00:01)
+Duration _calculateDelayUntilMidnight() {
+  final now = DateTime.now();
+  final tomorrow = DateTime(now.year, now.month, now.day + 1, 0, 1);
+  return tomorrow.difference(now);
+}
+
+class MyApp extends ConsumerWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final router = ref.watch(goRouterProvider);
+    final themeMode = ref.watch(themeModeNotifierProvider);
+
+    return MaterialApp.router(
+      title: 'MicroWins',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF4CAF50)),
+        useMaterial3: true,
+      ),
+      darkTheme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF4CAF50),
+          brightness: Brightness.dark,
+        ),
+        useMaterial3: true,
+      ),
+      themeMode: themeMode,
+      routerConfig: router,
+    );
+  }
+}
