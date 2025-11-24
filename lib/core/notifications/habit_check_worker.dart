@@ -3,11 +3,14 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import '../../firebase_options.dart';
 import '../utils/logger.dart';
+import '../../features/habits/data/models/habit_model.dart';
+import '../local/hive_setup.dart';
 
 /// Background task that runs every 15 minutes to check for due notifications
-/// Uses Firestore (multi-process safe) instead of Hive
+/// Uses Firestore as source of truth, updates both Firestore and Hive
 @pragma('vm:entry-point')
 void habitCheckWorker() {
   Workmanager().executeTask((task, inputData) async {
@@ -22,6 +25,13 @@ void habitCheckWorker() {
         options: DefaultFirebaseOptions.currentPlatform,
       );
 
+      // Initialize Hive for local updates
+      await Hive.initFlutter();
+      if (!Hive.isAdapterRegistered(0)) {
+        Hive.registerAdapter(HabitModelAdapter());
+      }
+      final habitBox = await Hive.openBox<HabitModel>(HiveSetup.habitsBoxName);
+
       // Get current user ID from SharedPreferences (multi-process safe)
       final prefs = await SharedPreferences.getInstance();
       final userId = prefs.getString('current_user_id');
@@ -34,7 +44,7 @@ void habitCheckWorker() {
         return Future.value(true);
       }
 
-      // Read habits from Firestore (multi-process safe)
+      // Read habits from Firestore (source of truth)
       final snapshot = await FirebaseFirestore.instance
           .collection('users')
           .doc(userId)
@@ -54,78 +64,117 @@ void habitCheckWorker() {
       int notificationsShown = 0;
 
       for (final doc in snapshot.docs) {
-        final data = doc.data();
-        final reminderTime = data['reminderTime'] as String? ?? '';
+        try {
+          final data = doc.data();
+          final reminderTime = data['reminderTime'] as String? ?? '';
 
-        if (reminderTime.isEmpty) continue;
+          if (reminderTime.isEmpty) continue;
 
-        // Parse reminder time
-        final timeParts = reminderTime.split(':');
-        if (timeParts.length != 2) continue;
+          // Parse reminder time
+          final timeParts = reminderTime.split(':');
+          if (timeParts.length != 2) {
+            AppLogger.warning(
+              'Invalid reminderTime format for habit ${doc.id}: $reminderTime',
+              tag: 'HabitCheckWorker',
+            );
+            continue;
+          }
 
-        final reminderHour = int.tryParse(timeParts[0]);
-        final reminderMinute = int.tryParse(timeParts[1]);
+          final reminderHour = int.tryParse(timeParts[0]);
+          final reminderMinute = int.tryParse(timeParts[1]);
 
-        if (reminderHour == null || reminderMinute == null) continue;
+          if (reminderHour == null || reminderMinute == null) {
+            AppLogger.warning(
+              'Could not parse reminderTime for habit ${doc.id}: $reminderTime',
+              tag: 'HabitCheckWorker',
+            );
+            continue;
+          }
 
-        final reminderTimeOfDay = TimeOfDay(
-          hour: reminderHour,
-          minute: reminderMinute,
-        );
-
-        // Calculate time difference in minutes
-        final currentMinutes = currentTime.hour * 60 + currentTime.minute;
-        final reminderMinutes =
-            reminderTimeOfDay.hour * 60 + reminderTimeOfDay.minute;
-        final diff = currentMinutes - reminderMinutes;
-
-        // Check if we should fire this notification (within 15-minute window)
-        final shouldNotify = diff >= 0 && diff <= 15;
-
-        // Check if already notified today (stored in Firestore)
-        final lastNotifiedStr = data['lastNotifiedDate'] as String?;
-        bool alreadyNotifiedToday = false;
-
-        if (lastNotifiedStr != null) {
-          final lastNotified = DateTime.parse(lastNotifiedStr);
-          final lastNotifiedDay = DateTime(
-            lastNotified.year,
-            lastNotified.month,
-            lastNotified.day,
-          );
-          alreadyNotifiedToday = lastNotifiedDay.isAtSameMomentAs(today);
-        }
-
-        if (shouldNotify && !alreadyNotifiedToday) {
-          // Show notification
-          final habitName = data['name'] as String? ?? 'Habit';
-          final durationMinutes = data['durationMinutes'] as int? ?? 15;
-
-          await _showNotification(
-            habitId: doc.id,
-            habitName: habitName,
-            durationMinutes: durationMinutes,
+          final reminderTimeOfDay = TimeOfDay(
+            hour: reminderHour,
+            minute: reminderMinute,
           );
 
-          // Update last notified timestamp in Firestore
-          await FirebaseFirestore.instance
-              .collection('users')
-              .doc(userId)
-              .collection('habits')
-              .doc(doc.id)
-              .update({'lastNotifiedDate': now.toIso8601String()});
+          // Calculate time difference in minutes
+          final currentMinutes = currentTime.hour * 60 + currentTime.minute;
+          final reminderMinutes =
+              reminderTimeOfDay.hour * 60 + reminderTimeOfDay.minute;
+          final diff = currentMinutes - reminderMinutes;
 
-          notificationsShown++;
+          // Check if we should fire this notification (within 15-minute window)
+          final shouldNotify = diff >= 0 && diff <= 15;
 
-          AppLogger.info(
-            'Showed notification for: $habitName',
+          // Check if already notified today (from Firestore)
+          final lastNotifiedStr = data['lastNotifiedDate'] as String?;
+          bool alreadyNotifiedToday = false;
+
+          if (lastNotifiedStr != null) {
+            try {
+              final lastNotified = DateTime.parse(lastNotifiedStr);
+              final lastNotifiedDay = DateTime(
+                lastNotified.year,
+                lastNotified.month,
+                lastNotified.day,
+              );
+              alreadyNotifiedToday = lastNotifiedDay.isAtSameMomentAs(today);
+            } catch (e) {
+              AppLogger.warning(
+                'Could not parse lastNotifiedDate for habit ${doc.id}: $lastNotifiedStr',
+                tag: 'HabitCheckWorker',
+              );
+            }
+          }
+
+          if (shouldNotify && !alreadyNotifiedToday) {
+            // Show notification
+            final habitName = data['name'] as String? ?? 'Habit';
+            final durationMinutes = data['durationMinutes'] as int? ?? 15;
+
+            await _showNotification(
+              habitId: doc.id,
+              habitName: habitName,
+              durationMinutes: durationMinutes,
+            );
+
+            // Update lastNotifiedDate in Firestore
+            await FirebaseFirestore.instance
+                .collection('users')
+                .doc(userId)
+                .collection('habits')
+                .doc(doc.id)
+                .update({'lastNotifiedDate': now.toIso8601String()});
+
+            // Update local Hive cache as well
+            final localHabit = habitBox.get(doc.id);
+            if (localHabit != null) {
+              localHabit.lastNotifiedDate = now;
+              await localHabit.save();
+            }
+
+            notificationsShown++;
+
+            AppLogger.info(
+              'Showed notification for: $habitName (${reminderHour.toString().padLeft(2, '0')}:${reminderMinute.toString().padLeft(2, '0')})',
+              tag: 'HabitCheckWorker',
+            );
+          } else if (shouldNotify && alreadyNotifiedToday) {
+            AppLogger.debug(
+              'Skipping notification for ${data['name']} - already notified today',
+              tag: 'HabitCheckWorker',
+            );
+          }
+        } catch (e) {
+          AppLogger.error(
+            'Error processing habit ${doc.id}',
             tag: 'HabitCheckWorker',
+            error: e,
           );
         }
       }
 
       AppLogger.info(
-        'Showed $notificationsShown notifications',
+        'Notification check complete: showed $notificationsShown notifications',
         tag: 'HabitCheckWorker',
       );
 

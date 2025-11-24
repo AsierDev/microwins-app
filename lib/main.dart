@@ -10,10 +10,7 @@ import 'core/router/app_router.dart';
 import 'core/theme/theme_provider.dart';
 import 'core/local/hive_setup.dart';
 import 'core/notifications/notification_service.dart';
-import 'core/notifications/notification_reschedule_service.dart';
-import 'core/notifications/habit_reminder_storage.dart';
 import 'core/notifications/habit_check_worker.dart';
-import 'features/habits/data/habit_provider.dart';
 import 'package:workmanager/workmanager.dart';
 
 void main() async {
@@ -27,9 +24,6 @@ void main() async {
   // Initialize Notifications (mobile only)
   if (!kIsWeb) {
     await NotificationService().init();
-
-    // Initialize Habit Reminder Storage
-    await HabitReminderStorage.init();
 
     // Initialize WorkManager for periodic notification checks
     await Workmanager().initialize(habitCheckWorker);
@@ -50,15 +44,6 @@ void main() async {
       initialDelay: _calculateDelayUntilMidnight(),
       constraints: Constraints(networkType: NetworkType.notRequired),
     );
-
-    // Reschedule all habit notifications on app start
-    // This ensures notifications stay current even if they expired
-    final container = ProviderContainer();
-    final habitRepository = container.read(habitRepositoryProvider);
-    await NotificationRescheduleService.rescheduleAllHabitNotifications(
-      habitRepository,
-    );
-    container.dispose();
   }
 
   // Initialize Ads

@@ -18,6 +18,7 @@ class HabitMapper {
       createdAt: model.createdAt,
       updatedAt: model.updatedAt,
       lastCompletedDate: model.lastCompletedDate,
+      lastNotifiedDate: model.lastNotifiedDate,
       isSynced: model.isSynced,
     );
   }
@@ -38,6 +39,7 @@ class HabitMapper {
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
       lastCompletedDate: entity.lastCompletedDate,
+      lastNotifiedDate: entity.lastNotifiedDate,
       isSynced: entity.isSynced,
     );
   }

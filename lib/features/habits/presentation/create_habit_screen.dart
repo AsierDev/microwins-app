@@ -94,18 +94,8 @@ class _CreateHabitScreenState extends ConsumerState<CreateHabitScreen> {
           );
           await ref.read(habitRepositoryProvider).updateHabit(updatedHabit);
 
-          // Reschedule notification with new time
-          if (reminderTimeString.isNotEmpty) {
-            await NotificationService().scheduleHabitReminder(
-              habitId: updatedHabit.id,
-              habitName: updatedHabit.name,
-              hour: _reminderTime.hour,
-              minute: _reminderTime.minute,
-              durationMinutes: _durationMinutes,
-            );
-          } else {
-            await NotificationService().deleteReminder(updatedHabit.id);
-          }
+          // WorkManager will automatically pick up the updated habit
+          // and schedule notifications based on the new reminderTime
         } else {
           // Create mode
           await ref

@@ -1,7 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
 import '../domain/entities/habit.dart';
-import '../../../core/notifications/notification_service.dart';
 import '../data/habit_provider.dart';
 
 part 'habit_view_model.g.dart';
@@ -44,24 +43,12 @@ class HabitViewModel extends _$HabitViewModel {
 
     await ref.read(habitRepositoryProvider).createHabit(habit);
 
-    // Schedule notification using WorkManager
-    if (reminderTime.isNotEmpty) {
-      final timeParts = reminderTime.split(':');
-      await NotificationService().scheduleHabitReminder(
-        habitId: habit.id,
-        habitName: name,
-        hour: int.parse(timeParts[0]),
-        minute: int.parse(timeParts[1]),
-        durationMinutes: durationMinutes,
-      );
-    }
+    // WorkManager will automatically pick up this habit and schedule notifications
+    // based on the reminderTime field in Firestore
   }
 
   Future<void> deleteHabit(String id) async {
-    // Remove reminder from storage
-    await NotificationService().deleteReminder(id);
-
-    // Delete from repository
+    // Delete from repository - WorkManager will stop checking this habit
     await ref.read(habitRepositoryProvider).deleteHabit(id);
   }
 
@@ -114,20 +101,8 @@ class HabitViewModel extends _$HabitViewModel {
 
     await ref.read(habitRepositoryProvider).updateHabit(updatedHabit);
 
-    // Reschedule notification if reminder time changed
-    if (updatedHabit.reminderTime.isNotEmpty) {
-      final timeParts = updatedHabit.reminderTime.split(':');
-      await NotificationService().scheduleHabitReminder(
-        habitId: updatedHabit.id,
-        habitName: updatedHabit.name,
-        hour: int.parse(timeParts[0]),
-        minute: int.parse(timeParts[1]),
-        durationMinutes: updatedHabit.durationMinutes,
-      );
-    } else {
-      // Remove reminder if turned off
-      await NotificationService().deleteReminder(habit.id);
-    }
+    // WorkManager will automatically pick up the updated reminderTime
+    // on the next 15-minute check cycle
   }
 
   Future<void> reorderHabits(int oldIndex, int newIndex) async {

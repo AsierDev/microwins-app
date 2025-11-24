@@ -49,6 +49,9 @@ class HabitModel extends HiveObject {
   @HiveField(14)
   DateTime? lastCompletedDate;
 
+  @HiveField(15)
+  DateTime? lastNotifiedDate;
+
   HabitModel({
     required this.id,
     required this.name,
@@ -65,5 +68,6 @@ class HabitModel extends HiveObject {
     required this.updatedAt,
     this.isSynced = false,
     this.lastCompletedDate,
+    this.lastNotifiedDate,
   });
 }

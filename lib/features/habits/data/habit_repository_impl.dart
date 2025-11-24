@@ -36,6 +36,7 @@ class HabitRepositoryImpl implements HabitRepository {
       'createdAt': model.createdAt.toIso8601String(),
       'updatedAt': model.updatedAt.toIso8601String(),
       'lastCompletedDate': model.lastCompletedDate?.toIso8601String(),
+      'lastNotifiedDate': model.lastNotifiedDate?.toIso8601String(),
     });
   }
 
@@ -60,6 +61,7 @@ class HabitRepositoryImpl implements HabitRepository {
       'createdAt': model.createdAt.toIso8601String(),
       'updatedAt': model.updatedAt.toIso8601String(),
       'lastCompletedDate': model.lastCompletedDate?.toIso8601String(),
+      'lastNotifiedDate': model.lastNotifiedDate?.toIso8601String(),
     });
   }
 
@@ -138,6 +140,9 @@ class HabitRepositoryImpl implements HabitRepository {
             updatedAt: DateTime.parse(data['updatedAt']),
             lastCompletedDate: data['lastCompletedDate'] != null
                 ? DateTime.parse(data['lastCompletedDate'])
+                : null,
+            lastNotifiedDate: data['lastNotifiedDate'] != null
+                ? DateTime.parse(data['lastNotifiedDate'])
                 : null,
           );
 

@@ -19,6 +19,7 @@ class Habit with _$Habit {
     required DateTime createdAt,
     required DateTime updatedAt,
     DateTime? lastCompletedDate,
+    DateTime? lastNotifiedDate,
     @Default(false) bool isSynced,
   }) = _Habit;
 }

@@ -1,7 +1,6 @@
 import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../features/habits/data/models/habit_model.dart';
-import '../notifications/habit_reminder_model.dart';
 
 class HiveSetup {
   static const String habitsBoxName = 'habits';
@@ -13,7 +12,6 @@ class HiveSetup {
 
     // Register Adapters
     Hive.registerAdapter(HabitModelAdapter());
-    Hive.registerAdapter(HabitReminderModelAdapter());
 
     // Open Boxes
     await Hive.openBox<HabitModel>(habitsBoxName);

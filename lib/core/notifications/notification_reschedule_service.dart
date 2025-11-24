@@ -1,34 +1,30 @@
 import '../../features/habits/domain/habit_repository.dart';
-import 'notification_service.dart';
 import '../utils/logger.dart';
 
+/// Service for rescheduling notifications on app startup
+/// Resets lastNotifiedDate to allow notifications to fire again
 class NotificationRescheduleService {
-  /// Reschedules all active habit notifications
-  /// Should be called on app startup and after completing habits
+  /// Reschedules all active habit notifications by resetting lastNotifiedDate
+  /// Should be called on app startup
   static Future<void> rescheduleAllHabitNotifications(
     HabitRepository habitRepository,
   ) async {
     try {
       final habits = await habitRepository.getHabits();
+      int resetCount = 0;
 
       for (final habit in habits) {
-        if (habit.reminderTime.isNotEmpty && habit.reminderDays.isNotEmpty) {
-          final timeParts = habit.reminderTime.split(':');
-          final hour = int.parse(timeParts[0]);
-          final minute = int.parse(timeParts[1]);
-
-          await NotificationService().scheduleDailyNotification(
-            id: habit.id.hashCode,
-            habitId: habit.id,
-            habitName: habit.name,
-            hour: hour,
-            minute: minute,
+        if (habit.reminderTime.isNotEmpty && !habit.isArchived) {
+          // Reset lastNotifiedDate to allow notifications to fire again
+          await habitRepository.updateHabit(
+            habit.copyWith(lastNotifiedDate: null),
           );
+          resetCount++;
         }
       }
 
       AppLogger.info(
-        'Rescheduled ${habits.length} habit notifications',
+        'Reset notification state for $resetCount habits',
         tag: 'NotificationReschedule',
       );
     } catch (e) {
