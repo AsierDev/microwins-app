@@ -34,7 +34,7 @@ class _CreateHabitScreenState extends ConsumerState<CreateHabitScreen> {
     'Learning',
     'Fitness',
   ];
-  final List<int> _durations = [2, 3, 4, 5, 10, 15, 20, 30];
+  final List<int> _durations = [2, 3, 5, 8, 10, 15];
   final List<String> _icons = [
     '✅',
     '💧',
@@ -236,16 +236,28 @@ class _CreateHabitScreenState extends ConsumerState<CreateHabitScreen> {
             ),
             const SizedBox(height: 16),
 
-            DropdownButtonFormField<int>(
-              initialValue: _durationMinutes,
-              decoration: const InputDecoration(
-                labelText: 'Duration (minutes)',
-                border: OutlineInputBorder(),
+            Text('Duration', style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(height: 8),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: _durations.map((duration) {
+                  final isSelected = _durationMinutes == duration;
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: ChoiceChip(
+                      label: Text('$duration min'),
+                      selected: isSelected,
+                      onSelected: (_) {
+                        setState(() {
+                          _durationMinutes = duration;
+                        });
+                      },
+                      showCheckmark: false,
+                    ),
+                  );
+                }).toList(),
               ),
-              items: _durations
-                  .map((d) => DropdownMenuItem(value: d, child: Text('$d min')))
-                  .toList(),
-              onChanged: (val) => setState(() => _durationMinutes = val!),
             ),
             const SizedBox(height: 24),
 
@@ -254,21 +266,35 @@ class _CreateHabitScreenState extends ConsumerState<CreateHabitScreen> {
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 8),
-            SegmentedButton<NotificationPeriod>(
-              segments: NotificationPeriod.values.map((period) {
-                return ButtonSegment<NotificationPeriod>(
-                  value: period,
-                  label: Text(period.label),
-                  icon: Text(period.icon, style: const TextStyle(fontSize: 20)),
+            // 2x2 Grid layout for better fit on all screen sizes
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: NotificationPeriod.values.map((period) {
+                final isSelected = _selectedPeriod == period;
+                return SizedBox(
+                  width:
+                      (MediaQuery.of(context).size.width - 64) /
+                      2, // Half width minus padding
+                  child: FilterChip(
+                    selected: isSelected,
+                    label: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(period.icon, style: const TextStyle(fontSize: 20)),
+                        const SizedBox(width: 8),
+                        Text(period.label),
+                      ],
+                    ),
+                    onSelected: (_) {
+                      setState(() {
+                        _selectedPeriod = period;
+                      });
+                    },
+                    showCheckmark: false,
+                  ),
                 );
               }).toList(),
-              selected: {_selectedPeriod},
-              onSelectionChanged: (Set<NotificationPeriod> newSelection) {
-                setState(() {
-                  _selectedPeriod = newSelection.first;
-                });
-              },
-              showSelectedIcon: false,
             ),
             const SizedBox(height: 24),
 

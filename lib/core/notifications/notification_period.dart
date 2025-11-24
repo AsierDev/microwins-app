@@ -1,28 +1,43 @@
 /// Notification periods for habit reminders
 /// Replaces exact time selection with user-friendly time periods
 enum NotificationPeriod {
-  morning('morning', 'Morning', '🌅', 9, 0),
-  midday('midday', 'Midday', '☀️', 13, 0),
-  evening('evening', 'Evening', '🌇', 18, 0),
-  night('night', 'Night', '🌙', 21, 0);
+  morning('morning', 'Morning', '🌅', 7, 0, 11, 59),
+  midday('midday', 'Midday', '☀️', 12, 0, 16, 59),
+  evening('evening', 'Evening', '🌇', 17, 0, 20, 59),
+  night('night', 'Night', '🌙', 21, 0, 23, 59);
 
   const NotificationPeriod(
     this.value,
     this.label,
     this.icon,
-    this.targetHour,
-    this.targetMinute,
+    this.startHour,
+    this.startMinute,
+    this.endHour,
+    this.endMinute,
   );
 
   final String value;
   final String label;
   final String icon;
-  final int targetHour;
-  final int targetMinute;
+  final int startHour;
+  final int startMinute;
+  final int endHour;
+  final int endMinute;
 
-  /// Convert period to time string (HH:mm format)
+  /// Get the target time to show notifications (start of period)
   String toTimeString() {
-    return '${targetHour.toString().padLeft(2, '0')}:${targetMinute.toString().padLeft(2, '0')}';
+    return '${startHour.toString().padLeft(2, '0')}:${startMinute.toString().padLeft(2, '0')}';
+  }
+
+  /// Check if current time is within this period
+  bool isWithinPeriod(DateTime dateTime) {
+    final hour = dateTime.hour;
+    final minute = dateTime.minute;
+    final currentMinutes = hour * 60 + minute;
+    final startMinutes = startHour * 60 + startMinute;
+    final endMinutes = endHour * 60 + endMinute;
+
+    return currentMinutes >= startMinutes && currentMinutes <= endMinutes;
   }
 
   /// Parse a time string or period value to NotificationPeriod
@@ -50,15 +65,15 @@ enum NotificationPeriod {
 
       final hour = int.parse(parts[0]);
 
-      // Map to closest period based on hour
-      if (hour < 11) {
-        return NotificationPeriod.morning; // Before 11:00 → Morning
-      } else if (hour < 16) {
-        return NotificationPeriod.midday; // 11:00-15:59 → Midday
-      } else if (hour < 20) {
-        return NotificationPeriod.evening; // 16:00-19:59 → Evening
+      // Map to period based on hour (matches period ranges)
+      if (hour < 12) {
+        return NotificationPeriod.morning; // 7:00-11:59
+      } else if (hour < 17) {
+        return NotificationPeriod.midday; // 12:00-16:59
+      } else if (hour < 21) {
+        return NotificationPeriod.evening; // 17:00-20:59
       } else {
-        return NotificationPeriod.night; // 20:00+ → Night
+        return NotificationPeriod.night; // 21:00-23:59
       }
     } catch (_) {
       return NotificationPeriod.morning; // Default fallback

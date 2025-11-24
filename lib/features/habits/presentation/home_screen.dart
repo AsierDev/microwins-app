@@ -52,7 +52,7 @@ class HomeScreen extends ConsumerWidget {
             ..sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
 
           return ReorderableListView.builder(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
             buildDefaultDragHandles: false,
             itemCount: sortedHabits.length,
             onReorder: (oldIndex, newIndex) {

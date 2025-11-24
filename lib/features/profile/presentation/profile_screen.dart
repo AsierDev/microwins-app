@@ -146,42 +146,6 @@ class ProfileScreen extends ConsumerWidget {
                 ),
                 const Divider(height: 1),
                 ListTile(
-                  leading: const Icon(Icons.access_time, color: Colors.blue),
-                  title: const Text('Notification System'),
-                  subtitle: const Text(
-                    'Using WorkManager for 100% reliable notifications.\n'
-                    'May arrive within 15 minutes of scheduled time.',
-                    style: TextStyle(fontSize: 12),
-                  ),
-                  trailing: TextButton(
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: const Text('How Notifications Work'),
-                          content: const Text(
-                            'MicroWins uses WorkManager to check for pending '
-                            'notifications every 15 minutes. This ensures notifications '
-                            'ALWAYS arrive, but may be delayed up to 15 minutes.\n\n'
-                            'This is the same approach used by apps like Todoist, '
-                            'Microsoft To-Do, and Google Keep.\n\n'
-                            'Why? Android 12+ blocks exact alarms for battery '
-                            'optimization, making them unreliable.',
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: const Text('Got it'),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                    child: const Text('Learn more'),
-                  ),
-                ),
-                const Divider(height: 1),
-                ListTile(
                   leading: const Icon(Icons.battery_alert),
                   title: const Text('Optimize Notifications'),
                   subtitle: const Text(

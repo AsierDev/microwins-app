@@ -13,6 +13,14 @@ class DiscoverScreen extends ConsumerStatefulWidget {
 class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
   final _goalController = TextEditingController();
 
+  // Quick start suggestions
+  final List<String> _quickStarts = [
+    'Sleep Better',
+    'Reduce Stress',
+    'Learn a Skill',
+    'Stay Hydrated',
+  ];
+
   @override
   void dispose() {
     _goalController.dispose();
@@ -53,7 +61,23 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
               ),
               onSubmitted: (_) => _generate(),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 12),
+            // Quick Start chips
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: _quickStarts.map((suggestion) {
+                return ActionChip(
+                  label: Text(suggestion),
+                  onPressed: () {
+                    _goalController.text = suggestion;
+                    _generate();
+                  },
+                  avatar: const Icon(Icons.lightbulb_outline, size: 18),
+                );
+              }).toList(),
+            ),
+            const SizedBox(height: 16),
             Expanded(
               child: aiState.when(
                 data: (habits) {

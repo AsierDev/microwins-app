@@ -106,7 +106,7 @@ class _HabitCardState extends State<HabitCard>
                       ReorderableDragStartListener(
                         index: widget.index ?? 0,
                         child: const Icon(
-                          Icons.drag_handle,
+                          Icons.drag_indicator,
                           color: Colors.grey,
                         ),
                       ),

@@ -59,7 +59,6 @@ void habitCheckWorker() {
       );
 
       final now = DateTime.now();
-      final currentTime = TimeOfDay(hour: now.hour, minute: now.minute);
       final today = DateTime(now.year, now.month, now.day);
 
       int notificationsShown = 0;
@@ -71,49 +70,26 @@ void habitCheckWorker() {
 
           if (reminderTime.isEmpty) continue;
 
-          // Convert period to time string if needed (e.g., 'morning' -> '09:00')
-          String timeString = reminderTime;
+          // Parse period from reminderTime
+          NotificationPeriod? period;
           try {
-            final period = NotificationPeriod.fromString(reminderTime);
-            timeString = period.toTimeString();
-          } catch (_) {
-            // Already a time string, use as-is
-          }
-
-          // Parse reminder time
-          final timeParts = timeString.split(':');
-          if (timeParts.length != 2) {
-            AppLogger.warning(
-              'Invalid reminderTime format for habit ${doc.id}: $reminderTime',
-              tag: 'HabitCheckWorker',
-            );
-            continue;
-          }
-
-          final reminderHour = int.tryParse(timeParts[0]);
-          final reminderMinute = int.tryParse(timeParts[1]);
-
-          if (reminderHour == null || reminderMinute == null) {
+            period = NotificationPeriod.fromString(reminderTime);
+          } catch (e) {
             AppLogger.warning(
               'Could not parse reminderTime for habit ${doc.id}: $reminderTime',
               tag: 'HabitCheckWorker',
+              error: e,
             );
             continue;
           }
 
-          final reminderTimeOfDay = TimeOfDay(
-            hour: reminderHour,
-            minute: reminderMinute,
-          );
+          // Check if current time is within this period
+          final isWithinPeriod = period.isWithinPeriod(now);
 
-          // Calculate time difference in minutes
-          final currentMinutes = currentTime.hour * 60 + currentTime.minute;
-          final reminderMinutes =
-              reminderTimeOfDay.hour * 60 + reminderTimeOfDay.minute;
-          final diff = currentMinutes - reminderMinutes;
-
-          // Check if we should fire this notification (within 15-minute window)
-          final shouldNotify = diff >= 0 && diff <= 15;
+          if (!isWithinPeriod) {
+            // Not within the notification period yet
+            continue;
+          }
 
           // Check if already notified today (from Firestore)
           final lastNotifiedStr = data['lastNotifiedDate'] as String?;
@@ -136,7 +112,7 @@ void habitCheckWorker() {
             }
           }
 
-          if (shouldNotify && !alreadyNotifiedToday) {
+          if (isWithinPeriod && !alreadyNotifiedToday) {
             // Show notification
             final habitName = data['name'] as String? ?? 'Habit';
             final durationMinutes = data['durationMinutes'] as int? ?? 15;
@@ -165,10 +141,10 @@ void habitCheckWorker() {
             notificationsShown++;
 
             AppLogger.info(
-              'Showed notification for: $habitName (${reminderHour.toString().padLeft(2, '0')}:${reminderMinute.toString().padLeft(2, '0')})',
+              'Showed notification for: $habitName (${period.label})',
               tag: 'HabitCheckWorker',
             );
-          } else if (shouldNotify && alreadyNotifiedToday) {
+          } else if (isWithinPeriod && alreadyNotifiedToday) {
             AppLogger.debug(
               'Skipping notification for ${data['name']} - already notified today',
               tag: 'HabitCheckWorker',
