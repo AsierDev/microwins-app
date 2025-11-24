@@ -3,11 +3,10 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'dart:io' show Platform;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
-import 'package:permission_handler/permission_handler.dart';
 import '../utils/logger.dart';
 
 /// Notification service for managing local notifications
-/// WorkManager handles all scheduled notifications via Firestore
+/// WorkManager handles all scheduled notifications via Firestore using time periods
 /// This service only handles initialization and test notifications
 class NotificationService {
   static final NotificationService _instance = NotificationService._internal();
@@ -16,40 +15,6 @@ class NotificationService {
 
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
-
-  /// Check if exact alarm permission is granted (Android 12+)
-  Future<bool> hasExactAlarmPermission() async {
-    if (kIsWeb || !Platform.isAndroid) return true;
-
-    try {
-      final status = await Permission.scheduleExactAlarm.status;
-      return status.isGranted;
-    } catch (e) {
-      AppLogger.error(
-        'Error checking exact alarm permission',
-        tag: 'NotificationService',
-        error: e,
-      );
-      return false;
-    }
-  }
-
-  /// Request exact alarm permission (Android 12+)
-  Future<bool> requestExactAlarmPermission() async {
-    if (kIsWeb || !Platform.isAndroid) return true;
-
-    try {
-      final status = await Permission.scheduleExactAlarm.request();
-      return status.isGranted;
-    } catch (e) {
-      AppLogger.error(
-        'Error requesting exact alarm permission',
-        tag: 'NotificationService',
-        error: e,
-      );
-      return false;
-    }
-  }
 
   /// Initialize the notification service
   Future<void> init() async {

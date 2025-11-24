@@ -8,6 +8,7 @@ import '../../firebase_options.dart';
 import '../utils/logger.dart';
 import '../../features/habits/data/models/habit_model.dart';
 import '../local/hive_setup.dart';
+import 'notification_period.dart';
 
 /// Background task that runs every 15 minutes to check for due notifications
 /// Uses Firestore as source of truth, updates both Firestore and Hive
@@ -70,8 +71,17 @@ void habitCheckWorker() {
 
           if (reminderTime.isEmpty) continue;
 
+          // Convert period to time string if needed (e.g., 'morning' -> '09:00')
+          String timeString = reminderTime;
+          try {
+            final period = NotificationPeriod.fromString(reminderTime);
+            timeString = period.toTimeString();
+          } catch (_) {
+            // Already a time string, use as-is
+          }
+
           // Parse reminder time
-          final timeParts = reminderTime.split(':');
+          final timeParts = timeString.split(':');
           if (timeParts.length != 2) {
             AppLogger.warning(
               'Invalid reminderTime format for habit ${doc.id}: $reminderTime',

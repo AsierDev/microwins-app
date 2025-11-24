@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import '../../../core/notifications/notification_service.dart';
+import '../../../core/notifications/notification_period.dart';
 
 import '../domain/entities/habit.dart';
 import '../data/habit_provider.dart';
@@ -23,7 +24,7 @@ class _CreateHabitScreenState extends ConsumerState<CreateHabitScreen> {
   String _selectedIcon = '✅';
   String _selectedCategory = 'Health';
   int _durationMinutes = 2;
-  TimeOfDay _reminderTime = const TimeOfDay(hour: 8, minute: 0);
+  NotificationPeriod _selectedPeriod = NotificationPeriod.morning;
   final List<int> _reminderDays = [1, 2, 3, 4, 5]; // Mon-Fri default
 
   final List<String> _categories = [
@@ -58,11 +59,8 @@ class _CreateHabitScreenState extends ConsumerState<CreateHabitScreen> {
       _selectedIcon = habit.icon;
       _selectedCategory = habit.category;
       _durationMinutes = habit.durationMinutes;
-      final timeParts = habit.reminderTime.split(':');
-      _reminderTime = TimeOfDay(
-        hour: int.parse(timeParts[0]),
-        minute: int.parse(timeParts[1]),
-      );
+      // Parse existing reminderTime to period (handles both periods and old time strings)
+      _selectedPeriod = NotificationPeriod.fromString(habit.reminderTime);
     }
   }
 
@@ -78,8 +76,8 @@ class _CreateHabitScreenState extends ConsumerState<CreateHabitScreen> {
 
       try {
         final name = _nameController.text.trim();
-        final reminderTimeString =
-            '${_reminderTime.hour.toString().padLeft(2, '0')}:${_reminderTime.minute.toString().padLeft(2, '0')}';
+        // Store period value instead of time string
+        final reminderTimeString = _selectedPeriod.value;
 
         if (widget.habitToEdit != null) {
           // Edit mode
@@ -251,20 +249,26 @@ class _CreateHabitScreenState extends ConsumerState<CreateHabitScreen> {
             ),
             const SizedBox(height: 24),
 
-            ListTile(
-              title: const Text('Reminder Time'),
-              trailing: Text(_reminderTime.format(context)),
-              onTap: () async {
-                final time = await showTimePicker(
-                  context: context,
-                  initialTime: _reminderTime,
+            Text(
+              'Reminder Time',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 8),
+            SegmentedButton<NotificationPeriod>(
+              segments: NotificationPeriod.values.map((period) {
+                return ButtonSegment<NotificationPeriod>(
+                  value: period,
+                  label: Text(period.label),
+                  icon: Text(period.icon, style: const TextStyle(fontSize: 20)),
                 );
-                if (time != null) setState(() => _reminderTime = time);
+              }).toList(),
+              selected: {_selectedPeriod},
+              onSelectionChanged: (Set<NotificationPeriod> newSelection) {
+                setState(() {
+                  _selectedPeriod = newSelection.first;
+                });
               },
-              tileColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
+              showSelectedIcon: false,
             ),
             const SizedBox(height: 24),
 

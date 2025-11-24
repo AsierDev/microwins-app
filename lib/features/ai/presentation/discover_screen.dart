@@ -99,7 +99,8 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                                           category: habit.category,
                                           durationMinutes:
                                               habit.durationMinutes,
-                                          reminderTime: '08:00',
+                                          reminderTime:
+                                              'morning', // Use period instead of exact time
                                           reminderDays: [1, 2, 3, 4, 5],
                                         );
                                     ScaffoldMessenger.of(context).showSnackBar(
