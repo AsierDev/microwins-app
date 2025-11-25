@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:workmanager/workmanager.dart';
 import '../../auth/data/auth_provider.dart';
 import '../../habits/presentation/habit_view_model.dart';
 import '../../settings/data/settings_provider.dart';
 import '../../../core/theme/theme_provider.dart';
+import '../../../core/notifications/notification_service.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -101,6 +103,36 @@ class ProfileScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 24),
 
+          // Debug Section
+          Text('Debug Tools', style: Theme.of(context).textTheme.titleLarge),
+          const SizedBox(height: 8),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.bug_report, color: Colors.orange),
+              title: const Text('🧪 Test Worker Now'),
+              subtitle: const Text('Trigger notification check in 10 seconds'),
+              onTap: () async {
+                await Workmanager().registerOneOffTask(
+                  'debug_test',
+                  'habitCheck',
+                  initialDelay: const Duration(seconds: 10),
+                );
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        '⏱️ Worker will fire in 10s. Check logs with:\n'
+                        'adb logcat | grep -E "(HabitCheckWorker|Flutter)"',
+                      ),
+                      duration: Duration(seconds: 5),
+                    ),
+                  );
+                }
+              },
+            ),
+          ),
+          const SizedBox(height: 24),
+
           // Settings Section
           Text('Settings', style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 8),
@@ -108,23 +140,43 @@ class ProfileScreen extends ConsumerWidget {
             child: Column(
               children: [
                 settingsAsync.when(
-                  data: (settings) => SwitchListTile(
-                    title: const Text('Enable Notifications'),
-                    subtitle: const Text('Receive daily habit reminders'),
-                    value: settings.notificationsEnabled,
-                    onChanged: (value) async {
-                      if (value) {
-                        final status = await Permission.notification.request();
-                        if (status.isGranted) {
-                          await ref
-                              .read(settingsNotifierProvider.notifier)
-                              .setNotificationsEnabled(true);
-                        }
-                      } else {
-                        await ref
-                            .read(settingsNotifierProvider.notifier)
-                            .setNotificationsEnabled(false);
-                      }
+                  data: (settings) => FutureBuilder<bool>(
+                    // Check actual permission status from system
+                    future: NotificationService().checkPermissionStatus(),
+                    builder: (context, snapshot) {
+                      final actualStatus =
+                          snapshot.data ?? settings.notificationsEnabled;
+                      return SwitchListTile(
+                        title: const Text('Enable Notifications'),
+                        subtitle: const Text('Receive daily habit reminders'),
+                        value: actualStatus,
+                        onChanged: (value) async {
+                          if (value) {
+                            final status = await Permission.notification
+                                .request();
+                            if (status.isGranted) {
+                              await ref
+                                  .read(settingsNotifierProvider.notifier)
+                                  .setNotificationsEnabled(true);
+                            } else {
+                              // Permission denied - show message
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      'Notification permission denied. Please enable in system settings.',
+                                    ),
+                                  ),
+                                );
+                              }
+                            }
+                          } else {
+                            await ref
+                                .read(settingsNotifierProvider.notifier)
+                                .setNotificationsEnabled(false);
+                          }
+                        },
+                      );
                     },
                   ),
                   loading: () => const SwitchListTile(

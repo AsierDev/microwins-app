@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:workmanager/workmanager.dart';
 
 import 'firebase_options.dart';
 import 'core/router/app_router.dart';
@@ -11,7 +12,6 @@ import 'core/theme/theme_provider.dart';
 import 'core/local/hive_setup.dart';
 import 'core/notifications/notification_service.dart';
 import 'core/notifications/callback_dispatcher.dart';
-import 'package:workmanager/workmanager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,14 +26,28 @@ void main() async {
     await NotificationService().init();
 
     // Initialize WorkManager with unified callback dispatcher
-    await Workmanager().initialize(callbackDispatcher);
+    await Workmanager().initialize(
+      callbackDispatcher,
+      isInDebugMode: true, // Enable WorkManager debug logs
+    );
+
+    debugPrint('✅ WorkManager initialized');
 
     // Register periodic task (runs every 15 minutes)
+    // Note: Android may not execute exactly every 15 min due to battery optimization
     await Workmanager().registerPeriodicTask(
       'habit-notification-check',
       'habitCheck',
       frequency: const Duration(minutes: 15),
-      constraints: Constraints(networkType: NetworkType.notRequired),
+      constraints: Constraints(
+        networkType: NetworkType.notRequired,
+        requiresBatteryNotLow: false, // Allow execution even on low battery
+      ),
+      existingWorkPolicy: ExistingPeriodicWorkPolicy.replace,
+    );
+
+    debugPrint(
+      '✅ Periodic task registered: habit-notification-check (every 15 min)',
     );
 
     // Register daily midnight reschedule (starts at 00:01, runs daily)
@@ -42,8 +56,14 @@ void main() async {
       'midnightReschedule',
       frequency: const Duration(hours: 24),
       initialDelay: _calculateDelayUntilMidnight(),
-      constraints: Constraints(networkType: NetworkType.notRequired),
+      constraints: Constraints(
+        networkType: NetworkType.notRequired,
+        requiresBatteryNotLow: false,
+      ),
+      existingWorkPolicy: ExistingPeriodicWorkPolicy.replace,
     );
+
+    debugPrint('✅ Periodic task registered: midnight-reschedule (daily)');
   }
 
   // Initialize Ads

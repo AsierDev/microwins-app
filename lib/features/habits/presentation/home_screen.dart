@@ -2,17 +2,77 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../core/ads/ad_helper.dart';
+import '../../../../core/notifications/notification_service.dart';
+import '../../../../core/utils/logger.dart';
 import '../../auth/data/auth_provider.dart';
 import '../domain/entities/habit.dart';
 import 'habit_view_model.dart';
 import 'widgets/habit_card.dart';
 
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Request notification permissions on first app access
+    _requestNotificationPermissionsIfNeeded();
+  }
+
+  Future<void> _requestNotificationPermissionsIfNeeded() async {
+    if (kIsWeb) return;
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final hasRequestedBefore =
+          prefs.getBool('has_requested_notification_permission') ?? false;
+
+      if (!hasRequestedBefore) {
+        AppLogger.info(
+          'First app access - requesting notification permissions',
+          tag: 'HomeScreen',
+        );
+
+        // Request permissions
+        final granted = await NotificationService().requestPermissions();
+
+        // Sync with app settings
+        await prefs.setBool('notifications_enabled', granted);
+        await prefs.setBool('has_requested_notification_permission', true);
+
+        AppLogger.info(
+          'Notification permissions ${granted ? "granted" : "denied"}',
+          tag: 'HomeScreen',
+        );
+      } else {
+        // Already requested before - sync current status with settings
+        final currentStatus = await NotificationService()
+            .checkPermissionStatus();
+        await prefs.setBool('notifications_enabled', currentStatus);
+
+        AppLogger.debug(
+          'Synced notification permission status: $currentStatus',
+          tag: 'HomeScreen',
+        );
+      }
+    } catch (e) {
+      AppLogger.error(
+        'Error requesting notification permissions',
+        tag: 'HomeScreen',
+        error: e,
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final habitsAsync = ref.watch(habitViewModelProvider);
 
     return Scaffold(

@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'dart:io' show Platform;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
@@ -17,7 +18,8 @@ class NotificationService {
       FlutterLocalNotificationsPlugin();
 
   /// Initialize the notification service
-  Future<void> init() async {
+  /// Returns true if permissions are granted, false otherwise
+  Future<bool> init() async {
     // Initialize timezone
     tz.initializeTimeZones();
 
@@ -49,7 +51,7 @@ class NotificationService {
 
     await flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
-    // Create notification channel for Android 8.0+
+    // Create notification channel for Android 8.0+ (pre-create in main process)
     if (!kIsWeb && Platform.isAndroid) {
       final AndroidFlutterLocalNotificationsPlugin? androidImplementation =
           flutterLocalNotificationsPlugin
@@ -61,18 +63,52 @@ class NotificationService {
         const AndroidNotificationChannel(
           'daily_habit_channel',
           'Daily Habits',
-          description: 'Notifications for daily habits',
+          description: 'Streak-saver reminder for incomplete habits',
           importance: Importance.max,
           playSound: true,
           enableVibration: true,
         ),
       );
+
+      AppLogger.debug(
+        'Notification channel created in main process',
+        tag: 'NotificationService',
+      );
     }
 
+    // Check if permissions are granted
+    final hasPermissions = await checkPermissionStatus();
+
     AppLogger.info(
-      'NotificationService initialized',
+      'NotificationService initialized (permissions: $hasPermissions)',
       tag: 'NotificationService',
     );
+
+    return hasPermissions;
+  }
+
+  /// Request notification permissions (Android 13+ / iOS)
+  /// Returns true if granted, false otherwise
+  Future<bool> requestPermissions() async {
+    if (kIsWeb) return true;
+
+    final status = await Permission.notification.request();
+    final granted = status.isGranted;
+
+    AppLogger.info(
+      'Notification permission requested: ${granted ? "granted" : "denied"}',
+      tag: 'NotificationService',
+    );
+
+    return granted;
+  }
+
+  /// Check current notification permission status
+  Future<bool> checkPermissionStatus() async {
+    if (kIsWeb) return true;
+
+    final status = await Permission.notification.status;
+    return status.isGranted;
   }
 
   /// Show an immediate notification (for testing)
@@ -92,6 +128,7 @@ class NotificationService {
           channelDescription: 'Notifications for daily habits',
           importance: Importance.max,
           priority: Priority.high,
+          icon: '@drawable/ic_notification',
         ),
       ),
     );
