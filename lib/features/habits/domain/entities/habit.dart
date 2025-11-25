@@ -10,8 +10,6 @@ class Habit with _$Habit {
     required String icon,
     required String category,
     required int durationMinutes,
-    required String reminderTime,
-    required List<int> reminderDays,
     @Default(0) int currentStreak,
     @Default(0) int bestStreak,
     @Default(0) int sortOrder,

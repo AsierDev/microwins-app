@@ -5,16 +5,18 @@ import 'package:uuid/uuid.dart';
 import '../../habits/domain/entities/habit.dart';
 
 class OpenRouterService {
-  static const String _baseUrl = 'https://openrouter.ai/api/v1/chat/completions';
-  
+  static const String _baseUrl =
+      'https://openrouter.ai/api/v1/chat/completions';
+
   Future<List<Habit>> generateHabits(String goal) async {
     final apiKey = dotenv.env['OPENROUTER_API_KEY'];
-    
+
     if (apiKey == null || apiKey.isEmpty) {
       throw Exception('OPENROUTER_API_KEY not found in .env');
     }
 
-    final prompt = '''
+    final prompt =
+        '''
 You are a habit formation expert. User goal: "$goal"
 
 Generate 3 micro-routines (2-5 minutes each) that are:
@@ -48,7 +50,7 @@ Valid categories: Health, Productivity, Wellness, Learning, Fitness
         body: jsonEncode({
           'model': 'google/gemini-2.5-flash-lite',
           'messages': [
-            {'role': 'user', 'content': prompt}
+            {'role': 'user', 'content': prompt},
           ],
         }),
       );
@@ -58,7 +60,9 @@ Valid categories: Health, Productivity, Wellness, Learning, Fitness
         final content = data['choices'][0]['message']['content'];
         return _parseHabits(content);
       } else {
-        throw Exception('Failed to generate habits: ${response.statusCode} ${response.body}');
+        throw Exception(
+          'Failed to generate habits: ${response.statusCode} ${response.body}',
+        );
       }
     } catch (e) {
       throw Exception('Error calling OpenRouter: $e');
@@ -68,18 +72,21 @@ Valid categories: Health, Productivity, Wellness, Learning, Fitness
   List<Habit> _parseHabits(String content) {
     try {
       // Clean up markdown code blocks if present
-      final jsonString = content.replaceAll('```json', '').replaceAll('```', '').trim();
+      final jsonString = content
+          .replaceAll('```json', '')
+          .replaceAll('```', '')
+          .trim();
       final List<dynamic> jsonList = jsonDecode(jsonString);
-      
+
       return jsonList.map((json) {
         return Habit(
           id: const Uuid().v4(),
           name: json['name'],
           icon: json['icon'] ?? '✅',
           category: json['category'] ?? 'Wellness',
-          durationMinutes: json['duration'] is int ? json['duration'] : int.tryParse(json['duration'].toString()) ?? 2,
-          reminderTime: '08:00', // Default
-          reminderDays: [1, 2, 3, 4, 5], // Default Mon-Fri
+          durationMinutes: json['duration'] is int
+              ? json['duration']
+              : int.tryParse(json['duration'].toString()) ?? 2,
           createdAt: DateTime.now(),
           updatedAt: DateTime.now(),
         );

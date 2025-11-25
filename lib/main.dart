@@ -10,7 +10,7 @@ import 'core/router/app_router.dart';
 import 'core/theme/theme_provider.dart';
 import 'core/local/hive_setup.dart';
 import 'core/notifications/notification_service.dart';
-import 'core/notifications/habit_check_worker.dart';
+import 'core/notifications/callback_dispatcher.dart';
 import 'package:workmanager/workmanager.dart';
 
 void main() async {
@@ -25,8 +25,8 @@ void main() async {
   if (!kIsWeb) {
     await NotificationService().init();
 
-    // Initialize WorkManager for periodic notification checks
-    await Workmanager().initialize(habitCheckWorker);
+    // Initialize WorkManager with unified callback dispatcher
+    await Workmanager().initialize(callbackDispatcher);
 
     // Register periodic task (runs every 15 minutes)
     await Workmanager().registerPeriodicTask(

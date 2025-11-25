@@ -17,8 +17,6 @@ class HabitViewModel extends _$HabitViewModel {
     required String icon,
     required String category,
     required int durationMinutes,
-    required String reminderTime,
-    required List<int> reminderDays,
   }) async {
     // Get current habits to determine sortOrder
     final existingHabits = await ref.read(habitRepositoryProvider).getHabits();
@@ -34,8 +32,6 @@ class HabitViewModel extends _$HabitViewModel {
       icon: icon,
       category: category,
       durationMinutes: durationMinutes,
-      reminderTime: reminderTime,
-      reminderDays: reminderDays,
       sortOrder: maxSortOrder + 1,
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),

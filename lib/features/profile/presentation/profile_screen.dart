@@ -136,6 +136,44 @@ class ProfileScreen extends ConsumerWidget {
                   error: (_, __) => const SizedBox.shrink(),
                 ),
                 const Divider(height: 1),
+                settingsAsync.when(
+                  data: (settings) => ListTile(
+                    leading: const Icon(Icons.access_time),
+                    title: const Text('Daily Reminder Time'),
+                    subtitle: Text(
+                      _formatTime(settings.dailyReminderTime),
+                      style: TextStyle(color: Colors.grey[600]),
+                    ),
+                    trailing: const Icon(Icons.edit, size: 16),
+                    onTap: () async {
+                      final timeParts = settings.dailyReminderTime.split(':');
+                      final initialTime = TimeOfDay(
+                        hour: int.parse(timeParts[0]),
+                        minute: int.parse(timeParts[1]),
+                      );
+
+                      final picked = await showTimePicker(
+                        context: context,
+                        initialTime: initialTime,
+                      );
+
+                      if (picked != null) {
+                        final timeString =
+                            '${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}';
+                        await ref
+                            .read(settingsNotifierProvider.notifier)
+                            .setDailyReminderTime(timeString);
+                      }
+                    },
+                  ),
+                  loading: () => const ListTile(
+                    leading: Icon(Icons.access_time),
+                    title: Text('Daily Reminder Time'),
+                    subtitle: Text('Loading...'),
+                  ),
+                  error: (_, __) => const SizedBox.shrink(),
+                ),
+                const Divider(height: 1),
                 SwitchListTile(
                   title: const Text('Dark Mode'),
                   subtitle: const Text('Use dark theme'),
@@ -243,6 +281,15 @@ class ProfileScreen extends ConsumerWidget {
       return user.email!.substring(0, 1).toUpperCase();
     }
     return 'U';
+  }
+
+  String _formatTime(String time24) {
+    final parts = time24.split(':');
+    final hour = int.parse(parts[0]);
+    final minute = parts[1];
+    final period = hour >= 12 ? 'PM' : 'AM';
+    final hour12 = hour > 12 ? hour - 12 : (hour == 0 ? 12 : hour);
+    return '$hour12:$minute $period';
   }
 }
 

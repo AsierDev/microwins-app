@@ -1,182 +1,171 @@
-import 'package:workmanager/workmanager.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../../firebase_options.dart';
 import '../utils/logger.dart';
 import '../../features/habits/data/models/habit_model.dart';
 import '../local/hive_setup.dart';
-import 'notification_period.dart';
 
-/// Background task that runs every 15 minutes to check for due notifications
-/// Uses Firestore as source of truth, updates both Firestore and Hive
-@pragma('vm:entry-point')
-void habitCheckWorker() {
-  Workmanager().executeTask((task, inputData) async {
-    try {
-      AppLogger.debug(
-        'WorkManager: Checking for due notifications...',
+/// Handler for checking habits and sending streak-saver notification
+/// Called by the callback dispatcher when 'habitCheck' task runs
+Future<bool> checkHabitsAndNotify() async {
+  try {
+    AppLogger.debug(
+      'WorkManager: Checking for streak-saver notification...',
+      tag: 'HabitCheckWorker',
+    );
+
+    // Initialize Firebase in WorkManager process
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+
+    // Initialize Hive for local access
+    await Hive.initFlutter();
+    if (!Hive.isAdapterRegistered(0)) {
+      Hive.registerAdapter(HabitModelAdapter());
+    }
+    await Hive.openBox<HabitModel>(HiveSetup.habitsBoxName);
+
+    // Get current user ID from SharedPreferences (multi-process safe)
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString('current_user_id');
+
+    if (userId == null) {
+      AppLogger.warning(
+        'No user logged in, skipping notification check',
         tag: 'HabitCheckWorker',
       );
+      return Future.value(true);
+    }
 
-      // Initialize Firebase in WorkManager process
-      await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform,
+    // Check if notifications are enabled
+    final notificationsEnabled = prefs.getBool('notifications_enabled') ?? true;
+    if (!notificationsEnabled) {
+      AppLogger.debug(
+        'Notifications disabled, skipping',
+        tag: 'HabitCheckWorker',
       );
+      return Future.value(true);
+    }
 
-      // Initialize Hive for local updates
-      await Hive.initFlutter();
-      if (!Hive.isAdapterRegistered(0)) {
-        Hive.registerAdapter(HabitModelAdapter());
-      }
-      final habitBox = await Hive.openBox<HabitModel>(HiveSetup.habitsBoxName);
+    // Get daily reminder time (e.g., "20:00")
+    final dailyReminderTime = prefs.getString('daily_reminder_time') ?? '20:00';
+    final timeParts = dailyReminderTime.split(':');
+    final reminderHour = int.parse(timeParts[0]);
+    final reminderMinute = int.parse(timeParts[1]);
 
-      // Get current user ID from SharedPreferences (multi-process safe)
-      final prefs = await SharedPreferences.getInstance();
-      final userId = prefs.getString('current_user_id');
+    // Check if we're within the notification window (current 15-min period includes the reminder time)
+    final now = DateTime.now();
+    final currentMinutes = now.hour * 60 + now.minute;
+    final reminderMinutes = reminderHour * 60 + reminderMinute;
 
-      if (userId == null) {
-        AppLogger.warning(
-          'No user logged in, skipping notification check',
-          tag: 'HabitCheckWorker',
+    // 15-minute window check (if WorkManager runs every 15 minutes)
+    final isWithinWindow =
+        (currentMinutes >= reminderMinutes) &&
+        (currentMinutes < reminderMinutes + 15);
+
+    if (!isWithinWindow) {
+      AppLogger.debug(
+        'Not within notification window (${now.hour}:${now.minute} vs $dailyReminderTime)',
+        tag: 'HabitCheckWorker',
+      );
+      return Future.value(true);
+    }
+
+    // Check if we already notified today
+    final lastNotifiedStr = prefs.getString('last_streak_notification_date');
+    final today = DateTime(now.year, now.month, now.day);
+
+    if (lastNotifiedStr != null) {
+      try {
+        final lastNotified = DateTime.parse(lastNotifiedStr);
+        final lastNotifiedDay = DateTime(
+          lastNotified.year,
+          lastNotified.month,
+          lastNotified.day,
         );
-        return Future.value(true);
+
+        if (lastNotifiedDay.isAtSameMomentAs(today)) {
+          AppLogger.debug(
+            'Already sent streak notification today',
+            tag: 'HabitCheckWorker',
+          );
+          return Future.value(true);
+        }
+      } catch (e) {
+        AppLogger.warning(
+          'Could not parse last notification date',
+          tag: 'HabitCheckWorker',
+          error: e,
+        );
       }
+    }
 
-      // Read habits from Firestore (source of truth)
-      final snapshot = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userId)
-          .collection('habits')
-          .where('isArchived', isEqualTo: false)
-          .get();
+    // Get incomplete habits for today using repository
+    // Note: We create repository with current user context from Hive box
+    final habitBox = Hive.box<HabitModel>(HiveSetup.habitsBoxName);
+    final allHabits = habitBox.values.toList();
 
-      AppLogger.debug(
-        'Found ${snapshot.docs.length} habits in Firestore',
-        tag: 'HabitCheckWorker',
+    // Filter out incomplete habits
+    final incompleteHabits = allHabits.where((habit) {
+      if (habit.isArchived) return false;
+      if (habit.lastCompletedDate == null) return true;
+
+      final lastCompleted = DateTime(
+        habit.lastCompletedDate!.year,
+        habit.lastCompletedDate!.month,
+        habit.lastCompletedDate!.day,
       );
 
-      final now = DateTime.now();
-      final today = DateTime(now.year, now.month, now.day);
+      return !lastCompleted.isAtSameMomentAs(today);
+    }).toList();
 
-      int notificationsShown = 0;
+    AppLogger.debug(
+      'Found ${incompleteHabits.length} incomplete habits',
+      tag: 'HabitCheckWorker',
+    );
 
-      for (final doc in snapshot.docs) {
-        try {
-          final data = doc.data();
-          final reminderTime = data['reminderTime'] as String? ?? '';
+    // Only notify if there are incomplete habits
+    if (incompleteHabits.isNotEmpty) {
+      final count = incompleteHabits.length;
+      final habitWord = count == 1 ? 'habit' : 'habits';
 
-          if (reminderTime.isEmpty) continue;
+      await _showNotification(
+        title: "Don't lose your streak! 🔥",
+        body:
+            "You have $count $habitWord left today. Take 5 mins to keep your momentum!",
+      );
 
-          // Parse period from reminderTime
-          NotificationPeriod? period;
-          try {
-            period = NotificationPeriod.fromString(reminderTime);
-          } catch (e) {
-            AppLogger.warning(
-              'Could not parse reminderTime for habit ${doc.id}: $reminderTime',
-              tag: 'HabitCheckWorker',
-              error: e,
-            );
-            continue;
-          }
-
-          // Check if current time is within this period
-          final isWithinPeriod = period.isWithinPeriod(now);
-
-          if (!isWithinPeriod) {
-            // Not within the notification period yet
-            continue;
-          }
-
-          // Check if already notified today (from Firestore)
-          final lastNotifiedStr = data['lastNotifiedDate'] as String?;
-          bool alreadyNotifiedToday = false;
-
-          if (lastNotifiedStr != null) {
-            try {
-              final lastNotified = DateTime.parse(lastNotifiedStr);
-              final lastNotifiedDay = DateTime(
-                lastNotified.year,
-                lastNotified.month,
-                lastNotified.day,
-              );
-              alreadyNotifiedToday = lastNotifiedDay.isAtSameMomentAs(today);
-            } catch (e) {
-              AppLogger.warning(
-                'Could not parse lastNotifiedDate for habit ${doc.id}: $lastNotifiedStr',
-                tag: 'HabitCheckWorker',
-              );
-            }
-          }
-
-          if (isWithinPeriod && !alreadyNotifiedToday) {
-            // Show notification
-            final habitName = data['name'] as String? ?? 'Habit';
-            final durationMinutes = data['durationMinutes'] as int? ?? 15;
-
-            await _showNotification(
-              habitId: doc.id,
-              habitName: habitName,
-              durationMinutes: durationMinutes,
-            );
-
-            // Update lastNotifiedDate in Firestore
-            await FirebaseFirestore.instance
-                .collection('users')
-                .doc(userId)
-                .collection('habits')
-                .doc(doc.id)
-                .update({'lastNotifiedDate': now.toIso8601String()});
-
-            // Update local Hive cache as well
-            final localHabit = habitBox.get(doc.id);
-            if (localHabit != null) {
-              localHabit.lastNotifiedDate = now;
-              await localHabit.save();
-            }
-
-            notificationsShown++;
-
-            AppLogger.info(
-              'Showed notification for: $habitName (${period.label})',
-              tag: 'HabitCheckWorker',
-            );
-          } else if (isWithinPeriod && alreadyNotifiedToday) {
-            AppLogger.debug(
-              'Skipping notification for ${data['name']} - already notified today',
-              tag: 'HabitCheckWorker',
-            );
-          }
-        } catch (e) {
-          AppLogger.error(
-            'Error processing habit ${doc.id}',
-            tag: 'HabitCheckWorker',
-            error: e,
-          );
-        }
-      }
+      // Update last notified date
+      await prefs.setString(
+        'last_streak_notification_date',
+        now.toIso8601String(),
+      );
 
       AppLogger.info(
-        'Notification check complete: showed $notificationsShown notifications',
+        'Sent streak-saver notification for $count incomplete habits',
         tag: 'HabitCheckWorker',
       );
-
-      return Future.value(true);
-    } catch (e) {
-      AppLogger.error('WorkManager error', tag: 'HabitCheckWorker', error: e);
-      return Future.value(false);
+    } else {
+      AppLogger.debug(
+        'All habits complete! No notification needed.',
+        tag: 'HabitCheckWorker',
+      );
     }
-  });
+
+    return Future.value(true);
+  } catch (e) {
+    AppLogger.error('WorkManager error', tag: 'HabitCheckWorker', error: e);
+    return Future.value(false);
+  }
 }
 
-/// Show an immediate notification
+/// Show a streak-saver notification
 Future<void> _showNotification({
-  required String habitId,
-  required String habitName,
-  required int durationMinutes,
+  required String title,
+  required String body,
 }) async {
   final FlutterLocalNotificationsPlugin notificationsPlugin =
       FlutterLocalNotificationsPlugin();
@@ -191,14 +180,14 @@ Future<void> _showNotification({
   await notificationsPlugin.initialize(initializationSettings);
 
   await notificationsPlugin.show(
-    habitId.hashCode,
-    'Time for $habitName! ⏰',
-    '$durationMinutes min',
+    999, // Fixed ID for the daily streak notification
+    title,
+    body,
     const NotificationDetails(
       android: AndroidNotificationDetails(
         'daily_habit_channel',
         'Daily Habits',
-        channelDescription: 'Notifications for daily habits',
+        channelDescription: 'Streak-saver reminder for incomplete habits',
         importance: Importance.max,
         priority: Priority.high,
         playSound: true,
@@ -206,11 +195,4 @@ Future<void> _showNotification({
       ),
     ),
   );
-}
-
-class TimeOfDay {
-  final int hour;
-  final int minute;
-
-  TimeOfDay({required this.hour, required this.minute});
 }

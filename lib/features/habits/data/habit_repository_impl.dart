@@ -27,8 +27,6 @@ class HabitRepositoryImpl implements HabitRepository {
       'icon': model.icon,
       'category': model.category,
       'durationMinutes': model.durationMinutes,
-      'reminderTime': model.reminderTime,
-      'reminderDays': model.reminderDays,
       'currentStreak': model.currentStreak,
       'bestStreak': model.bestStreak,
       'sortOrder': model.sortOrder,
@@ -52,8 +50,6 @@ class HabitRepositoryImpl implements HabitRepository {
       'icon': model.icon,
       'category': model.category,
       'durationMinutes': model.durationMinutes,
-      'reminderTime': model.reminderTime,
-      'reminderDays': model.reminderDays,
       'currentStreak': model.currentStreak,
       'bestStreak': model.bestStreak,
       'sortOrder': model.sortOrder,
@@ -129,9 +125,6 @@ class HabitRepositoryImpl implements HabitRepository {
             icon: data['icon'],
             category: data['category'],
             durationMinutes: data['durationMinutes'],
-            reminderTime: data['reminderTime'] as String? ?? '',
-            reminderDays:
-                (data['reminderDays'] as List<dynamic>?)?.cast<int>() ?? [],
             currentStreak: data['currentStreak'] ?? 0,
             bestStreak: data['bestStreak'] ?? 0,
             sortOrder: data['sortOrder'] ?? 0,
@@ -162,5 +155,31 @@ class HabitRepositoryImpl implements HabitRepository {
         error: e,
       );
     }
+  }
+
+  @override
+  Future<List<Habit>> getIncompleteHabitsForToday() async {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+
+    final allHabits = await getHabits();
+
+    // Filter habits that haven't been completed today
+    return allHabits.where((habit) {
+      // Skip archived habits
+      if (habit.isArchived) return false;
+
+      // Check if habit was completed today
+      if (habit.lastCompletedDate == null) return true;
+
+      final lastCompleted = DateTime(
+        habit.lastCompletedDate!.year,
+        habit.lastCompletedDate!.month,
+        habit.lastCompletedDate!.day,
+      );
+
+      // Include habit if it wasn't completed today
+      return !lastCompleted.isAtSameMomentAs(today);
+    }).toList();
   }
 }

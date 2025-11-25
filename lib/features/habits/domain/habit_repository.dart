@@ -8,4 +8,5 @@ abstract class HabitRepository {
   Stream<List<Habit>> watchHabits();
   Future<void> updateHabitsOrder(List<Habit> habits);
   Future<void> syncFromCloud();
+  Future<List<Habit>> getIncompleteHabitsForToday();
 }

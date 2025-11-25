@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import '../../../core/notifications/notification_service.dart';
-import '../../../core/notifications/notification_period.dart';
 
 import '../domain/entities/habit.dart';
 import '../data/habit_provider.dart';
@@ -24,8 +21,6 @@ class _CreateHabitScreenState extends ConsumerState<CreateHabitScreen> {
   String _selectedIcon = '✅';
   String _selectedCategory = 'Health';
   int _durationMinutes = 2;
-  NotificationPeriod _selectedPeriod = NotificationPeriod.morning;
-  final List<int> _reminderDays = [1, 2, 3, 4, 5]; // Mon-Fri default
 
   final List<String> _categories = [
     'Health',
@@ -59,8 +54,6 @@ class _CreateHabitScreenState extends ConsumerState<CreateHabitScreen> {
       _selectedIcon = habit.icon;
       _selectedCategory = habit.category;
       _durationMinutes = habit.durationMinutes;
-      // Parse existing reminderTime to period (handles both periods and old time strings)
-      _selectedPeriod = NotificationPeriod.fromString(habit.reminderTime);
     }
   }
 
@@ -76,8 +69,6 @@ class _CreateHabitScreenState extends ConsumerState<CreateHabitScreen> {
 
       try {
         final name = _nameController.text.trim();
-        // Store period value instead of time string
-        final reminderTimeString = _selectedPeriod.value;
 
         if (widget.habitToEdit != null) {
           // Edit mode
@@ -86,14 +77,9 @@ class _CreateHabitScreenState extends ConsumerState<CreateHabitScreen> {
             icon: _selectedIcon,
             category: _selectedCategory,
             durationMinutes: _durationMinutes,
-            reminderTime: reminderTimeString,
-            reminderDays: _reminderDays,
             updatedAt: DateTime.now(),
           );
           await ref.read(habitRepositoryProvider).updateHabit(updatedHabit);
-
-          // WorkManager will automatically pick up the updated habit
-          // and schedule notifications based on the new reminderTime
         } else {
           // Create mode
           await ref
@@ -103,27 +89,7 @@ class _CreateHabitScreenState extends ConsumerState<CreateHabitScreen> {
                 icon: _selectedIcon,
                 category: _selectedCategory,
                 durationMinutes: _durationMinutes,
-                reminderTime: reminderTimeString,
-                reminderDays: _reminderDays,
               );
-
-          // Check notification permissions
-          final settings = await NotificationService()
-              .flutterLocalNotificationsPlugin
-              .resolvePlatformSpecificImplementation<
-                AndroidFlutterLocalNotificationsPlugin
-              >()
-              ?.requestNotificationsPermission();
-
-          if (settings == false && mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text(
-                  'Please enable notifications to receive reminders',
-                ),
-              ),
-            );
-          }
         }
 
         if (mounted) {
@@ -258,43 +224,6 @@ class _CreateHabitScreenState extends ConsumerState<CreateHabitScreen> {
                   );
                 }).toList(),
               ),
-            ),
-            const SizedBox(height: 24),
-
-            Text(
-              'Reminder Time',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 8),
-            // 2x2 Grid layout for better fit on all screen sizes
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: NotificationPeriod.values.map((period) {
-                final isSelected = _selectedPeriod == period;
-                return SizedBox(
-                  width:
-                      (MediaQuery.of(context).size.width - 64) /
-                      2, // Half width minus padding
-                  child: FilterChip(
-                    selected: isSelected,
-                    label: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(period.icon, style: const TextStyle(fontSize: 20)),
-                        const SizedBox(width: 8),
-                        Text(period.label),
-                      ],
-                    ),
-                    onSelected: (_) {
-                      setState(() {
-                        _selectedPeriod = period;
-                      });
-                    },
-                    showCheckmark: false,
-                  ),
-                );
-              }).toList(),
             ),
             const SizedBox(height: 24),
 

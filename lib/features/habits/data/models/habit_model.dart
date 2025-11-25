@@ -19,12 +19,6 @@ class HabitModel extends HiveObject {
   @HiveField(4)
   late int durationMinutes;
 
-  @HiveField(5)
-  late String reminderTime;
-
-  @HiveField(6)
-  late List<int> reminderDays;
-
   @HiveField(7)
   late int currentStreak;
 
@@ -58,8 +52,6 @@ class HabitModel extends HiveObject {
     required this.icon,
     required this.category,
     required this.durationMinutes,
-    required this.reminderTime,
-    required this.reminderDays,
     this.currentStreak = 0,
     this.bestStreak = 0,
     this.sortOrder = 0,
