@@ -53,10 +53,7 @@ class SyncManager {
           connectivityResult.contains(ConnectivityResult.ethernet);
 
       if (!isOnline) {
-        AppLogger.debug(
-          'Sync skipped: No internet connection',
-          tag: 'SyncManager',
-        );
+        AppLogger.debug('Sync skipped: No internet connection', tag: 'SyncManager');
         return;
       }
 
@@ -68,11 +65,7 @@ class SyncManager {
           await _performRemoteOperation(user.uid, item);
           keysToDelete.add(_syncQueueBox.keyAt(i));
         } catch (e) {
-          AppLogger.warning(
-            'Sync error for item $i',
-            tag: 'SyncManager',
-            error: e,
-          );
+          AppLogger.warning('Sync error for item $i', tag: 'SyncManager', error: e);
           // Don't stop processing, continue with next items
           // Items that fail will be retried on next sync
         }
@@ -81,28 +74,18 @@ class SyncManager {
       // Remove processed items
       if (keysToDelete.isNotEmpty) {
         await _syncQueueBox.deleteAll(keysToDelete);
-        AppLogger.info(
-          'Synced ${keysToDelete.length} items to Firestore',
-          tag: 'SyncManager',
-        );
+        AppLogger.info('Synced ${keysToDelete.length} items to Firestore', tag: 'SyncManager');
       }
     } catch (e) {
       // Catch any unexpected errors to prevent blocking local operations
-      AppLogger.error(
-        'Sync queue processing error',
-        tag: 'SyncManager',
-        error: e,
-      );
+      AppLogger.error('Sync queue processing error', tag: 'SyncManager', error: e);
     }
   }
 
   Future<void> _performRemoteOperation(String userId, Map item) async {
     final action = item['action'] as String;
     final data = item['data'] as Map<String, dynamic>;
-    final habitsCollection = _firestore
-        .collection('users')
-        .doc(userId)
-        .collection('habits');
+    final habitsCollection = _firestore.collection('users').doc(userId).collection('habits');
 
     switch (action) {
       case 'createHabit':
@@ -133,11 +116,7 @@ class SyncManager {
 
       return snapshot.docs.map((doc) => doc.data()).toList();
     } catch (e) {
-      AppLogger.error(
-        'Error fetching habits from Firestore',
-        tag: 'SyncManager',
-        error: e,
-      );
+      AppLogger.error('Error fetching habits from Firestore', tag: 'SyncManager', error: e);
       return [];
     }
   }

@@ -22,26 +22,9 @@ class _CreateHabitScreenState extends ConsumerState<CreateHabitScreen> {
   String _selectedCategory = 'Health';
   int _durationMinutes = 2;
 
-  final List<String> _categories = [
-    'Health',
-    'Productivity',
-    'Wellness',
-    'Learning',
-    'Fitness',
-  ];
+  final List<String> _categories = ['Health', 'Productivity', 'Wellness', 'Learning', 'Fitness'];
   final List<int> _durations = [2, 3, 5, 8, 10, 15];
-  final List<String> _icons = [
-    '✅',
-    '💧',
-    '🏃',
-    '📚',
-    '🧘',
-    '💪',
-    '🍎',
-    '💤',
-    '💻',
-    '🎨',
-  ];
+  final List<String> _icons = ['✅', '💧', '🏃', '📚', '🧘', '💪', '🍎', '💤', '💻', '🎨'];
 
   bool _isLoading = false;
 
@@ -112,10 +95,7 @@ class _CreateHabitScreenState extends ConsumerState<CreateHabitScreen> {
               title: const Text('Error'),
               content: Text('Failed to create habit: $e'),
               actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('OK'),
-                ),
+                TextButton(onPressed: () => Navigator.pop(context), child: const Text('OK')),
               ],
             ),
           );
@@ -171,9 +151,7 @@ class _CreateHabitScreenState extends ConsumerState<CreateHabitScreen> {
                       margin: const EdgeInsets.only(right: 12),
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: isSelected
-                            ? Theme.of(context).colorScheme.primaryContainer
-                            : null,
+                        color: isSelected ? Theme.of(context).colorScheme.primaryContainer : null,
                         border: Border.all(
                           color: isSelected
                               ? Theme.of(context).colorScheme.primary
@@ -195,9 +173,7 @@ class _CreateHabitScreenState extends ConsumerState<CreateHabitScreen> {
                 labelText: 'Category',
                 border: OutlineInputBorder(),
               ),
-              items: _categories
-                  .map((c) => DropdownMenuItem(value: c, child: Text(c)))
-                  .toList(),
+              items: _categories.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
               onChanged: (val) => setState(() => _selectedCategory = val!),
             ),
             const SizedBox(height: 16),
@@ -235,10 +211,7 @@ class _CreateHabitScreenState extends ConsumerState<CreateHabitScreen> {
                     ? const SizedBox(
                         height: 20,
                         width: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
-                        ),
+                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                       )
                     : Text(isEditing ? 'Save Changes' : 'Create Habit'),
               ),

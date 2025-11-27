@@ -43,11 +43,10 @@ class NotificationService {
     const DarwinInitializationSettings initializationSettingsDarwin =
         DarwinInitializationSettings();
 
-    const InitializationSettings initializationSettings =
-        InitializationSettings(
-          android: initializationSettingsAndroid,
-          iOS: initializationSettingsDarwin,
-        );
+    const InitializationSettings initializationSettings = InitializationSettings(
+      android: initializationSettingsAndroid,
+      iOS: initializationSettingsDarwin,
+    );
 
     await flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
@@ -55,9 +54,7 @@ class NotificationService {
     if (!kIsWeb && Platform.isAndroid) {
       final AndroidFlutterLocalNotificationsPlugin? androidImplementation =
           flutterLocalNotificationsPlugin
-              .resolvePlatformSpecificImplementation<
-                AndroidFlutterLocalNotificationsPlugin
-              >();
+              .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
 
       await androidImplementation?.createNotificationChannel(
         const AndroidNotificationChannel(
@@ -70,10 +67,7 @@ class NotificationService {
         ),
       );
 
-      AppLogger.debug(
-        'Notification channel created in main process',
-        tag: 'NotificationService',
-      );
+      AppLogger.debug('Notification channel created in main process', tag: 'NotificationService');
     }
 
     // Check if permissions are granted
@@ -132,10 +126,7 @@ class NotificationService {
         ),
       ),
     );
-    AppLogger.debug(
-      'Showed immediate notification: $title',
-      tag: 'NotificationService',
-    );
+    AppLogger.debug('Showed immediate notification: $title', tag: 'NotificationService');
   }
 
   /// Cancel all notifications

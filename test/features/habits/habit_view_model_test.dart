@@ -52,18 +52,11 @@ void main() {
       ];
 
       when(mockRepository.getHabits()).thenAnswer((_) async => existingHabits);
-      when(
-        mockRepository.createHabit(any),
-      ).thenAnswer((_) async => Future.value());
+      when(mockRepository.createHabit(any)).thenAnswer((_) async => Future.value());
 
       final notifier = container.read(habitViewModelProvider.notifier);
 
-      await notifier.addHabit(
-        name: 'Read',
-        icon: '📚',
-        category: 'Learning',
-        durationMinutes: 20,
-      );
+      await notifier.addHabit(name: 'Read', icon: '📚', category: 'Learning', durationMinutes: 20);
 
       verify(mockRepository.getHabits()).called(1);
       verify(mockRepository.createHabit(any)).called(1);
@@ -104,9 +97,7 @@ void main() {
       ];
 
       when(mockRepository.getHabits()).thenAnswer((_) async => habits);
-      when(
-        mockRepository.updateHabitsOrder(any),
-      ).thenAnswer((_) async => Future.value());
+      when(mockRepository.updateHabitsOrder(any)).thenAnswer((_) async => Future.value());
 
       final notifier = container.read(habitViewModelProvider.notifier);
 
@@ -136,9 +127,7 @@ void main() {
       );
 
       when(mockRepository.getHabits()).thenAnswer((_) async => [habit]);
-      when(
-        mockRepository.updateHabit(any),
-      ).thenAnswer((_) async => Future.value());
+      when(mockRepository.updateHabit(any)).thenAnswer((_) async => Future.value());
 
       final notifier = container.read(habitViewModelProvider.notifier);
 
@@ -149,9 +138,7 @@ void main() {
     });
 
     test('deleteHabit should remove habit and cancel notification', () async {
-      when(
-        mockRepository.deleteHabit('1'),
-      ).thenAnswer((_) async => Future.value());
+      when(mockRepository.deleteHabit('1')).thenAnswer((_) async => Future.value());
 
       final notifier = container.read(habitViewModelProvider.notifier);
 

@@ -33,12 +33,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       } else {
         await ref.read(authViewModelProvider.notifier).signUp(email, password);
       }
-      
+
       if (mounted && !ref.read(authViewModelProvider).hasError) {
-         // Navigation is handled by auth state listener in router or splash, 
-         // but for now we can force it or wait for stream.
-         // Ideally, the router redirects based on auth state.
-         context.go('/home');
+        // Navigation is handled by auth state listener in router or splash,
+        // but for now we can force it or wait for stream.
+        // Ideally, the router redirects based on auth state.
+        context.go('/home');
       }
     }
   }
@@ -50,9 +50,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     ref.listen(authViewModelProvider, (previous, next) {
       if (next.hasError) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(next.error.toString())),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(next.error.toString())));
       }
     });
 
@@ -76,8 +76,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   Text(
                     _isLogin ? 'Welcome Back' : 'Create Account',
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                      fontWeight: FontWeight.bold,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 32),
@@ -90,7 +90,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                     keyboardType: TextInputType.emailAddress,
                     validator: (value) {
-                      if (value == null || value.isEmpty) return 'Please enter email';
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter email';
+                      }
                       if (!value.contains('@')) return 'Invalid email';
                       return null;
                     },
@@ -105,7 +107,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                     obscureText: true,
                     validator: (value) {
-                      if (value == null || value.isEmpty) return 'Please enter password';
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter password';
+                      }
                       if (value.length < 6) return 'Password too short';
                       return null;
                     },
@@ -129,8 +133,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     onPressed: isLoading
                         ? null
                         : () async {
-                            await ref.read(authViewModelProvider.notifier).signInWithGoogle();
-                            if (mounted && !ref.read(authViewModelProvider).hasError) {
+                            await ref
+                                .read(authViewModelProvider.notifier)
+                                .signInWithGoogle();
+                            if (mounted &&
+                                context.mounted &&
+                                !ref.read(authViewModelProvider).hasError) {
                               context.go('/home');
                             }
                           },
@@ -147,14 +155,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               builder: (context) => AlertDialog(
                                 title: const Text('Continue as Guest?'),
                                 content: const Text(
-                                    'Your data will only be saved on this device. Sign up later to backup your habits.'),
+                                  'Your data will only be saved on this device. Sign up later to backup your habits.',
+                                ),
                                 actions: [
                                   TextButton(
-                                    onPressed: () => Navigator.pop(context, false),
+                                    onPressed: () =>
+                                        Navigator.pop(context, false),
                                     child: const Text('Cancel'),
                                   ),
                                   FilledButton(
-                                    onPressed: () => Navigator.pop(context, true),
+                                    onPressed: () =>
+                                        Navigator.pop(context, true),
                                     child: const Text('Continue'),
                                   ),
                                 ],
@@ -162,8 +173,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             );
 
                             if (confirm == true) {
-                              await ref.read(authViewModelProvider.notifier).signInAnonymously();
-                              if (mounted && !ref.read(authViewModelProvider).hasError) {
+                              await ref
+                                  .read(authViewModelProvider.notifier)
+                                  .signInAnonymously();
+                              if (mounted &&
+                                  context.mounted &&
+                                  !ref.read(authViewModelProvider).hasError) {
                                 context.go('/home');
                               }
                             }
@@ -174,7 +189,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(_isLogin ? "Don't have an account? " : 'Already have an account? '),
+                      Text(
+                        _isLogin
+                            ? "Don't have an account? "
+                            : 'Already have an account? ',
+                      ),
                       GestureDetector(
                         onTap: () {
                           setState(() {

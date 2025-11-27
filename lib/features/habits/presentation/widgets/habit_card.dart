@@ -22,18 +22,14 @@ class HabitCard extends StatefulWidget {
   State<HabitCard> createState() => _HabitCardState();
 }
 
-class _HabitCardState extends State<HabitCard>
-    with SingleTickerProviderStateMixin {
+class _HabitCardState extends State<HabitCard> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   bool _showConfetti = false;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 2),
-    );
+    _controller = AnimationController(vsync: this, duration: const Duration(seconds: 2));
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
         setState(() => _showConfetti = false);
@@ -61,11 +57,7 @@ class _HabitCardState extends State<HabitCard>
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final lastDate = widget.habit.lastCompletedDate!;
-    final lastCompletedDay = DateTime(
-      lastDate.year,
-      lastDate.month,
-      lastDate.day,
-    );
+    final lastCompletedDay = DateTime(lastDate.year, lastDate.month, lastDate.day);
     return lastCompletedDay.isAtSameMomentAs(today);
   }
 
@@ -82,15 +74,9 @@ class _HabitCardState extends State<HabitCard>
                 color: Theme.of(context).colorScheme.primaryContainer,
                 shape: BoxShape.circle,
               ),
-              child: Text(
-                widget.habit.icon,
-                style: const TextStyle(fontSize: 24),
-              ),
+              child: Text(widget.habit.icon, style: const TextStyle(fontSize: 24)),
             ),
-            title: Text(
-              widget.habit.name,
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
+            title: Text(widget.habit.name, style: const TextStyle(fontWeight: FontWeight.bold)),
             subtitle: Text(
               '${widget.habit.durationMinutes} min • Streak: ${widget.habit.currentStreak} 🔥',
             ),
@@ -105,10 +91,7 @@ class _HabitCardState extends State<HabitCard>
                       const SizedBox(width: 8),
                       ReorderableDragStartListener(
                         index: widget.index ?? 0,
-                        child: const Icon(
-                          Icons.drag_indicator,
-                          color: Colors.grey,
-                        ),
+                        child: const Icon(Icons.drag_indicator, color: Colors.grey),
                       ),
                     ],
                   )
@@ -156,10 +139,7 @@ class _AnimatedCheckButtonState extends State<_AnimatedCheckButton>
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 200),
-    );
+    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 200));
     _scaleAnimation = Tween<double>(
       begin: 1.0,
       end: 0.8,
@@ -192,13 +172,9 @@ class _AnimatedCheckButtonState extends State<_AnimatedCheckButton>
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: widget.isCompleted ? Colors.green : Colors.transparent,
-            border: widget.isCompleted
-                ? null
-                : Border.all(color: Colors.grey.shade400, width: 2),
+            border: widget.isCompleted ? null : Border.all(color: Colors.grey.shade400, width: 2),
           ),
-          child: widget.isCompleted
-              ? const Icon(Icons.check, color: Colors.white, size: 24)
-              : null,
+          child: widget.isCompleted ? const Icon(Icons.check, color: Colors.white, size: 24) : null,
         ),
       ),
     );

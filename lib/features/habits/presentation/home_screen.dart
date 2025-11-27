@@ -31,14 +31,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     try {
       final prefs = await SharedPreferences.getInstance();
-      final hasRequestedBefore =
-          prefs.getBool('has_requested_notification_permission') ?? false;
+      final hasRequestedBefore = prefs.getBool('has_requested_notification_permission') ?? false;
 
       if (!hasRequestedBefore) {
-        AppLogger.info(
-          'First app access - requesting notification permissions',
-          tag: 'HomeScreen',
-        );
+        AppLogger.info('First app access - requesting notification permissions', tag: 'HomeScreen');
 
         // Request permissions
         final granted = await NotificationService().requestPermissions();
@@ -53,21 +49,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         );
       } else {
         // Already requested before - sync current status with settings
-        final currentStatus = await NotificationService()
-            .checkPermissionStatus();
+        final currentStatus = await NotificationService().checkPermissionStatus();
         await prefs.setBool('notifications_enabled', currentStatus);
 
-        AppLogger.debug(
-          'Synced notification permission status: $currentStatus',
-          tag: 'HomeScreen',
-        );
+        AppLogger.debug('Synced notification permission status: $currentStatus', tag: 'HomeScreen');
       }
     } catch (e) {
-      AppLogger.error(
-        'Error requesting notification permissions',
-        tag: 'HomeScreen',
-        error: e,
-      );
+      AppLogger.error('Error requesting notification permissions', tag: 'HomeScreen', error: e);
     }
   }
 
@@ -116,9 +104,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             buildDefaultDragHandles: false,
             itemCount: sortedHabits.length,
             onReorder: (oldIndex, newIndex) {
-              ref
-                  .read(habitViewModelProvider.notifier)
-                  .reorderHabits(oldIndex, newIndex);
+              ref.read(habitViewModelProvider.notifier).reorderHabits(oldIndex, newIndex);
             },
             itemBuilder: (context, index) {
               final habit = sortedHabits[index];
@@ -137,9 +123,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     builder: (BuildContext context) {
                       return AlertDialog(
                         title: const Text('Confirm'),
-                        content: const Text(
-                          'Are you sure you want to delete this habit?',
-                        ),
+                        content: const Text('Are you sure you want to delete this habit?'),
                         actions: <Widget>[
                           TextButton(
                             onPressed: () => Navigator.of(context).pop(false),
@@ -155,12 +139,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   );
                 },
                 onDismissed: (direction) {
-                  ref
-                      .read(habitViewModelProvider.notifier)
-                      .deleteHabit(habit.id);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('${habit.name} deleted')),
-                  );
+                  ref.read(habitViewModelProvider.notifier).deleteHabit(habit.id);
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text('${habit.name} deleted')));
                 },
                 child: GestureDetector(
                   onLongPress: () {
@@ -171,9 +153,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     showDragHandle: true,
                     index: index,
                     onComplete: () {
-                      ref
-                          .read(habitViewModelProvider.notifier)
-                          .completeHabit(habit.id);
+                      ref.read(habitViewModelProvider.notifier).completeHabit(habit.id);
                     },
                     onTap: () {
                       // Navigate to details
@@ -187,16 +167,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, stack) => Center(child: Text('Error: $err')),
       ),
-      floatingActionButton:
-          habitsAsync.hasValue && habitsAsync.value!.isNotEmpty
+      floatingActionButton: habitsAsync.hasValue && habitsAsync.value!.isNotEmpty
           ? FloatingActionButton(
               onPressed: () => context.push('/create-habit'),
               child: const Icon(Icons.add),
             )
           : null,
-      bottomNavigationBar: const SafeArea(
-        child: kIsWeb ? SizedBox.shrink() : BannerAdWidget(),
-      ),
+      bottomNavigationBar: const SafeArea(child: kIsWeb ? SizedBox.shrink() : BannerAdWidget()),
     );
   }
 }

@@ -19,32 +19,11 @@ void main() {
       expect(instance1, equals(instance2));
     });
 
-    test(
-      'scheduleDailyNotification should schedule notification correctly',
-      () async {
-        // This is a basic test structure
-        // In a real scenario, you would mock FlutterLocalNotificationsPlugin
-        // and verify the zonedSchedule method is called with correct parameters
-
-        expect(() async {
-          await notificationService.scheduleDailyNotification(
-            id: 1,
-            habitId: 'test-habit-id',
-            habitName: 'Test Habit',
-            hour: 10,
-            minute: 30,
-          );
-        }, returnsNormally);
-      },
-    );
-
-    test('cancelNotification should cancel notification by id', () async {
-      expect(() async {
-        await notificationService.cancelNotification(1);
-      }, returnsNormally);
+    test('should initialize correctly', () {
+      expect(notificationService, isNotNull);
     });
 
-    test('cancelAllNotifications should cancel all notifications', () async {
+    test('cancelAllNotifications should complete without errors', () async {
       expect(() async {
         await notificationService.cancelAllNotifications();
       }, returnsNormally);

@@ -12,8 +12,7 @@ class ThemeModeNotifier extends _$ThemeModeNotifier {
   @override
   ThemeMode build() {
     // Initialize with system theme brightness
-    final brightness =
-        SchedulerBinding.instance.platformDispatcher.platformBrightness;
+    final brightness = SchedulerBinding.instance.platformDispatcher.platformBrightness;
     state = brightness == Brightness.dark ? ThemeMode.dark : ThemeMode.light;
 
     // Load saved theme asynchronously
@@ -27,8 +26,7 @@ class ThemeModeNotifier extends _$ThemeModeNotifier {
     if (themeModeString != null) {
       state = ThemeMode.values.firstWhere(
         (mode) => mode.toString() == themeModeString,
-        orElse: () =>
-            state, // Keep current state (system-based) if parsing fails
+        orElse: () => state, // Keep current state (system-based) if parsing fails
       );
     }
   }

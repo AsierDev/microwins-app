@@ -25,10 +25,7 @@ GoRouter goRouter(GoRouterRef ref) {
     initialLocation: '/',
     routes: [
       GoRoute(path: '/', builder: (context, state) => const SplashScreen()),
-      GoRoute(
-        path: '/onboarding',
-        builder: (context, state) => const OnboardingScreen(),
-      ),
+      GoRoute(path: '/onboarding', builder: (context, state) => const OnboardingScreen()),
       GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
@@ -36,36 +33,20 @@ GoRouter goRouter(GoRouterRef ref) {
         },
         branches: [
           StatefulShellBranch(
+            routes: [GoRoute(path: '/home', builder: (context, state) => const HomeScreen())],
+          ),
+          StatefulShellBranch(
             routes: [
-              GoRoute(
-                path: '/home',
-                builder: (context, state) => const HomeScreen(),
-              ),
+              GoRoute(path: '/progress', builder: (context, state) => const ProgressScreen()),
             ],
           ),
           StatefulShellBranch(
             routes: [
-              GoRoute(
-                path: '/progress',
-                builder: (context, state) => const ProgressScreen(),
-              ),
+              GoRoute(path: '/discover', builder: (context, state) => const DiscoverScreen()),
             ],
           ),
           StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: '/discover',
-                builder: (context, state) => const DiscoverScreen(),
-              ),
-            ],
-          ),
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: '/profile',
-                builder: (context, state) => const ProfileScreen(),
-              ),
-            ],
+            routes: [GoRoute(path: '/profile', builder: (context, state) => const ProfileScreen())],
           ),
         ],
       ),

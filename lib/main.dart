@@ -26,10 +26,7 @@ void main() async {
     await NotificationService().init();
 
     // Initialize WorkManager with unified callback dispatcher
-    await Workmanager().initialize(
-      callbackDispatcher,
-      isInDebugMode: true, // Enable WorkManager debug logs
-    );
+    await Workmanager().initialize(callbackDispatcher);
 
     debugPrint('✅ WorkManager initialized');
 

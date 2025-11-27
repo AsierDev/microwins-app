@@ -22,9 +22,7 @@ class HabitViewModel extends _$HabitViewModel {
     final existingHabits = await ref.read(habitRepositoryProvider).getHabits();
     final maxSortOrder = existingHabits.isEmpty
         ? -1
-        : existingHabits
-              .map((h) => h.sortOrder)
-              .reduce((a, b) => a > b ? a : b);
+        : existingHabits.map((h) => h.sortOrder).reduce((a, b) => a > b ? a : b);
 
     final habit = Habit(
       id: const Uuid().v4(),
@@ -57,11 +55,7 @@ class HabitViewModel extends _$HabitViewModel {
 
     if (habit.lastCompletedDate != null) {
       final lastDate = habit.lastCompletedDate!;
-      final lastCompletedDay = DateTime(
-        lastDate.year,
-        lastDate.month,
-        lastDate.day,
-      );
+      final lastCompletedDay = DateTime(lastDate.year, lastDate.month, lastDate.day);
 
       if (lastCompletedDay.isAtSameMomentAs(today)) {
         // Already completed today
@@ -72,11 +66,7 @@ class HabitViewModel extends _$HabitViewModel {
     int newStreak = 1;
     if (habit.lastCompletedDate != null) {
       final lastDate = habit.lastCompletedDate!;
-      final lastCompletedDay = DateTime(
-        lastDate.year,
-        lastDate.month,
-        lastDate.day,
-      );
+      final lastCompletedDay = DateTime(lastDate.year, lastDate.month, lastDate.day);
       final yesterday = today.subtract(const Duration(days: 1));
 
       if (lastCompletedDay.isAtSameMomentAs(yesterday)) {
@@ -84,9 +74,7 @@ class HabitViewModel extends _$HabitViewModel {
       }
     }
 
-    final newBestStreak = newStreak > habit.bestStreak
-        ? newStreak
-        : habit.bestStreak;
+    final newBestStreak = newStreak > habit.bestStreak ? newStreak : habit.bestStreak;
 
     final updatedHabit = habit.copyWith(
       currentStreak: newStreak,

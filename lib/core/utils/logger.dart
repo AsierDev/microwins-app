@@ -42,12 +42,7 @@ class AppLogger {
   }
 
   /// Log errors (always logged)
-  static void error(
-    String message, {
-    String? tag,
-    Object? error,
-    StackTrace? stackTrace,
-  }) {
+  static void error(String message, {String? tag, Object? error, StackTrace? stackTrace}) {
     final logTag = tag ?? 'Error';
     developer.log(
       message,
@@ -59,12 +54,7 @@ class AppLogger {
   }
 
   /// Log critical errors that should be reported to crash analytics
-  static void critical(
-    String message, {
-    String? tag,
-    Object? error,
-    StackTrace? stackTrace,
-  }) {
+  static void critical(String message, {String? tag, Object? error, StackTrace? stackTrace}) {
     final logTag = tag ?? 'Critical';
     developer.log(
       message,

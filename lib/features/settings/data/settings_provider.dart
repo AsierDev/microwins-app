@@ -11,8 +11,7 @@ class SettingsNotifier extends _$SettingsNotifier {
   @override
   Future<SettingsState> build() async {
     final prefs = await SharedPreferences.getInstance();
-    final notificationsEnabled =
-        prefs.getBool(_notificationsEnabledKey) ?? true;
+    final notificationsEnabled = prefs.getBool(_notificationsEnabledKey) ?? true;
     final dailyReminderTime = prefs.getString(_dailyReminderTimeKey) ?? '20:00';
 
     return SettingsState(
@@ -40,15 +39,9 @@ class SettingsState {
   final bool notificationsEnabled;
   final String dailyReminderTime;
 
-  SettingsState({
-    required this.notificationsEnabled,
-    required this.dailyReminderTime,
-  });
+  SettingsState({required this.notificationsEnabled, required this.dailyReminderTime});
 
-  SettingsState copyWith({
-    bool? notificationsEnabled,
-    String? dailyReminderTime,
-  }) {
+  SettingsState copyWith({bool? notificationsEnabled, String? dailyReminderTime}) {
     return SettingsState(
       notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
       dailyReminderTime: dailyReminderTime ?? this.dailyReminderTime,

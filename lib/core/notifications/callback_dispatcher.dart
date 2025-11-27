@@ -9,10 +9,7 @@ import 'midnight_reschedule_worker.dart';
 void callbackDispatcher() {
   Workmanager().executeTask((task, inputData) async {
     try {
-      AppLogger.debug(
-        'WorkManager task started: $task',
-        tag: 'CallbackDispatcher',
-      );
+      AppLogger.debug('WorkManager task started: $task', tag: 'CallbackDispatcher');
 
       switch (task) {
         case 'habitCheck':

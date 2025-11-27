@@ -23,14 +23,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     ),
     OnboardingPageData(
       title: 'Track streaks,\nearn badges',
-      description:
-          'Stay motivated by keeping your streak alive and unlocking achievements.',
+      description: 'Stay motivated by keeping your streak alive and unlocking achievements.',
       icon: Icons.local_fire_department_outlined,
     ),
     OnboardingPageData(
       title: 'AI-powered habit\nsuggestions',
-      description:
-          'Not sure where to start? Let AI generate personalized micro-routines for you.',
+      description: 'Not sure where to start? Let AI generate personalized micro-routines for you.',
       icon: Icons.auto_awesome_outlined,
     ),
   ];
@@ -91,9 +89,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         decoration: BoxDecoration(
                           color: _currentPage == index
                               ? Theme.of(context).colorScheme.primary
-                              : Theme.of(
-                                  context,
-                                ).colorScheme.surfaceContainerHighest,
+                              : Theme.of(context).colorScheme.surfaceContainerHighest,
                           borderRadius: BorderRadius.circular(4),
                         ),
                       ),
@@ -102,11 +98,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   // Next/Done Button
                   FilledButton(
                     onPressed: _nextPage,
-                    child: Text(
-                      _currentPage == _pages.length - 1
-                          ? 'Get Started'
-                          : 'Next',
-                    ),
+                    child: Text(_currentPage == _pages.length - 1 ? 'Get Started' : 'Next'),
                   ),
                 ],
               ),
@@ -130,11 +122,7 @@ class OnboardingPage extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            data.icon,
-            size: 120,
-            color: Theme.of(context).colorScheme.primary,
-          ),
+          Icon(data.icon, size: 120, color: Theme.of(context).colorScheme.primary),
           const SizedBox(height: 40),
           Text(
             data.title,
@@ -147,9 +135,9 @@ class OnboardingPage extends StatelessWidget {
           Text(
             data.description,
             textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
           ),
         ],
       ),
@@ -162,9 +150,5 @@ class OnboardingPageData {
   final String description;
   final IconData icon;
 
-  OnboardingPageData({
-    required this.title,
-    required this.description,
-    required this.icon,
-  });
+  OnboardingPageData({required this.title, required this.description, required this.icon});
 }

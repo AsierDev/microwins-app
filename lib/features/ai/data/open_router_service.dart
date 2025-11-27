@@ -5,8 +5,7 @@ import 'package:uuid/uuid.dart';
 import '../../habits/domain/entities/habit.dart';
 
 class OpenRouterService {
-  static const String _baseUrl =
-      'https://openrouter.ai/api/v1/chat/completions';
+  static const String _baseUrl = 'https://openrouter.ai/api/v1/chat/completions';
 
   Future<List<Habit>> generateHabits(String goal) async {
     final apiKey = dotenv.env['OPENROUTER_API_KEY'];
@@ -60,9 +59,7 @@ Valid categories: Health, Productivity, Wellness, Learning, Fitness
         final content = data['choices'][0]['message']['content'];
         return _parseHabits(content);
       } else {
-        throw Exception(
-          'Failed to generate habits: ${response.statusCode} ${response.body}',
-        );
+        throw Exception('Failed to generate habits: ${response.statusCode} ${response.body}');
       }
     } catch (e) {
       throw Exception('Error calling OpenRouter: $e');
@@ -72,10 +69,7 @@ Valid categories: Health, Productivity, Wellness, Learning, Fitness
   List<Habit> _parseHabits(String content) {
     try {
       // Clean up markdown code blocks if present
-      final jsonString = content
-          .replaceAll('```json', '')
-          .replaceAll('```', '')
-          .trim();
+      final jsonString = content.replaceAll('```json', '').replaceAll('```', '').trim();
       final List<dynamic> jsonList = jsonDecode(jsonString);
 
       return jsonList.map((json) {

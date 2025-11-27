@@ -29,9 +29,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
 
   void _generate() {
     if (_goalController.text.isNotEmpty) {
-      ref
-          .read(aiViewModelProvider.notifier)
-          .generateHabits(_goalController.text);
+      ref.read(aiViewModelProvider.notifier).generateHabits(_goalController.text);
     }
   }
 
@@ -53,10 +51,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
               decoration: InputDecoration(
                 labelText: 'What is your goal?',
                 hintText: 'e.g., Sleep better, Learn Spanish',
-                suffixIcon: IconButton(
-                  onPressed: _generate,
-                  icon: const Icon(Icons.auto_awesome),
-                ),
+                suffixIcon: IconButton(onPressed: _generate, icon: const Icon(Icons.auto_awesome)),
                 border: const OutlineInputBorder(),
               ),
               onSubmitted: (_) => _generate(),
@@ -82,34 +77,22 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
               child: aiState.when(
                 data: (habits) {
                   if (habits.isEmpty) {
-                    return const Center(
-                      child: Text('Enter a goal to generate micro-habits!'),
-                    );
+                    return const Center(child: Text('Enter a goal to generate micro-habits!'));
                   }
                   return ListView.builder(
                     itemCount: habits.length,
                     itemBuilder: (context, index) {
                       final habit = habits[index];
-                      final isAdded = existingHabitNames.contains(
-                        habit.name.toLowerCase(),
-                      );
+                      final isAdded = existingHabitNames.contains(habit.name.toLowerCase());
 
                       return Card(
                         child: ListTile(
-                          leading: Text(
-                            habit.icon,
-                            style: const TextStyle(fontSize: 24),
-                          ),
+                          leading: Text(habit.icon, style: const TextStyle(fontSize: 24)),
                           title: Text(habit.name),
-                          subtitle: Text(
-                            '${habit.durationMinutes} min • ${habit.category}',
-                          ),
+                          subtitle: Text('${habit.durationMinutes} min • ${habit.category}'),
                           trailing: isAdded
                               ? const IconButton(
-                                  icon: Icon(
-                                    Icons.check_circle,
-                                    color: Colors.green,
-                                  ),
+                                  icon: Icon(Icons.check_circle, color: Colors.green),
                                   onPressed: null,
                                 )
                               : IconButton(
@@ -121,14 +104,11 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                                           name: habit.name,
                                           icon: habit.icon,
                                           category: habit.category,
-                                          durationMinutes:
-                                              habit.durationMinutes,
+                                          durationMinutes: habit.durationMinutes,
                                         );
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
-                                        content: Text(
-                                          'Added "${habit.name}" to your habits!',
-                                        ),
+                                        content: Text('Added "${habit.name}" to your habits!'),
                                       ),
                                     );
                                   },

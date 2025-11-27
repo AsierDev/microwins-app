@@ -23,15 +23,11 @@ Future<bool> checkHabitsAndNotify() async {
 
     // Initialize Firebase in WorkManager process
     try {
-      await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform,
-      );
+      await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
       debugPrint('✅ Firebase initialized');
     } catch (e) {
       // Firebase might already be initialized - this is ok
-      debugPrint(
-        '⚠️ Firebase initialization: $e (might already be initialized)',
-      );
+      debugPrint('⚠️ Firebase initialization: $e (might already be initialized)');
     }
 
     // Initialize Hive for local access
@@ -49,10 +45,7 @@ Future<bool> checkHabitsAndNotify() async {
 
     if (userId == null) {
       debugPrint('⚠️ No user logged in, skipping notification check');
-      AppLogger.warning(
-        'No user logged in, skipping notification check',
-        tag: 'HabitCheckWorker',
-      );
+      AppLogger.warning('No user logged in, skipping notification check', tag: 'HabitCheckWorker');
       return Future.value(true);
     }
 
@@ -61,10 +54,7 @@ Future<bool> checkHabitsAndNotify() async {
     debugPrint('🔔 Notifications enabled: $notificationsEnabled');
     if (!notificationsEnabled) {
       debugPrint('⚠️ Notifications disabled in settings, skipping');
-      AppLogger.debug(
-        'Notifications disabled, skipping',
-        tag: 'HabitCheckWorker',
-      );
+      AppLogger.debug('Notifications disabled, skipping', tag: 'HabitCheckWorker');
       return Future.value(true);
     }
 
@@ -80,19 +70,13 @@ Future<bool> checkHabitsAndNotify() async {
     final now = DateTime.now();
     final currentMinutes = now.hour * 60 + now.minute;
     final reminderMinutes = reminderHour * 60 + reminderMinute;
-    debugPrint(
-      '🕐 Current time: ${now.hour}:${now.minute} ($currentMinutes minutes)',
-    );
-    debugPrint(
-      '🎯 Reminder time: $reminderHour:$reminderMinute ($reminderMinutes minutes)',
-    );
+    debugPrint('🕐 Current time: ${now.hour}:${now.minute} ($currentMinutes minutes)');
+    debugPrint('🎯 Reminder time: $reminderHour:$reminderMinute ($reminderMinutes minutes)');
 
     // ± 30-minute window check (flexible for WorkManager scheduling)
     final minuteDifference = (currentMinutes - reminderMinutes).abs();
     final isWithinWindow = minuteDifference <= 30;
-    debugPrint(
-      '📊 Minute difference: $minuteDifference (within ±30min window: $isWithinWindow)',
-    );
+    debugPrint('📊 Minute difference: $minuteDifference (within ±30min window: $isWithinWindow)');
 
     if (!isWithinWindow) {
       debugPrint('⏸️ Not within notification window, skipping');
@@ -112,18 +96,11 @@ Future<bool> checkHabitsAndNotify() async {
     if (lastNotifiedStr != null) {
       try {
         final lastNotified = DateTime.parse(lastNotifiedStr);
-        final lastNotifiedDay = DateTime(
-          lastNotified.year,
-          lastNotified.month,
-          lastNotified.day,
-        );
+        final lastNotifiedDay = DateTime(lastNotified.year, lastNotified.month, lastNotified.day);
 
         if (lastNotifiedDay.isAtSameMomentAs(today)) {
           debugPrint('✅ Already sent notification today, skipping');
-          AppLogger.debug(
-            'Already sent streak notification today',
-            tag: 'HabitCheckWorker',
-          );
+          AppLogger.debug('Already sent streak notification today', tag: 'HabitCheckWorker');
           return Future.value(true);
         }
       } catch (e) {
@@ -156,10 +133,7 @@ Future<bool> checkHabitsAndNotify() async {
       return !lastCompleted.isAtSameMomentAs(today);
     }).toList();
 
-    AppLogger.debug(
-      'Found ${incompleteHabits.length} incomplete habits',
-      tag: 'HabitCheckWorker',
-    );
+    AppLogger.debug('Found ${incompleteHabits.length} incomplete habits', tag: 'HabitCheckWorker');
     debugPrint('🎯 Incomplete habits: ${incompleteHabits.length}');
 
     // Only notify if there are incomplete habits
@@ -167,8 +141,7 @@ Future<bool> checkHabitsAndNotify() async {
       final count = incompleteHabits.length;
       final habitWord = count == 1 ? 'habit' : 'habits';
       const title = "Don't lose your streak! 🔥";
-      final body =
-          'You have $count $habitWord left today. Take 5 mins to keep your momentum!';
+      final body = 'You have $count $habitWord left today. Take 5 mins to keep your momentum!';
 
       debugPrint('📬 Sending notification:');
       debugPrint('   Title: $title');
@@ -177,10 +150,7 @@ Future<bool> checkHabitsAndNotify() async {
       await _showNotification(title: title, body: body);
 
       // Update last notified date
-      await prefs.setString(
-        'last_streak_notification_date',
-        now.toIso8601String(),
-      );
+      await prefs.setString('last_streak_notification_date', now.toIso8601String());
 
       debugPrint('✅ Notification sent successfully!');
       AppLogger.info(
@@ -189,10 +159,7 @@ Future<bool> checkHabitsAndNotify() async {
       );
     } else {
       debugPrint('🎉 All habits complete! No notification needed.');
-      AppLogger.debug(
-        'All habits complete! No notification needed.',
-        tag: 'HabitCheckWorker',
-      );
+      AppLogger.debug('All habits complete! No notification needed.', tag: 'HabitCheckWorker');
     }
 
     debugPrint('═══════════════════════════════');
@@ -206,15 +173,12 @@ Future<bool> checkHabitsAndNotify() async {
 }
 
 /// Show a streak-saver notification
-Future<void> _showNotification({
-  required String title,
-  required String body,
-}) async {
-  final FlutterLocalNotificationsPlugin notificationsPlugin =
-      FlutterLocalNotificationsPlugin();
+Future<void> _showNotification({required String title, required String body}) async {
+  final FlutterLocalNotificationsPlugin notificationsPlugin = FlutterLocalNotificationsPlugin();
 
-  const AndroidInitializationSettings initializationSettingsAndroid =
-      AndroidInitializationSettings('@drawable/ic_notification');
+  const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings(
+    '@drawable/ic_notification',
+  );
 
   const InitializationSettings initializationSettings = InitializationSettings(
     android: initializationSettingsAndroid,

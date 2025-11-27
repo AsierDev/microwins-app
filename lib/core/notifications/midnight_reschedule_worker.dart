@@ -6,19 +6,13 @@ import '../utils/logger.dart';
 /// This allows a new notification to be sent the next day
 Future<bool> resetDailyNotificationFlag() async {
   try {
-    AppLogger.debug(
-      'Midnight Worker: Resetting daily notification flag...',
-      tag: 'MidnightWorker',
-    );
+    AppLogger.debug('Midnight Worker: Resetting daily notification flag...', tag: 'MidnightWorker');
 
     // Get SharedPreferences and clear the last notification date
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('last_streak_notification_date');
 
-    AppLogger.info(
-      'Midnight reschedule complete: notification flag reset',
-      tag: 'MidnightWorker',
-    );
+    AppLogger.info('Midnight reschedule complete: notification flag reset', tag: 'MidnightWorker');
 
     return Future.value(true);
   } catch (e) {
