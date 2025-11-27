@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Privacy Policy for MicroWins - Micro habit tracker app">
+    <title>Privacy Policy - MicroWins</title>
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --text-color: #333;
+            --bg-color: #f9f9f9;
+            --card-bg: #ffffff;
+            --border-color: #e0e0e0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .last-updated {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        h2 {
+            color: var(--text-color);
+            font-size: 1.8rem;
+            margin-top: 32px;
+            margin-bottom: 16px;
+        }
+
+        h3 {
+            color: var(--text-color);
+            font-size: 1.3rem;
+            margin-top: 24px;
+            margin-bottom: 12px;
+        }
+
+        p, li {
+            margin-bottom: 12px;
+            color: #555;
+        }
+
+        ul {
+            margin-left: 20px;
+            margin-bottom: 16px;
+        }
+
+        a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .contact-box {
+            background: var(--bg-color);
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 32px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .contact-box strong {
+            color: var(--primary-color);
+        }
+
+        .intro {
+            font-size: 1.1rem;
+            color: #555;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Privacy Policy</h1>
+        <p class="last-updated"><strong>Last updated:</strong> November 26, 2025</p>
+
+        <p class="intro">
+            MicroWins ("we", "our", or "us") respects your privacy and is committed to protecting your personal data. 
+            This privacy policy will inform you about how we look after your personal data when you use our mobile 
+            application and tell you about your privacy rights.
+        </p>
+
+        <h2>Introduction</h2>
+        <p>
+            MicroWins is a habit-tracking application that helps you build lasting habits through micro-habits, 
+            gamification, and AI-powered suggestions.
+        </p>
+
+        <h2>Information We Collect</h2>
+        <p>We collect and process the following types of information:</p>
+
+        <h3>Account Information</h3>
+        <p>When you sign in with Google or create an account, we collect:</p>
+        <ul>
+            <li>Name</li>
+            <li>Email address</li>
+            <li>Profile picture (if using Google Sign-In)</li>
+        </ul>
+
+        <h3>Habit Data</h3>
+        <p>We store your habits and related information, including:</p>
+        <ul>
+            <li>Habit names and descriptions</li>
+            <li>Categories and settings</li>
+            <li>Completion history and streaks</li>
+            <li>Reminder times</li>
+            <li>Progress statistics</li>
+        </ul>
+
+        <h3>Device Information</h3>
+        <p>We may collect device identifiers and technical information for:</p>
+        <ul>
+            <li>Analytics and crash reporting</li>
+            <li>App performance optimization</li>
+        </ul>
+
+        <h2>How We Use Your Information</h2>
+        <p>We use your information to:</p>
+        <ul>
+            <li><strong>Provide and maintain our service:</strong> Enable habit tracking and synchronization across your devices</li>
+            <li><strong>Send notifications:</strong> Deliver habit reminders at your scheduled times (if enabled)</li>
+            <li><strong>Sync your data:</strong> Store your habit data in the cloud using Firebase Firestore</li>
+            <li><strong>Improve our app:</strong> Analyze usage patterns to develop new features and optimize performance</li>
+            <li><strong>Communicate with you:</strong> Send updates about the app and respond to support requests</li>
+            <li><strong>Generate AI suggestions:</strong> Provide personalized habit recommendations using OpenRouter API</li>
+        </ul>
+
+        <h2>Data Storage and Security</h2>
+
+        <h3>Local Storage</h3>
+        <p>Your habit data is stored locally on your device using Hive (local database) for offline access.</p>
+
+        <h3>Cloud Storage</h3>
+        <p>When online, your data is synchronized to Firebase Firestore for cross-device access and backup.</p>
+
+        <h3>Security Measures</h3>
+        <p>We implement appropriate security measures to protect your data, including:</p>
+        <ul>
+            <li>Encryption in transit (HTTPS/TLS)</li>
+            <li>Secure authentication through Firebase Auth</li>
+            <li>Industry-standard database security</li>
+        </ul>
+        <p>However, no method of transmission over the internet is 100% secure, and we cannot guarantee absolute security.</p>
+
+        <h2>Third-Party Services</h2>
+        <p>We use the following third-party services that may collect and process your data:</p>
+
+        <h3>Firebase (Google)</h3>
+        <ul>
+            <li><strong>Purpose:</strong> Authentication, cloud storage, and analytics</li>
+            <li><strong>Data collected:</strong> Email, name, habit data, device information</li>
+            <li><strong>Privacy Policy:</strong> <a href="https://firebase.google.com/support/privacy" target="_blank">https://firebase.google.com/support/privacy</a></li>
+        </ul>
+
+        <h3>Google Sign-In</h3>
+        <ul>
+            <li><strong>Purpose:</strong> User authentication</li>
+            <li><strong>Data collected:</strong> Email, name, profile picture</li>
+            <li><strong>Privacy Policy:</strong> <a href="https://policies.google.com/privacy" target="_blank">https://policies.google.com/privacy</a></li>
+        </ul>
+
+        <h3>OpenRouter API</h3>
+        <ul>
+            <li><strong>Purpose:</strong> AI-powered habit suggestions</li>
+            <li><strong>Data collected:</strong> Habit-related queries (no personally identifiable information)</li>
+            <li><strong>Privacy Policy:</strong> <a href="https://openrouter.ai/privacy" target="_blank">https://openrouter.ai/privacy</a></li>
+        </ul>
+
+        <h2>Data Sharing</h2>
+        <p>We <strong>do not sell</strong> your personal data to third parties.</p>
+        <p>We share your data only with:</p>
+        <ul>
+            <li><strong>Firebase services</strong> (infrastructure provider)</li>
+            <li><strong>OpenRouter</strong> (for AI suggestions, anonymized)</li>
+        </ul>
+
+        <h2>Your Rights</h2>
+        <p>You have the right to:</p>
+        <ul>
+            <li><strong>Access your personal data:</strong> Request a copy of the data we hold about you</li>
+            <li><strong>Correct your personal data:</strong> Update inaccurate or incomplete information</li>
+            <li><strong>Delete your personal data:</strong> Request deletion of your account and all associated data</li>
+            <li><strong>Object to processing:</strong> Object to the processing of your personal data</li>
+            <li><strong>Data portability:</strong> Request transfer of your personal data to another service</li>
+        </ul>
+        <p>To exercise any of these rights, please contact us at <strong>support@microwins.app</strong>.</p>
+
+        <h2>Data Retention</h2>
+        <p>
+            We retain your personal data only for as long as necessary to provide you with our services and for 
+            legitimate business purposes.
+        </p>
+        <p>
+            If you delete your account, we will delete your personal data within <strong>30 days</strong>, except 
+            where we are required to retain it by law.
+        </p>
+
+        <h2>Children's Privacy</h2>
+        <p>
+            Our service is not directed to children under <strong>13 years of age</strong>. We do not knowingly 
+            collect personal information from children under 13.
+        </p>
+        <p>
+            If you are a parent or guardian and believe your child has provided us with personal information, please 
+            contact us at <strong>support@microwins.app</strong>, and we will take steps to delete such information.
+        </p>
+
+        <h2>Changes to This Policy</h2>
+        <p>
+            We may update this privacy policy from time to time to reflect changes in our practices or for legal, 
+            operational, or regulatory reasons.
+        </p>
+        <p>We will notify you of any material changes by:</p>
+        <ul>
+            <li>Posting the new privacy policy on this page</li>
+            <li>Updating the "Last updated" date</li>
+            <li>Sending you a notification through the app (for significant changes)</li>
+        </ul>
+        <p>
+            Your continued use of the app after changes are posted constitutes your acceptance of the updated policy.
+        </p>
+
+        <div class="contact-box">
+            <h2>Contact Us</h2>
+            <p>
+                If you have any questions about this privacy policy or our data practices, please contact us at:
+            </p>
+            <p><strong>Email:</strong> support@microwins.app</p>
+            <p><strong>App:</strong> MicroWins - Settings → Privacy Policy</p>
+        </div>
+
+        <p style="margin-top: 40px; text-align: center; color: #999; font-size: 0.9rem;">
+            <strong>Effective Date:</strong> November 26, 2025
+        </p>
+    </div>
+</body>
+</html>
