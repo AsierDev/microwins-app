@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -34,11 +35,16 @@ class ProfileScreen extends ConsumerWidget {
                   CircleAvatar(
                     radius: 40,
                     backgroundColor: Theme.of(context).colorScheme.primary,
-                    backgroundImage: user?.photoURL != null ? NetworkImage(user!.photoURL!) : null,
+                    backgroundImage: user?.photoURL != null
+                        ? NetworkImage(user!.photoURL!)
+                        : null,
                     child: user?.photoURL == null
                         ? Text(
                             _getInitial(user),
-                            style: const TextStyle(fontSize: 32, color: Colors.white),
+                            style: const TextStyle(
+                              fontSize: 32,
+                              color: Colors.white,
+                            ),
                           )
                         : null,
                   ),
@@ -50,7 +56,9 @@ class ProfileScreen extends ConsumerWidget {
                   const SizedBox(height: 4),
                   Text(
                     user?.email ?? '',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodyMedium?.copyWith(color: Colors.grey),
                   ),
                 ],
               ),
@@ -68,7 +76,9 @@ class ProfileScreen extends ConsumerWidget {
                 data: (habits) {
                   final totalHabits = habits.length;
                   final bestStreak = habits.isNotEmpty
-                      ? habits.map((h) => h.bestStreak).reduce((a, b) => a > b ? a : b)
+                      ? habits
+                            .map((h) => h.bestStreak)
+                            .reduce((a, b) => a > b ? a : b)
                       : 0;
 
                   return Row(
@@ -95,34 +105,38 @@ class ProfileScreen extends ConsumerWidget {
           const SizedBox(height: 24),
 
           // Debug Section
-          Text('Debug Tools', style: Theme.of(context).textTheme.titleLarge),
-          const SizedBox(height: 8),
-          Card(
-            child: ListTile(
-              leading: const Icon(Icons.bug_report, color: Colors.orange),
-              title: const Text('🧪 Test Worker Now'),
-              subtitle: const Text('Trigger notification check in 10 seconds'),
-              onTap: () async {
-                await Workmanager().registerOneOffTask(
-                  'debug_test',
-                  'habitCheck',
-                  initialDelay: const Duration(seconds: 10),
-                );
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        '⏱️ Worker will fire in 10s. Check logs with:\n'
-                        'adb logcat | grep -E "(HabitCheckWorker|Flutter)"',
-                      ),
-                      duration: Duration(seconds: 5),
-                    ),
+          if (kDebugMode) ...[
+            Text('Debug Tools', style: Theme.of(context).textTheme.titleLarge),
+            const SizedBox(height: 8),
+            Card(
+              child: ListTile(
+                leading: const Icon(Icons.bug_report, color: Colors.orange),
+                title: const Text('🧪 Test Worker Now'),
+                subtitle: const Text(
+                  'Trigger notification check in 10 seconds',
+                ),
+                onTap: () async {
+                  await Workmanager().registerOneOffTask(
+                    'debug_test',
+                    'habitCheck',
+                    initialDelay: const Duration(seconds: 10),
                   );
-                }
-              },
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          '⏱️ Worker will fire in 10s. Check logs with:\n'
+                          'adb logcat | grep -E "(HabitCheckWorker|Flutter)"',
+                        ),
+                        duration: Duration(seconds: 5),
+                      ),
+                    );
+                  }
+                },
+              ),
             ),
-          ),
-          const SizedBox(height: 24),
+            const SizedBox(height: 24),
+          ],
 
           // Settings Section
           Text('Settings', style: Theme.of(context).textTheme.titleLarge),
@@ -135,14 +149,16 @@ class ProfileScreen extends ConsumerWidget {
                     // Check actual permission status from system
                     future: NotificationService().checkPermissionStatus(),
                     builder: (context, snapshot) {
-                      final actualStatus = snapshot.data ?? settings.notificationsEnabled;
+                      final actualStatus =
+                          snapshot.data ?? settings.notificationsEnabled;
                       return SwitchListTile(
                         title: const Text('Enable Notifications'),
                         subtitle: const Text('Receive daily habit reminders'),
                         value: actualStatus,
                         onChanged: (value) async {
                           if (value) {
-                            final status = await Permission.notification.request();
+                            final status = await Permission.notification
+                                .request();
                             if (status.isGranted) {
                               await ref
                                   .read(settingsNotifierProvider.notifier)
@@ -227,7 +243,9 @@ class ProfileScreen extends ConsumerWidget {
                 ListTile(
                   leading: const Icon(Icons.battery_alert),
                   title: const Text('Optimize Notifications'),
-                  subtitle: const Text('Disable battery restrictions for accurate reminders'),
+                  subtitle: const Text(
+                    'Disable battery restrictions for accurate reminders',
+                  ),
                   trailing: const Icon(Icons.open_in_new, size: 16),
                   onTap: () {
                     showDialog(
@@ -337,7 +355,11 @@ class _StatItem extends StatelessWidget {
   final String value;
   final IconData icon;
 
-  const _StatItem({required this.label, required this.value, required this.icon});
+  const _StatItem({
+    required this.label,
+    required this.value,
+    required this.icon,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -347,10 +369,17 @@ class _StatItem extends StatelessWidget {
         const SizedBox(height: 8),
         Text(
           value,
-          style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
+          style: Theme.of(
+            context,
+          ).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 4),
-        Text(label, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey)),
+        Text(
+          label,
+          style: Theme.of(
+            context,
+          ).textTheme.bodySmall?.copyWith(color: Colors.grey),
+        ),
       ],
     );
   }
