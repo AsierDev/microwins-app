@@ -23,8 +23,17 @@ class PrivacyPolicyScreen extends StatelessWidget {
                   final uri = Uri.parse(
                     'https://asierdev.github.io/microwins-app/privacy-policy.html',
                   );
-                  if (await canLaunchUrl(uri)) {
+                  try {
                     await launchUrl(uri, mode: LaunchMode.externalApplication);
+                  } catch (e) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Could not open URL: $e'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
                   }
                 },
               ),
