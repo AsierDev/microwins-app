@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:workmanager/workmanager.dart';
 
@@ -61,11 +60,6 @@ void main() async {
     );
 
     debugPrint('✅ Periodic task registered: midnight-reschedule (daily)');
-  }
-
-  // Initialize Ads
-  if (!kIsWeb) {
-    await MobileAds.instance.initialize();
   }
 
   runApp(const ProviderScope(child: MyApp()));

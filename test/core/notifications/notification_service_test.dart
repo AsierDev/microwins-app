@@ -6,6 +6,7 @@ import 'package:microwins/core/notifications/notification_service.dart';
 // Generate mocks with: flutter pub run build_runner build
 @GenerateMocks([FlutterLocalNotificationsPlugin])
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   group('NotificationService', () {
     late NotificationService notificationService;
 

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -11,9 +10,8 @@ const String _themeModeKey = 'theme_mode';
 class ThemeModeNotifier extends _$ThemeModeNotifier {
   @override
   ThemeMode build() {
-    // Initialize with system theme brightness
-    final brightness = SchedulerBinding.instance.platformDispatcher.platformBrightness;
-    state = brightness == Brightness.dark ? ThemeMode.dark : ThemeMode.light;
+    // Initialize with system theme mode (respects user's OS preference)
+    state = ThemeMode.system;
 
     // Load saved theme asynchronously
     _loadThemeMode();
@@ -26,7 +24,8 @@ class ThemeModeNotifier extends _$ThemeModeNotifier {
     if (themeModeString != null) {
       state = ThemeMode.values.firstWhere(
         (mode) => mode.toString() == themeModeString,
-        orElse: () => state, // Keep current state (system-based) if parsing fails
+        orElse: () =>
+            state, // Keep current state (system-based) if parsing fails
       );
     }
   }
@@ -34,8 +33,10 @@ class ThemeModeNotifier extends _$ThemeModeNotifier {
   Future<void> toggleTheme() async {
     final prefs = await SharedPreferences.getInstance();
 
-    // Toggle between light and dark (skip system for now)
-    if (state == ThemeMode.dark || state == ThemeMode.system) {
+    // Cycle: system → dark → light → dark → light...
+    if (state == ThemeMode.system) {
+      state = ThemeMode.dark;
+    } else if (state == ThemeMode.dark) {
       state = ThemeMode.light;
     } else {
       state = ThemeMode.dark;

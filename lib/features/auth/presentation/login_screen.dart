@@ -50,9 +50,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     ref.listen(authViewModelProvider, (previous, next) {
       if (next.hasError) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(next.error.toString())));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(next.error.toString())));
       }
     });
 
@@ -75,9 +73,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   const SizedBox(height: 32),
                   Text(
                     _isLogin ? 'Welcome Back' : 'Create Account',
-                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 32),
@@ -133,9 +131,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     onPressed: isLoading
                         ? null
                         : () async {
-                            await ref
-                                .read(authViewModelProvider.notifier)
-                                .signInWithGoogle();
+                            await ref.read(authViewModelProvider.notifier).signInWithGoogle();
                             if (mounted &&
                                 context.mounted &&
                                 !ref.read(authViewModelProvider).hasError) {
@@ -159,13 +155,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 ),
                                 actions: [
                                   TextButton(
-                                    onPressed: () =>
-                                        Navigator.pop(context, false),
+                                    onPressed: () => Navigator.pop(context, false),
                                     child: const Text('Cancel'),
                                   ),
                                   FilledButton(
-                                    onPressed: () =>
-                                        Navigator.pop(context, true),
+                                    onPressed: () => Navigator.pop(context, true),
                                     child: const Text('Continue'),
                                   ),
                                 ],
@@ -173,9 +167,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             );
 
                             if (confirm == true) {
-                              await ref
-                                  .read(authViewModelProvider.notifier)
-                                  .signInAnonymously();
+                              await ref.read(authViewModelProvider.notifier).signInAnonymously();
                               if (mounted &&
                                   context.mounted &&
                                   !ref.read(authViewModelProvider).hasError) {
@@ -189,11 +181,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        _isLogin
-                            ? "Don't have an account? "
-                            : 'Already have an account? ',
-                      ),
+                      Text(_isLogin ? "Don't have an account? " : 'Already have an account? '),
                       GestureDetector(
                         onTap: () {
                           setState(() {
