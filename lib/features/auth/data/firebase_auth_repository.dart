@@ -97,9 +97,20 @@ class FirebaseAuthRepository implements AuthRepository {
     }
 
     try {
-      // 1. Delete Firestore user data
-      final firestore = FirebaseFirestore.instance;
-      await firestore.collection('users').doc(user.uid).delete();
+      // 1. Try to delete Firestore user data (skip if no permissions or doesn't exist)
+      try {
+        final firestore = FirebaseFirestore.instance;
+        final docRef = firestore.collection('users').doc(user.uid);
+        final docSnapshot = await docRef.get();
+
+        if (docSnapshot.exists) {
+          await docRef.delete();
+        }
+      } catch (firestoreError) {
+        // Ignore Firestore errors (e.g., permission-denied, not-found)
+        // Continue with account deletion even if Firestore fails
+        print('Firestore deletion skipped: $firestoreError');
+      }
 
       // 2. Clear local Hive data
       await Hive.deleteBoxFromDisk('habits');

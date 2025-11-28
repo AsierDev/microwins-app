@@ -284,75 +284,83 @@ class ProfileScreen extends ConsumerWidget {
                     context.push('/privacy-policy');
                   },
                 ),
-                const Divider(height: 1),
-                ListTile(
-                  leading: const Icon(Icons.delete_forever, color: Colors.red),
-                  title: const Text(
-                    'Delete Account',
-                    style: TextStyle(color: Colors.red),
-                  ),
-                  subtitle: const Text(
-                    'Permanently delete your account and data',
-                  ),
-                  trailing: const Icon(
-                    Icons.arrow_forward_ios,
-                    size: 16,
-                    color: Colors.red,
-                  ),
-                  onTap: () async {
-                    final shouldDelete = await showDialog<bool>(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text('Delete Account?'),
-                        content: const Text(
-                          '⚠️ This action cannot be undone.\n\n'
-                          'All your data will be permanently deleted:\n'
-                          '• All habits and progress\n'
-                          '• Account information\n'
-                          '• Cloud sync data\n\n'
-                          'Are you absolutely sure?',
+                // Only show Delete Account for authenticated users (not anonymous)
+                if (user != null && !user.isAnonymous) ...[
+                  const Divider(height: 1),
+                  ListTile(
+                    leading: const Icon(
+                      Icons.delete_forever,
+                      color: Colors.red,
+                    ),
+                    title: const Text(
+                      'Delete Account',
+                      style: TextStyle(color: Colors.red),
+                    ),
+                    subtitle: const Text(
+                      'Permanently delete your account and data',
+                    ),
+                    trailing: const Icon(
+                      Icons.arrow_forward_ios,
+                      size: 16,
+                      color: Colors.red,
+                    ),
+                    onTap: () async {
+                      final shouldDelete = await showDialog<bool>(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text('Delete Account?'),
+                          content: const Text(
+                            '⚠️ This action cannot be undone.\n\n'
+                            'All your data will be permanently deleted:\n'
+                            '• All habits and progress\n'
+                            '• Account information\n'
+                            '• Cloud sync data\n\n'
+                            'Are you absolutely sure?',
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, false),
+                              child: const Text('Cancel'),
+                            ),
+                            FilledButton(
+                              style: FilledButton.styleFrom(
+                                backgroundColor: Colors.red,
+                              ),
+                              onPressed: () => Navigator.pop(context, true),
+                              child: const Text('Delete Forever'),
+                            ),
+                          ],
                         ),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context, false),
-                            child: const Text('Cancel'),
-                          ),
-                          FilledButton(
-                            style: FilledButton.styleFrom(
-                              backgroundColor: Colors.red,
-                            ),
-                            onPressed: () => Navigator.pop(context, true),
-                            child: const Text('Delete Forever'),
-                          ),
-                        ],
-                      ),
-                    );
+                      );
 
-                    if (shouldDelete == true && context.mounted) {
-                      try {
-                        await ref.read(authRepositoryProvider).deleteAccount();
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Account deleted successfully'),
-                              backgroundColor: Colors.green,
-                            ),
-                          );
-                          context.go('/login');
-                        }
-                      } catch (e) {
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Error: $e'),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
+                      if (shouldDelete == true && context.mounted) {
+                        try {
+                          await ref
+                              .read(authRepositoryProvider)
+                              .deleteAccount();
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Account deleted successfully'),
+                                backgroundColor: Colors.green,
+                              ),
+                            );
+                            context.go('/login');
+                          }
+                        } catch (e) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Error: $e'),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
                         }
                       }
-                    }
-                  },
-                ),
+                    },
+                  ),
+                ],
               ],
             ),
           ),
