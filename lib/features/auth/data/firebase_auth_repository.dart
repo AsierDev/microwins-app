@@ -5,6 +5,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hive/hive.dart';
 import '../domain/auth_repository.dart';
 
+import '../../habits/data/models/habit_model.dart';
+
 class FirebaseAuthRepository implements AuthRepository {
   final FirebaseAuth _firebaseAuth;
   final GoogleSignIn _googleSignIn;
@@ -74,7 +76,15 @@ class FirebaseAuthRepository implements AuthRepository {
 
   @override
   Future<void> signOut() async {
+    // 1. Clear local Hive data
+    await Hive.box<HabitModel>('habits').clear();
+    await Hive.box<dynamic>('settings').clear();
+    await Hive.box<dynamic>('syncQueue').clear();
+
+    // 2. Clear WorkManager user ID
     await _clearUserIdFromWorkManager();
+
+    // 3. Sign out from Firebase and Google
     await Future.wait([_firebaseAuth.signOut(), _googleSignIn.signOut()]);
   }
 

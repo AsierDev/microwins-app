@@ -1,5 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../../core/sync/sync_manager.dart';
+import '../../auth/data/auth_provider.dart';
 import '../domain/habit_repository.dart';
 import 'habit_repository_impl.dart';
 
@@ -12,6 +13,9 @@ SyncManager syncManager(SyncManagerRef ref) {
 
 @Riverpod(keepAlive: true)
 HabitRepository habitRepository(HabitRepositoryRef ref) {
+  // Rebuild repository when auth state changes (login/logout)
+  ref.watch(authStateProvider);
+
   final syncManager = ref.watch(syncManagerProvider);
   final repository = HabitRepositoryImpl(syncManager);
   // Trigger sync in background
