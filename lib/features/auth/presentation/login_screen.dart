@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'auth_view_model.dart';
+import '../utils/auth_error_handler.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -15,6 +16,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isLogin = true; // Toggle between Login and Sign Up
+  bool _obscurePassword = true;
 
   @override
   void dispose() {
@@ -24,6 +26,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   void _submit() async {
+    if (ref.read(authViewModelProvider).isLoading) return;
     if (_formKey.currentState!.validate()) {
       final email = _emailController.text.trim();
       final password = _passwordController.text.trim();
@@ -35,9 +38,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       }
 
       if (mounted && !ref.read(authViewModelProvider).hasError) {
-        // Navigation is handled by auth state listener in router or splash,
-        // but for now we can force it or wait for stream.
-        // Ideally, the router redirects based on auth state.
         context.go('/home');
       }
     }
@@ -50,7 +50,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     ref.listen(authViewModelProvider, (previous, next) {
       if (next.hasError) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(next.error.toString())));
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(AuthErrorHandler.getErrorMessage(next.error!)),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
       }
     });
 
@@ -73,9 +79,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   const SizedBox(height: 32),
                   Text(
                     _isLogin ? 'Welcome Back' : 'Create Account',
-                    style: Theme.of(
-                      context,
-                    ).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
+                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 32),
@@ -87,32 +93,63 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       prefixIcon: Icon(Icons.email_outlined),
                     ),
                     keyboardType: TextInputType.emailAddress,
+                    onChanged: (value) =>
+                        setState(() {}), // Trigger rebuild for validation icon
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter email';
+                        return 'Please enter your email';
                       }
-                      if (!value.contains('@')) return 'Invalid email';
+                      final emailRegex = RegExp(
+                        r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                      );
+                      if (!emailRegex.hasMatch(value)) {
+                        return 'Invalid email format';
+                      }
                       return null;
                     },
                   ),
                   const SizedBox(height: 16),
                   TextFormField(
                     controller: _passwordController,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: 'Password',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.lock_outline),
+                      border: const OutlineInputBorder(),
+                      prefixIcon: const Icon(Icons.lock_outline),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscurePassword
+                              ? Icons.visibility_outlined
+                              : Icons.visibility_off_outlined,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _obscurePassword = !_obscurePassword;
+                          });
+                        },
+                      ),
                     ),
-                    obscureText: true,
+                    obscureText: _obscurePassword,
+                    onChanged: (value) =>
+                        setState(() {}), // Trigger rebuild for validation icon
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter password';
+                        return 'Please enter your password';
                       }
                       if (value.length < 6) return 'Password too short';
                       return null;
                     },
                   ),
-                  const SizedBox(height: 24),
+                  if (_isLogin) ...[
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
+                        onPressed: () => context.push('/forgot-password'),
+                        child: const Text('Forgot Password?'),
+                      ),
+                    ),
+                  ] else
+                    const SizedBox(height: 24),
+
                   FilledButton(
                     onPressed: isLoading ? null : _submit,
                     child: Padding(
@@ -131,7 +168,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     onPressed: isLoading
                         ? null
                         : () async {
-                            await ref.read(authViewModelProvider.notifier).signInWithGoogle();
+                            await ref
+                                .read(authViewModelProvider.notifier)
+                                .signInWithGoogle();
                             if (mounted &&
                                 context.mounted &&
                                 !ref.read(authViewModelProvider).hasError) {
@@ -155,11 +194,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 ),
                                 actions: [
                                   TextButton(
-                                    onPressed: () => Navigator.pop(context, false),
+                                    onPressed: () =>
+                                        Navigator.pop(context, false),
                                     child: const Text('Cancel'),
                                   ),
                                   FilledButton(
-                                    onPressed: () => Navigator.pop(context, true),
+                                    onPressed: () =>
+                                        Navigator.pop(context, true),
                                     child: const Text('Continue'),
                                   ),
                                 ],
@@ -167,7 +208,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             );
 
                             if (confirm == true) {
-                              await ref.read(authViewModelProvider.notifier).signInAnonymously();
+                              await ref
+                                  .read(authViewModelProvider.notifier)
+                                  .signInAnonymously();
                               if (mounted &&
                                   context.mounted &&
                                   !ref.read(authViewModelProvider).hasError) {
@@ -181,11 +224,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(_isLogin ? "Don't have an account? " : 'Already have an account? '),
+                      Text(
+                        _isLogin
+                            ? "Don't have an account? "
+                            : 'Already have an account? ',
+                      ),
                       GestureDetector(
                         onTap: () {
                           setState(() {
                             _isLogin = !_isLogin;
+                            _formKey.currentState?.reset();
+                            _emailController.clear();
+                            _passwordController.clear();
                           });
                         },
                         child: Text(

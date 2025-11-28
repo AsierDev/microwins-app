@@ -128,4 +128,9 @@ class FirebaseAuthRepository implements AuthRepository {
       throw Exception('Failed to delete account: $e');
     }
   }
+
+  @override
+  Future<void> sendPasswordResetEmail(String email) async {
+    await _firebaseAuth.sendPasswordResetEmail(email: email);
+  }
 }
