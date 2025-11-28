@@ -102,7 +102,7 @@ You have the right to:
 - **Object to processing**: Object to the processing of your personal data
 - **Data portability**: Request transfer of your personal data to another service
 
-To exercise any of these rights, please contact us at **support@microwins.app**.
+To exercise any of these rights, please contact us at **app.microwins@gmail.com**.
 
 ## Data Retention
 
@@ -114,7 +114,7 @@ If you delete your account, we will delete your personal data within **30 days**
 
 Our service is not directed to children under **13 years of age**. We do not knowingly collect personal information from children under 13.
 
-If you are a parent or guardian and believe your child has provided us with personal information, please contact us at **support@microwins.app**, and we will take steps to delete such information.
+If you are a parent or guardian and believe your child has provided us with personal information, please contact us at **app.microwins@gmail.com**, and we will take steps to delete such information.
 
 ## Changes to This Policy
 
@@ -131,7 +131,7 @@ Your continued use of the app after changes are posted constitutes your acceptan
 
 If you have any questions about this privacy policy or our data practices, please contact us at:
 
-**Email**: support@microwins.app  
+**Email**: app.microwins@gmail.com  
 **App**: MicroWins - Settings → Privacy Policy
 
 ---

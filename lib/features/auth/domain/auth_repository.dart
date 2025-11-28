@@ -6,4 +6,5 @@ abstract class AuthRepository {
   Future<void> signInAnonymously();
   Future<void> signOut();
   String? get currentUser;
+  Future<void> deleteAccount();
 }

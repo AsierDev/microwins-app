@@ -52,4 +52,11 @@ class MockAuthRepository implements AuthRepository {
     _currentUser = null;
     _controller.add(null);
   }
+
+  @override
+  Future<void> deleteAccount() async {
+    await Future.delayed(const Duration(seconds: 1));
+    _currentUser = null;
+    _controller.add(null);
+  }
 }

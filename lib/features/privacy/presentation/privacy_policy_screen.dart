@@ -118,7 +118,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
               context,
               'Contact Us',
               'If you have any questions about this privacy policy or our data practices, please contact us at:\n\n'
-                  'Email: support@microwins.app',
+                  'Email: app.microwins@gmail.com',
             ),
             const SizedBox(height: 32),
           ],
