@@ -55,8 +55,15 @@ class MockAuthRepository implements AuthRepository {
 
   @override
   Future<void> deleteAccount() async {
-    await Future.delayed(const Duration(seconds: 1));
+    await Future<void>.delayed(const Duration(seconds: 1));
     _currentUser = null;
     _controller.add(null);
+  }
+
+  @override
+  Future<void> sendPasswordResetEmail(String email) async {
+    // Mock implementation - just simulate a delay
+    await Future<void>.delayed(const Duration(seconds: 1));
+    // In a real implementation, this would send an email
   }
 }
