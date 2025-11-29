@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../domain/entities/habit.dart';
 import '../data/habit_provider.dart';
 import 'habit_view_model.dart';
+import '../../../l10n/app_localizations.dart';
 
 class CreateHabitScreen extends ConsumerStatefulWidget {
   final Habit? habitToEdit;
@@ -22,9 +23,26 @@ class _CreateHabitScreenState extends ConsumerState<CreateHabitScreen> {
   String _selectedCategory = 'Health';
   int _durationMinutes = 2;
 
-  final List<String> _categories = ['Health', 'Productivity', 'Wellness', 'Learning', 'Fitness'];
+  final List<String> _categories = [
+    'Health',
+    'Productivity',
+    'Wellness',
+    'Learning',
+    'Fitness',
+  ];
   final List<int> _durations = [2, 3, 5, 8, 10, 15];
-  final List<String> _icons = ['✅', '💧', '🏃', '📚', '🧘', '💪', '🍎', '💤', '💻', '🎨'];
+  final List<String> _icons = [
+    '✅',
+    '💧',
+    '🏃',
+    '📚',
+    '🧘',
+    '💪',
+    '🍎',
+    '💤',
+    '💻',
+    '🎨',
+  ];
 
   bool _isLoading = false;
 
@@ -80,8 +98,8 @@ class _CreateHabitScreenState extends ConsumerState<CreateHabitScreen> {
             SnackBar(
               content: Text(
                 widget.habitToEdit != null
-                    ? 'Habit updated successfully!'
-                    : 'Habit created successfully!',
+                    ? AppLocalizations.of(context)!.habitUpdatedSuccess
+                    : AppLocalizations.of(context)!.habitCreatedSuccess,
               ),
             ),
           );
@@ -92,10 +110,15 @@ class _CreateHabitScreenState extends ConsumerState<CreateHabitScreen> {
           await showDialog(
             context: context,
             builder: (context) => AlertDialog(
-              title: const Text('Error'),
-              content: Text('Failed to create habit: $e'),
+              title: Text(AppLocalizations.of(context)!.errorTitle),
+              content: Text(
+                '${AppLocalizations.of(context)!.failedToCreateHabit}: $e',
+              ),
               actions: [
-                TextButton(onPressed: () => Navigator.pop(context), child: const Text('OK')),
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(AppLocalizations.of(context)!.okButton),
+                ),
               ],
             ),
           );
@@ -113,7 +136,13 @@ class _CreateHabitScreenState extends ConsumerState<CreateHabitScreen> {
     final isEditing = widget.habitToEdit != null;
 
     return Scaffold(
-      appBar: AppBar(title: Text(isEditing ? 'Edit Habit' : 'New Habit')),
+      appBar: AppBar(
+        title: Text(
+          isEditing
+              ? AppLocalizations.of(context)!.editHabitTitle
+              : AppLocalizations.of(context)!.newHabitTitle,
+        ),
+      ),
       body: Form(
         key: _formKey,
         child: ListView(
@@ -121,21 +150,24 @@ class _CreateHabitScreenState extends ConsumerState<CreateHabitScreen> {
           children: [
             TextFormField(
               controller: _nameController,
-              decoration: const InputDecoration(
-                labelText: 'Habit Name',
-                hintText: 'e.g., Drink Water',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context)!.habitNameLabel,
+                hintText: AppLocalizations.of(context)!.habitNameHint,
+                border: const OutlineInputBorder(),
               ),
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'Please enter a name';
+                  return AppLocalizations.of(context)!.pleaseEnterName;
                 }
                 return null;
               },
             ),
             const SizedBox(height: 24),
 
-            Text('Icon', style: Theme.of(context).textTheme.titleMedium),
+            Text(
+              AppLocalizations.of(context)!.iconLabel,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
             const SizedBox(height: 8),
             SizedBox(
               height: 60,
@@ -151,7 +183,9 @@ class _CreateHabitScreenState extends ConsumerState<CreateHabitScreen> {
                       margin: const EdgeInsets.only(right: 12),
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: isSelected ? Theme.of(context).colorScheme.primaryContainer : null,
+                        color: isSelected
+                            ? Theme.of(context).colorScheme.primaryContainer
+                            : null,
                         border: Border.all(
                           color: isSelected
                               ? Theme.of(context).colorScheme.primary
@@ -169,16 +203,21 @@ class _CreateHabitScreenState extends ConsumerState<CreateHabitScreen> {
 
             DropdownButtonFormField<String>(
               initialValue: _selectedCategory,
-              decoration: const InputDecoration(
-                labelText: 'Category',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context)!.categoryLabel,
+                border: const OutlineInputBorder(),
               ),
-              items: _categories.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
+              items: _categories
+                  .map((c) => DropdownMenuItem(value: c, child: Text(c)))
+                  .toList(),
               onChanged: (val) => setState(() => _selectedCategory = val!),
             ),
             const SizedBox(height: 16),
 
-            Text('Duration', style: Theme.of(context).textTheme.titleMedium),
+            Text(
+              AppLocalizations.of(context)!.durationLabel,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
             const SizedBox(height: 8),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -211,9 +250,16 @@ class _CreateHabitScreenState extends ConsumerState<CreateHabitScreen> {
                     ? const SizedBox(
                         height: 20,
                         width: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
                       )
-                    : Text(isEditing ? 'Save Changes' : 'Create Habit'),
+                    : Text(
+                        isEditing
+                            ? AppLocalizations.of(context)!.saveChangesButton
+                            : AppLocalizations.of(context)!.createHabitButton,
+                      ),
               ),
             ),
           ],

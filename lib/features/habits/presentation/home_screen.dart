@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../core/notifications/notification_service.dart';
 import '../../../../core/utils/logger.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../auth/data/auth_provider.dart';
 import '../domain/entities/habit.dart';
 import 'habit_view_model.dart';
@@ -96,12 +97,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 children: [
                   const Icon(Icons.eco_outlined, size: 64, color: Colors.grey),
                   const SizedBox(height: 16),
-                  const Text('No habits yet. Start small!'),
+                  Text(AppLocalizations.of(context)!.noHabitsYet),
                   const SizedBox(height: 24),
                   FilledButton.icon(
                     onPressed: () => context.push('/create-habit'),
                     icon: const Icon(Icons.add),
-                    label: const Text('Create First Habit'),
+                    label: Text(AppLocalizations.of(context)!.createFirstHabit),
                   ),
                 ],
               ),
@@ -134,11 +135,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   return await showDialog(
                     context: context,
                     builder: (BuildContext context) {
+                      final l10n = AppLocalizations.of(context)!;
                       return AlertDialog(
-                        title: const Text('Confirm'),
-                        content: const Text(
-                          'Are you sure you want to delete this habit?',
-                        ),
+                        title: Text(l10n.confirmDeleteTitle),
+                        content: Text(l10n.confirmDeleteMessage),
                         actions: <Widget>[
                           TextButton(
                             onPressed: () => Navigator.of(context).pop(false),

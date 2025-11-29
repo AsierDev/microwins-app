@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'auth_view_model.dart';
 import '../utils/auth_error_handler.dart';
+import '../../../l10n/app_localizations.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -78,7 +79,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                   const SizedBox(height: 32),
                   Text(
-                    _isLogin ? 'Welcome Back' : 'Create Account',
+                    _isLogin
+                        ? AppLocalizations.of(context)!.loginTitle
+                        : AppLocalizations.of(context)!.createAccountTitle,
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -87,23 +90,23 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   const SizedBox(height: 32),
                   TextFormField(
                     controller: _emailController,
-                    decoration: const InputDecoration(
-                      labelText: 'Email',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.email_outlined),
+                    decoration: InputDecoration(
+                      labelText: AppLocalizations.of(context)!.emailLabel,
+                      border: const OutlineInputBorder(),
+                      prefixIcon: const Icon(Icons.email_outlined),
                     ),
                     keyboardType: TextInputType.emailAddress,
                     onChanged: (value) =>
                         setState(() {}), // Trigger rebuild for validation icon
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter your email';
+                        return AppLocalizations.of(context)!.pleaseEnterEmail;
                       }
                       final emailRegex = RegExp(
                         r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
                       );
                       if (!emailRegex.hasMatch(value)) {
-                        return 'Invalid email format';
+                        return AppLocalizations.of(context)!.invalidEmailFormat;
                       }
                       return null;
                     },
@@ -112,7 +115,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   TextFormField(
                     controller: _passwordController,
                     decoration: InputDecoration(
-                      labelText: 'Password',
+                      labelText: AppLocalizations.of(context)!.passwordLabel,
                       border: const OutlineInputBorder(),
                       prefixIcon: const Icon(Icons.lock_outline),
                       suffixIcon: IconButton(
@@ -133,9 +136,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         setState(() {}), // Trigger rebuild for validation icon
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter your password';
+                        return AppLocalizations.of(
+                          context,
+                        )!.pleaseEnterPassword;
                       }
-                      if (value.length < 6) return 'Password too short';
+                      if (value.length < 6)
+                        return AppLocalizations.of(context)!.passwordTooShort;
                       return null;
                     },
                   ),
@@ -144,7 +150,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       alignment: Alignment.centerRight,
                       child: TextButton(
                         onPressed: () => context.push('/forgot-password'),
-                        child: const Text('Forgot Password?'),
+                        child: Text(
+                          AppLocalizations.of(context)!.forgotPassword,
+                        ),
                       ),
                     ),
                   ] else
@@ -160,7 +168,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               width: 20,
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
-                          : Text(_isLogin ? 'Login' : 'Sign Up'),
+                          : Text(
+                              _isLogin
+                                  ? AppLocalizations.of(context)!.loginButton
+                                  : AppLocalizations.of(context)!.signUpButton,
+                            ),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -178,7 +190,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             }
                           },
                     icon: const Icon(Icons.g_mobiledata, size: 28),
-                    label: const Text('Continue with Google'),
+                    label: Text(
+                      AppLocalizations.of(context)!.googleLoginButton,
+                    ),
                   ),
                   const SizedBox(height: 16),
                   TextButton(
@@ -188,20 +202,34 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             final confirm = await showDialog<bool>(
                               context: context,
                               builder: (context) => AlertDialog(
-                                title: const Text('Continue as Guest?'),
-                                content: const Text(
-                                  'Your data will only be saved on this device. Sign up later to backup your habits.',
+                                title: Text(
+                                  AppLocalizations.of(
+                                    context,
+                                  )!.guestDialogTitle,
+                                ),
+                                content: Text(
+                                  AppLocalizations.of(
+                                    context,
+                                  )!.guestDialogMessage,
                                 ),
                                 actions: [
                                   TextButton(
                                     onPressed: () =>
                                         Navigator.pop(context, false),
-                                    child: const Text('Cancel'),
+                                    child: Text(
+                                      AppLocalizations.of(
+                                        context,
+                                      )!.cancelButton,
+                                    ),
                                   ),
                                   FilledButton(
                                     onPressed: () =>
                                         Navigator.pop(context, true),
-                                    child: const Text('Continue'),
+                                    child: Text(
+                                      AppLocalizations.of(
+                                        context,
+                                      )!.continueButton,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -218,7 +246,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               }
                             }
                           },
-                    child: const Text('Continue as Guest'),
+                    child: Text(AppLocalizations.of(context)!.guestLoginButton),
                   ),
                   const SizedBox(height: 24),
                   Row(
@@ -226,8 +254,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     children: [
                       Text(
                         _isLogin
-                            ? "Don't have an account? "
-                            : 'Already have an account? ',
+                            ? AppLocalizations.of(context)!.dontHaveAccount
+                            : AppLocalizations.of(context)!.alreadyHaveAccount,
                       ),
                       GestureDetector(
                         onTap: () {
@@ -239,7 +267,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           });
                         },
                         child: Text(
-                          _isLogin ? 'Sign Up' : 'Login',
+                          _isLogin
+                              ? AppLocalizations.of(context)!.signUpButton
+                              : AppLocalizations.of(context)!.loginButton,
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.primary,
                             fontWeight: FontWeight.bold,

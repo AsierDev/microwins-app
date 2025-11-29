@@ -10,6 +10,7 @@ import '../../habits/presentation/habit_view_model.dart';
 import '../../settings/data/settings_provider.dart';
 import '../../../core/theme/theme_provider.dart';
 import '../../../core/notifications/notification_service.dart';
+import '../../../l10n/app_localizations.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -22,7 +23,7 @@ class ProfileScreen extends ConsumerWidget {
     final themeMode = ref.watch(themeModeNotifierProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Profile')),
+      appBar: AppBar(title: Text(AppLocalizations.of(context)!.profileTab)),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -67,7 +68,10 @@ class ProfileScreen extends ConsumerWidget {
           const SizedBox(height: 24),
 
           // Stats Summary
-          Text('Statistics', style: Theme.of(context).textTheme.titleLarge),
+          Text(
+            AppLocalizations.of(context)!.statistics,
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
           const SizedBox(height: 8),
           Card(
             child: Padding(
@@ -85,12 +89,12 @@ class ProfileScreen extends ConsumerWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       _StatItem(
-                        label: 'Total Habits',
+                        label: AppLocalizations.of(context)!.totalHabits,
                         value: totalHabits.toString(),
                         icon: Icons.eco,
                       ),
                       _StatItem(
-                        label: 'Best Streak',
+                        label: AppLocalizations.of(context)!.bestStreak,
                         value: bestStreak.toString(),
                         icon: Icons.local_fire_department,
                       ),
@@ -139,7 +143,10 @@ class ProfileScreen extends ConsumerWidget {
           ],
 
           // Settings Section
-          Text('Settings', style: Theme.of(context).textTheme.titleLarge),
+          Text(
+            AppLocalizations.of(context)!.settingsTitle,
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
           const SizedBox(height: 8),
           Card(
             child: Column(
@@ -152,8 +159,12 @@ class ProfileScreen extends ConsumerWidget {
                       final actualStatus =
                           snapshot.data ?? settings.notificationsEnabled;
                       return SwitchListTile(
-                        title: const Text('Enable Notifications'),
-                        subtitle: const Text('Receive daily habit reminders'),
+                        title: Text(
+                          AppLocalizations.of(context)!.notificationsLabel,
+                        ),
+                        subtitle: Text(
+                          AppLocalizations.of(context)!.receiveDailyReminders,
+                        ),
                         value: actualStatus,
                         onChanged: (value) async {
                           if (value) {
@@ -184,9 +195,13 @@ class ProfileScreen extends ConsumerWidget {
                       );
                     },
                   ),
-                  loading: () => const SwitchListTile(
-                    title: Text('Enable Notifications'),
-                    subtitle: Text('Receive daily habit reminders'),
+                  loading: () => SwitchListTile(
+                    title: Text(
+                      AppLocalizations.of(context)!.notificationsLabel,
+                    ),
+                    subtitle: Text(
+                      AppLocalizations.of(context)!.receiveDailyReminders,
+                    ),
                     value: true,
                     onChanged: null,
                   ),
@@ -196,7 +211,9 @@ class ProfileScreen extends ConsumerWidget {
                 settingsAsync.when(
                   data: (settings) => ListTile(
                     leading: const Icon(Icons.access_time),
-                    title: const Text('Daily Reminder Time'),
+                    title: Text(
+                      AppLocalizations.of(context)!.reminderTimeLabel,
+                    ),
                     subtitle: Text(
                       _formatTime(settings.dailyReminderTime),
                       style: TextStyle(color: Colors.grey[600]),
@@ -232,8 +249,8 @@ class ProfileScreen extends ConsumerWidget {
                 ),
                 const Divider(height: 1),
                 SwitchListTile(
-                  title: const Text('Dark Mode'),
-                  subtitle: const Text('Use dark theme'),
+                  title: Text(AppLocalizations.of(context)!.darkModeLabel),
+                  subtitle: Text(AppLocalizations.of(context)!.useDarkTheme),
                   value: themeMode == ThemeMode.dark,
                   onChanged: (value) {
                     ref.read(themeModeNotifierProvider.notifier).toggleTheme();
@@ -242,43 +259,48 @@ class ProfileScreen extends ConsumerWidget {
                 const Divider(height: 1),
                 ListTile(
                   leading: const Icon(Icons.battery_alert),
-                  title: const Text('Optimize Notifications'),
-                  subtitle: const Text(
-                    'Disable battery restrictions for accurate reminders',
+                  title: Text(
+                    AppLocalizations.of(context)!.optimizeNotifications,
+                  ),
+                  subtitle: Text(
+                    AppLocalizations.of(context)!.disableBatteryRestrictions,
                   ),
                   trailing: const Icon(Icons.open_in_new, size: 16),
                   onTap: () {
                     showDialog(
                       context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text('Enable Unrestricted Battery'),
-                        content: const Text(
-                          'To ensure reminders arrive on time, please disable battery restrictions for MicroWins.\n\n'
-                          '1. Tap "Go to Settings"\n'
-                          '2. Tap "App battery usage" or "Battery"\n'
-                          '3. Select "Unrestricted" or "No restrictions"',
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text('Cancel'),
+                      builder: (dialogContext) {
+                        final l10n = AppLocalizations.of(context)!;
+                        return AlertDialog(
+                          title: Text(l10n.enableUnrestrictedBattery),
+                          content: Text(
+                            '${l10n.batteryDialogMessage}\n\n'
+                            '${l10n.batteryStep1}\n'
+                            '${l10n.batteryStep2}\n'
+                            '${l10n.batteryStep3}',
                           ),
-                          FilledButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                              openAppSettings();
-                            },
-                            child: const Text('Go to Settings'),
-                          ),
-                        ],
-                      ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(dialogContext),
+                              child: Text(l10n.cancelButton),
+                            ),
+                            FilledButton(
+                              onPressed: () {
+                                Navigator.pop(dialogContext);
+                                openAppSettings();
+                              },
+                              child: Text(l10n.goToSettings),
+                            ),
+                          ],
+                        );
+                      },
                     );
                   },
                 ),
                 const Divider(height: 1),
                 ListTile(
                   leading: const Icon(Icons.privacy_tip),
-                  title: const Text('Privacy Policy'),
+                  title: Text(AppLocalizations.of(context)!.privacyPolicyLabel),
                   trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                   onTap: () {
                     context.push('/privacy-policy');
@@ -292,9 +314,9 @@ class ProfileScreen extends ConsumerWidget {
                       Icons.delete_forever,
                       color: Colors.red,
                     ),
-                    title: const Text(
-                      'Delete Account',
-                      style: TextStyle(color: Colors.red),
+                    title: Text(
+                      AppLocalizations.of(context)!.deleteAccountLabel,
+                      style: const TextStyle(color: Colors.red),
                     ),
                     subtitle: const Text(
                       'Permanently delete your account and data',
@@ -308,26 +330,31 @@ class ProfileScreen extends ConsumerWidget {
                       final shouldDelete = await showDialog<bool>(
                         context: context,
                         builder: (context) => AlertDialog(
-                          title: const Text('Delete Account?'),
-                          content: const Text(
-                            '⚠️ This action cannot be undone.\n\n'
-                            'All your data will be permanently deleted:\n'
-                            '• All habits and progress\n'
-                            '• Account information\n'
-                            '• Cloud sync data\n\n'
-                            'Are you absolutely sure?',
+                          title: Text(
+                            AppLocalizations.of(
+                              context,
+                            )!.deleteAccountDialogTitle,
+                          ),
+                          content: Text(
+                            AppLocalizations.of(
+                              context,
+                            )!.deleteAccountDialogMessage,
                           ),
                           actions: [
                             TextButton(
                               onPressed: () => Navigator.pop(context, false),
-                              child: const Text('Cancel'),
+                              child: Text(
+                                AppLocalizations.of(context)!.cancelButton,
+                              ),
                             ),
                             FilledButton(
                               style: FilledButton.styleFrom(
                                 backgroundColor: Colors.red,
                               ),
                               onPressed: () => Navigator.pop(context, true),
-                              child: const Text('Delete Forever'),
+                              child: Text(
+                                AppLocalizations.of(context)!.confirmButton,
+                              ),
                             ),
                           ],
                         ),
@@ -381,7 +408,7 @@ class ProfileScreen extends ConsumerWidget {
                     ),
                     TextButton(
                       onPressed: () => Navigator.pop(context, true),
-                      child: const Text('Log Out'),
+                      child: Text(AppLocalizations.of(context)!.logoutButton),
                     ),
                   ],
                 ),
@@ -399,7 +426,7 @@ class ProfileScreen extends ConsumerWidget {
               backgroundColor: Colors.red.shade100,
               foregroundColor: Colors.red.shade900,
             ),
-            child: const Text('Log Out'),
+            child: Text(AppLocalizations.of(context)!.logoutButton),
           ),
           const SizedBox(height: 16),
         ],

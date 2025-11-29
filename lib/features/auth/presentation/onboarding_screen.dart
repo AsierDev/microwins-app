@@ -1,40 +1,45 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hive/hive.dart';
 import '../../../core/local/hive_setup.dart';
+import '../../../l10n/app_localizations.dart';
 
-class OnboardingScreen extends StatefulWidget {
+class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
 
   @override
-  State<OnboardingScreen> createState() => _OnboardingScreenState();
+  ConsumerState<OnboardingScreen> createState() => _OnboardingScreenState();
 }
 
-class _OnboardingScreenState extends State<OnboardingScreen> {
+class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
-  final List<OnboardingPageData> _pages = [
-    OnboardingPageData(
-      title: 'Build habits in just\n2-5 minutes',
-      description:
-          'Small actions lead to big results. Start with micro-habits that are easy to stick to.',
-      icon: Icons.timer_outlined,
-    ),
-    OnboardingPageData(
-      title: 'Track streaks,\nearn badges',
-      description: 'Stay motivated by keeping your streak alive and unlocking achievements.',
-      icon: Icons.local_fire_department_outlined,
-    ),
-    OnboardingPageData(
-      title: 'AI-powered habit\nsuggestions',
-      description: 'Not sure where to start? Let AI generate personalized micro-routines for you.',
-      icon: Icons.auto_awesome_outlined,
-    ),
-  ];
+  List<OnboardingPageData> _getPages(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return [
+      OnboardingPageData(
+        title: l10n.onboardingTitle1,
+        description: l10n.onboardingSubtitle1,
+        icon: Icons.timer_outlined,
+      ),
+      OnboardingPageData(
+        title: l10n.onboardingTitle2,
+        description: l10n.onboardingSubtitle2,
+        icon: Icons.local_fire_department_outlined,
+      ),
+      OnboardingPageData(
+        title: l10n.onboardingTitle3,
+        description: l10n.onboardingSubtitle3,
+        icon: Icons.auto_awesome_outlined,
+      ),
+    ];
+  }
 
   void _nextPage() {
-    if (_currentPage < _pages.length - 1) {
+    final pages = _getPages(context);
+    if (_currentPage < pages.length - 1) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
@@ -45,15 +50,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   void _finishOnboarding() {
-    // Save hasSeenOnboarding flag
-    final settingsBox = Hive.box(HiveSetup.settingsBoxName);
+    final settingsBox = Hive.box<dynamic>(HiveSetup.settingsBoxName);
     settingsBox.put('hasSeenOnboarding', true);
-
     context.go('/login');
   }
 
   @override
   Widget build(BuildContext context) {
+    final pages = _getPages(context);
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -66,9 +72,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     _currentPage = index;
                   });
                 },
-                itemCount: _pages.length,
+                itemCount: pages.length,
                 itemBuilder: (context, index) {
-                  return OnboardingPage(data: _pages[index]);
+                  return OnboardingPage(data: pages[index]);
                 },
               ),
             ),
@@ -80,7 +86,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   // Page Indicators
                   Row(
                     children: List.generate(
-                      _pages.length,
+                      pages.length,
                       (index) => AnimatedContainer(
                         duration: const Duration(milliseconds: 300),
                         margin: const EdgeInsets.only(right: 8),
@@ -89,7 +95,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         decoration: BoxDecoration(
                           color: _currentPage == index
                               ? Theme.of(context).colorScheme.primary
-                              : Theme.of(context).colorScheme.surfaceContainerHighest,
+                              : Theme.of(
+                                  context,
+                                ).colorScheme.surfaceContainerHighest,
                           borderRadius: BorderRadius.circular(4),
                         ),
                       ),
@@ -98,7 +106,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   // Next/Done Button
                   FilledButton(
                     onPressed: _nextPage,
-                    child: Text(_currentPage == _pages.length - 1 ? 'Get Started' : 'Next'),
+                    child: Text(
+                      _currentPage == pages.length - 1
+                          ? l10n.getStartedButton
+                          : 'Next',
+                    ),
                   ),
                 ],
               ),
@@ -113,17 +125,21 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 class OnboardingPage extends StatelessWidget {
   final OnboardingPageData data;
 
-  const OnboardingPage({super.key, required this.data});
+  const OnboardingPage({required this.data, super.key});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(24.0),
+      padding: const EdgeInsets.all(40.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(data.icon, size: 120, color: Theme.of(context).colorScheme.primary),
-          const SizedBox(height: 40),
+          Icon(
+            data.icon,
+            size: 120,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+          const SizedBox(height: 48),
           Text(
             data.title,
             textAlign: TextAlign.center,
@@ -131,13 +147,13 @@ class OnboardingPage extends StatelessWidget {
               context,
             ).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           Text(
             data.description,
             textAlign: TextAlign.center,
-            style: Theme.of(
-              context,
-            ).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
           ),
         ],
       ),
@@ -150,5 +166,9 @@ class OnboardingPageData {
   final String description;
   final IconData icon;
 
-  OnboardingPageData({required this.title, required this.description, required this.icon});
+  OnboardingPageData({
+    required this.title,
+    required this.description,
+    required this.icon,
+  });
 }

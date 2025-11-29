@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../habits/presentation/habit_view_model.dart';
+import '../../../l10n/app_localizations.dart';
 
 class ProgressScreen extends ConsumerWidget {
   const ProgressScreen({super.key});
@@ -11,7 +12,7 @@ class ProgressScreen extends ConsumerWidget {
     final habitsAsync = ref.watch(habitViewModelProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Progress')),
+      appBar: AppBar(title: Text(AppLocalizations.of(context)!.progressTitle)),
       body: habitsAsync.when(
         data: (habits) {
           final totalHabits = habits.length;
@@ -24,7 +25,11 @@ class ProgressScreen extends ConsumerWidget {
           for (var h in habits) {
             if (h.lastCompletedDate != null) {
               final lastDate = h.lastCompletedDate!;
-              final lastCompletedDay = DateTime(lastDate.year, lastDate.month, lastDate.day);
+              final lastCompletedDay = DateTime(
+                lastDate.year,
+                lastDate.month,
+                lastDate.day,
+              );
 
               if (lastCompletedDay.isAtSameMomentAs(today)) {
                 completedToday++;
@@ -40,8 +45,10 @@ class ProgressScreen extends ConsumerWidget {
                 // Let's assume chart X=0 is Today - 6 days, X=6 is Today.
                 // OR chart X=0 is Mon, X=6 is Sun. Let's stick to Mon-Sun fixed for simplicity.
 
-                final int weekdayIndex = lastCompletedDay.weekday - 1; // 0=Mon, 6=Sun
-                weeklyCompletions[weekdayIndex] = (weeklyCompletions[weekdayIndex] ?? 0) + 1;
+                final int weekdayIndex =
+                    lastCompletedDay.weekday - 1; // 0=Mon, 6=Sun
+                weeklyCompletions[weekdayIndex] =
+                    (weeklyCompletions[weekdayIndex] ?? 0) + 1;
               }
             }
           }
@@ -49,18 +56,26 @@ class ProgressScreen extends ConsumerWidget {
           return ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              _buildSummaryCard(context, 'Total Habits', totalHabits.toString(), Icons.list),
+              _buildSummaryCard(
+                context,
+                AppLocalizations.of(context)!.totalHabits,
+                totalHabits.toString(),
+                Icons.list,
+              ),
               const SizedBox(height: 16),
               _buildSummaryCard(
                 context,
-                'Completed Today',
+                AppLocalizations.of(context)!.completedToday,
                 '$completedToday / $totalHabits',
                 Icons.check_circle,
               ),
               const SizedBox(height: 24),
-              const Text(
-                'Weekly Completion',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              Text(
+                AppLocalizations.of(context)!.weeklyCompletion,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 16),
               SizedBox(
@@ -69,9 +84,15 @@ class ProgressScreen extends ConsumerWidget {
                   BarChartData(
                     gridData: const FlGridData(show: false),
                     titlesData: FlTitlesData(
-                      leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                      topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                      rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                      leftTitles: const AxisTitles(
+                        sideTitles: SideTitles(showTitles: false),
+                      ),
+                      topTitles: const AxisTitles(
+                        sideTitles: SideTitles(showTitles: false),
+                      ),
+                      rightTitles: const AxisTitles(
+                        sideTitles: SideTitles(showTitles: false),
+                      ),
                       bottomTitles: AxisTitles(
                         sideTitles: SideTitles(
                           showTitles: true,
@@ -113,7 +134,12 @@ class ProgressScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSummaryCard(BuildContext context, String title, String value, IconData icon) {
+  Widget _buildSummaryCard(
+    BuildContext context,
+    String title,
+    String value,
+    IconData icon,
+  ) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -127,9 +153,9 @@ class ProgressScreen extends ConsumerWidget {
                 Text(title, style: Theme.of(context).textTheme.titleMedium),
                 Text(
                   value,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ],
             ),

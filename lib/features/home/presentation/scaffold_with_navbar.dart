@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../l10n/app_localizations.dart';
 
 class ScaffoldWithNavBar extends StatelessWidget {
   final StatefulNavigationShell navigationShell;
@@ -8,7 +9,10 @@ class ScaffoldWithNavBar extends StatelessWidget {
     : super(key: key ?? const ValueKey<String>('ScaffoldWithNavBar'));
 
   void _goBranch(int index) {
-    navigationShell.goBranch(index, initialLocation: index == navigationShell.currentIndex);
+    navigationShell.goBranch(
+      index,
+      initialLocation: index == navigationShell.currentIndex,
+    );
   }
 
   @override
@@ -17,26 +21,26 @@ class ScaffoldWithNavBar extends StatelessWidget {
       body: navigationShell,
       bottomNavigationBar: NavigationBar(
         selectedIndex: navigationShell.currentIndex,
-        destinations: const [
+        destinations: [
           NavigationDestination(
-            label: 'Home',
-            icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home),
+            icon: const Icon(Icons.home_outlined),
+            selectedIcon: const Icon(Icons.home),
+            label: AppLocalizations.of(context)!.homeTab,
           ),
           NavigationDestination(
-            label: 'Progress',
-            icon: Icon(Icons.bar_chart_outlined),
-            selectedIcon: Icon(Icons.bar_chart),
+            icon: const Icon(Icons.format_list_bulleted),
+            selectedIcon: const Icon(Icons.format_list_bulleted),
+            label: AppLocalizations.of(context)!.habitsTab,
           ),
           NavigationDestination(
-            label: 'Discover',
-            icon: Icon(Icons.auto_awesome_outlined),
-            selectedIcon: Icon(Icons.auto_awesome),
+            icon: const Icon(Icons.bar_chart_outlined),
+            selectedIcon: const Icon(Icons.bar_chart),
+            label: AppLocalizations.of(context)!.progressTab,
           ),
           NavigationDestination(
-            label: 'Profile',
-            icon: Icon(Icons.person_outline),
-            selectedIcon: Icon(Icons.person),
+            icon: const Icon(Icons.person_outline),
+            selectedIcon: const Icon(Icons.person),
+            label: AppLocalizations.of(context)!.profileTab,
           ),
         ],
         onDestinationSelected: _goBranch,

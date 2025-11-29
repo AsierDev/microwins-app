@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'auth_view_model.dart';
 import '../utils/auth_error_handler.dart';
+import '../../../l10n/app_localizations.dart';
 
 class ForgotPasswordScreen extends ConsumerStatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -55,7 +56,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     });
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Reset Password')),
+      appBar: AppBar(
+        title: Text(AppLocalizations.of(context)!.resetPasswordTitle),
+      ),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -71,20 +74,14 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                       ),
                       const SizedBox(height: 24),
                       Text(
-                        'Email Sent!',
+                        AppLocalizations.of(context)!.resetPasswordSuccess,
                         style: Theme.of(context).textTheme.headlineMedium,
                         textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'We have sent a recovery link to ${_emailController.text}. Please check your inbox.',
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.bodyLarge,
                       ),
                       const SizedBox(height: 32),
                       FilledButton(
                         onPressed: () => context.pop(),
-                        child: const Text('Back to Login'),
+                        child: Text(AppLocalizations.of(context)!.backToLogin),
                       ),
                     ],
                   )
@@ -101,33 +98,37 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                         ),
                         const SizedBox(height: 24),
                         Text(
-                          'Forgot Password?',
+                          AppLocalizations.of(context)!.resetPasswordTitle,
                           style: Theme.of(context).textTheme.headlineMedium,
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 16),
-                        const Text(
-                          'Enter your email address and we will send you a link to reset your password.',
+                        Text(
+                          AppLocalizations.of(context)!.resetPasswordPrompt,
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 32),
                         TextFormField(
                           controller: _emailController,
-                          decoration: const InputDecoration(
-                            labelText: 'Email',
-                            border: OutlineInputBorder(),
-                            prefixIcon: Icon(Icons.email_outlined),
+                          decoration: InputDecoration(
+                            labelText: AppLocalizations.of(context)!.emailLabel,
+                            border: const OutlineInputBorder(),
+                            prefixIcon: const Icon(Icons.email_outlined),
                           ),
                           keyboardType: TextInputType.emailAddress,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Please enter your email';
+                              return AppLocalizations.of(
+                                context,
+                              )!.pleaseEnterEmail;
                             }
                             final emailRegex = RegExp(
                               r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
                             );
                             if (!emailRegex.hasMatch(value)) {
-                              return 'Invalid email format';
+                              return AppLocalizations.of(
+                                context,
+                              )!.invalidEmailFormat;
                             }
                             return null;
                           },
@@ -145,7 +146,11 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                                       strokeWidth: 2,
                                     ),
                                   )
-                                : const Text('Send Link'),
+                                : Text(
+                                    AppLocalizations.of(
+                                      context,
+                                    )!.sendLinkButton,
+                                  ),
                           ),
                         ),
                       ],

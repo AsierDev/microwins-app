@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../habits/presentation/habit_view_model.dart';
 import 'ai_view_model.dart';
 
@@ -13,13 +14,15 @@ class DiscoverScreen extends ConsumerStatefulWidget {
 class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
   final _goalController = TextEditingController();
 
-  // Quick start suggestions
-  final List<String> _quickStarts = [
-    'Sleep Better',
-    'Reduce Stress',
-    'Learn a Skill',
-    'Stay Hydrated',
-  ];
+  List<String> _getQuickStarts(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return [
+      l10n.sleepBetter,
+      l10n.reduceStress,
+      l10n.learnSkill,
+      l10n.stayHydrated,
+    ];
+  }
 
   @override
   void dispose() {
@@ -29,7 +32,9 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
 
   void _generate() {
     if (_goalController.text.isNotEmpty) {
-      ref.read(aiViewModelProvider.notifier).generateHabits(_goalController.text);
+      ref
+          .read(aiViewModelProvider.notifier)
+          .generateHabits(_goalController.text);
     }
   }
 
@@ -41,7 +46,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
         habitState.valueOrNull?.map((h) => h.name.toLowerCase()).toSet() ?? {};
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Discover Habits')),
+      appBar: AppBar(title: Text(AppLocalizations.of(context)!.discoverHabits)),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -49,9 +54,12 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
             TextField(
               controller: _goalController,
               decoration: InputDecoration(
-                labelText: 'What is your goal?',
-                hintText: 'e.g., Sleep better, Learn Spanish',
-                suffixIcon: IconButton(onPressed: _generate, icon: const Icon(Icons.auto_awesome)),
+                labelText: AppLocalizations.of(context)!.whatIsYourGoal,
+                hintText: AppLocalizations.of(context)!.goalPromptHint,
+                suffixIcon: IconButton(
+                  onPressed: _generate,
+                  icon: const Icon(Icons.auto_awesome),
+                ),
                 border: const OutlineInputBorder(),
               ),
               onSubmitted: (_) => _generate(),
@@ -61,7 +69,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
             Wrap(
               spacing: 8,
               runSpacing: 8,
-              children: _quickStarts.map((suggestion) {
+              children: _getQuickStarts(context).map((suggestion) {
                 return ActionChip(
                   label: Text(suggestion),
                   onPressed: () {
@@ -77,22 +85,36 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
               child: aiState.when(
                 data: (habits) {
                   if (habits.isEmpty) {
-                    return const Center(child: Text('Enter a goal to generate micro-habits!'));
+                    return Center(
+                      child: Text(
+                        AppLocalizations.of(context)!.enterGoalPrompt,
+                      ),
+                    );
                   }
                   return ListView.builder(
                     itemCount: habits.length,
                     itemBuilder: (context, index) {
                       final habit = habits[index];
-                      final isAdded = existingHabitNames.contains(habit.name.toLowerCase());
+                      final isAdded = existingHabitNames.contains(
+                        habit.name.toLowerCase(),
+                      );
 
                       return Card(
                         child: ListTile(
-                          leading: Text(habit.icon, style: const TextStyle(fontSize: 24)),
+                          leading: Text(
+                            habit.icon,
+                            style: const TextStyle(fontSize: 24),
+                          ),
                           title: Text(habit.name),
-                          subtitle: Text('${habit.durationMinutes} min • ${habit.category}'),
+                          subtitle: Text(
+                            '${habit.durationMinutes} min • ${habit.category}',
+                          ),
                           trailing: isAdded
                               ? const IconButton(
-                                  icon: Icon(Icons.check_circle, color: Colors.green),
+                                  icon: Icon(
+                                    Icons.check_circle,
+                                    color: Colors.green,
+                                  ),
                                   onPressed: null,
                                 )
                               : IconButton(
@@ -104,11 +126,14 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                                           name: habit.name,
                                           icon: habit.icon,
                                           category: habit.category,
-                                          durationMinutes: habit.durationMinutes,
+                                          durationMinutes:
+                                              habit.durationMinutes,
                                         );
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
-                                        content: Text('Added "${habit.name}" to your habits!'),
+                                        content: Text(
+                                          'Added "${habit.name}" to your habits!',
+                                        ),
                                       ),
                                     );
                                   },
