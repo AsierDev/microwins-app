@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -235,14 +236,69 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               ),
                             );
 
-                            if (confirm == true) {
-                              await ref
-                                  .read(authViewModelProvider.notifier)
-                                  .signInAnonymously();
-                              if (mounted &&
-                                  context.mounted &&
-                                  !ref.read(authViewModelProvider).hasError) {
-                                context.go('/home');
+                            if (confirm == true && mounted) {
+                              try {
+                                // Add timeout to prevent infinite loading
+                                await ref
+                                    .read(authViewModelProvider.notifier)
+                                    .signInAnonymously()
+                                    .timeout(
+                                      const Duration(seconds: 10),
+                                      onTimeout: () {
+                                        // Check if auth succeeded despite timeout
+                                        if (mounted) {
+                                          final authState = ref.read(
+                                            authViewModelProvider,
+                                          );
+                                          if (!authState.hasError) {
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              const SnackBar(
+                                                content: Text(
+                                                  'Signed in successfully (slow connection)',
+                                                ),
+                                                duration: Duration(seconds: 2),
+                                              ),
+                                            );
+                                          } else {
+                                            throw TimeoutException(
+                                              'Guest login timed out',
+                                            );
+                                          }
+                                        }
+                                      },
+                                    );
+
+                                if (mounted && context.mounted) {
+                                  final authState = ref.read(
+                                    authViewModelProvider,
+                                  );
+                                  if (!authState.hasError) {
+                                    context.go('/home');
+                                  }
+                                }
+                              } on TimeoutException {
+                                if (mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        'Connection is slow. Please try again.',
+                                      ),
+                                      backgroundColor: Colors.orange,
+                                      duration: Duration(seconds: 3),
+                                    ),
+                                  );
+                                }
+                              } catch (e) {
+                                if (mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('Error: ${e.toString()}'),
+                                      backgroundColor: Colors.red,
+                                    ),
+                                  );
+                                }
                               }
                             }
                           },
