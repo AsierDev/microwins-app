@@ -51,16 +51,16 @@ GoRouter goRouter(GoRouterRef ref) {
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: '/progress',
-                builder: (context, state) => const ProgressScreen(),
+                path: '/discover',
+                builder: (context, state) => const DiscoverScreen(),
               ),
             ],
           ),
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: '/discover',
-                builder: (context, state) => const DiscoverScreen(),
+                path: '/progress',
+                builder: (context, state) => const ProgressScreen(),
               ),
             ],
           ),
