@@ -53,7 +53,10 @@ class SyncManager {
           connectivityResult.contains(ConnectivityResult.ethernet);
 
       if (!isOnline) {
-        AppLogger.debug('Sync skipped: No internet connection', tag: 'SyncManager');
+        AppLogger.debug(
+          'Sync skipped: No internet connection',
+          tag: 'SyncManager',
+        );
         return;
       }
 
@@ -65,7 +68,11 @@ class SyncManager {
           await _performRemoteOperation(user.uid, item);
           keysToDelete.add(_syncQueueBox.keyAt(i));
         } catch (e) {
-          AppLogger.warning('Sync error for item $i', tag: 'SyncManager', error: e);
+          AppLogger.warning(
+            'Sync error for item $i',
+            tag: 'SyncManager',
+            error: e,
+          );
           // Don't stop processing, continue with next items
           // Items that fail will be retried on next sync
         }
@@ -74,18 +81,32 @@ class SyncManager {
       // Remove processed items
       if (keysToDelete.isNotEmpty) {
         await _syncQueueBox.deleteAll(keysToDelete);
-        AppLogger.info('Synced ${keysToDelete.length} items to Firestore', tag: 'SyncManager');
+        AppLogger.info(
+          'Synced ${keysToDelete.length} items to Firestore',
+          tag: 'SyncManager',
+        );
       }
     } catch (e) {
       // Catch any unexpected errors to prevent blocking local operations
-      AppLogger.error('Sync queue processing error', tag: 'SyncManager', error: e);
+      AppLogger.error(
+        'Sync queue processing error',
+        tag: 'SyncManager',
+        error: e,
+      );
     }
   }
 
   Future<void> _performRemoteOperation(String userId, Map item) async {
     final action = item['action'] as String;
     final data = item['data'] as Map<String, dynamic>;
-    final habitsCollection = _firestore.collection('users').doc(userId).collection('habits');
+    final habitsCollection = _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('habits');
+    final completionsCollection = _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('completions');
 
     switch (action) {
       case 'createHabit':
@@ -96,6 +117,15 @@ class SyncManager {
         break;
       case 'deleteHabit':
         await habitsCollection.doc(data['id'] as String).delete();
+        break;
+      case 'createCompletion':
+        await completionsCollection.doc(data['id'] as String).set(data);
+        break;
+      case 'updateCompletion':
+        await completionsCollection.doc(data['id'] as String).update(data);
+        break;
+      case 'deleteCompletion':
+        await completionsCollection.doc(data['id'] as String).delete();
         break;
       default:
         AppLogger.warning('Unknown sync action: $action', tag: 'SyncManager');
@@ -116,7 +146,11 @@ class SyncManager {
 
       return snapshot.docs.map((doc) => doc.data()).toList();
     } catch (e) {
-      AppLogger.error('Error fetching habits from Firestore', tag: 'SyncManager', error: e);
+      AppLogger.error(
+        'Error fetching habits from Firestore',
+        tag: 'SyncManager',
+        error: e,
+      );
       return [];
     }
   }
@@ -132,6 +166,44 @@ class SyncManager {
         .collection('users')
         .doc(user.uid)
         .collection('habits')
+        .snapshots()
+        .map((snapshot) => snapshot.docs.map((doc) => doc.data()).toList());
+  }
+
+  /// Fetch all completions from Firestore for current user
+  Future<List<Map<String, dynamic>>> fetchCompletionsFromFirestore() async {
+    final user = _auth.currentUser;
+    if (user == null) return [];
+
+    try {
+      final snapshot = await _firestore
+          .collection('users')
+          .doc(user.uid)
+          .collection('completions')
+          .get();
+
+      return snapshot.docs.map((doc) => doc.data()).toList();
+    } catch (e) {
+      AppLogger.error(
+        'Error fetching completions from Firestore',
+        tag: 'SyncManager',
+        error: e,
+      );
+      return [];
+    }
+  }
+
+  /// Listen to Firestore completions changes for real-time sync
+  Stream<List<Map<String, dynamic>>> watchCompletionsFromFirestore() {
+    final user = _auth.currentUser;
+    if (user == null) {
+      return Stream.value([]);
+    }
+
+    return _firestore
+        .collection('users')
+        .doc(user.uid)
+        .collection('completions')
         .snapshots()
         .map((snapshot) => snapshot.docs.map((doc) => doc.data()).toList());
   }

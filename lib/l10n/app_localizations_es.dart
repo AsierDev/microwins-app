@@ -351,8 +351,305 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get batteryStep3 =>
-      '3. Selecciona \'Sin restricciones\' o \'Sin restricciones\'';
+      '3. Selecciona \'Sin restricciones\' o \'No restringido\'';
 
   @override
   String get goToSettings => 'Ir a Configuración';
+
+  @override
+  String get gamificationBadgesAndLevels => 'Logros y Niveles';
+
+  @override
+  String gamificationExperience(Object exp) {
+    return 'Experiencia: $exp EXP';
+  }
+
+  @override
+  String gamificationExpToNextLevel(Object exp) {
+    return '$exp EXP para siguiente nivel';
+  }
+
+  @override
+  String get gamificationStatistics => 'Estadísticas';
+
+  @override
+  String get gamificationCurrentStreak => 'Racha Actual';
+
+  @override
+  String get gamificationBestStreak => 'Mejor Racha';
+
+  @override
+  String get gamificationTotalCompleted => 'Total Completado';
+
+  @override
+  String get gamificationAchievementCollection => 'Colección de Logros';
+
+  @override
+  String gamificationUnlockedCount(Object total, Object unlocked) {
+    return '$unlocked/$total desbloqueados';
+  }
+
+  @override
+  String get gamificationLoadingAchievements => 'Cargando tus logros...';
+
+  @override
+  String get gamificationErrorLoadingAchievements => 'Error al cargar logros';
+
+  @override
+  String get gamificationRetry => 'Reintentar';
+
+  @override
+  String get gamificationAchievementUnlocked => '¡Logro Desbloqueado!';
+
+  @override
+  String get gamificationNewAchievementUnlocked => '¡Nuevo Logro Desbloqueado!';
+
+  @override
+  String get gamificationViewAchievements => 'Ver Logros';
+
+  @override
+  String get gamificationActiveHabits => 'Hábitos activos';
+
+  @override
+  String get gamificationWeeklyProgress => 'Progreso semanal';
+
+  @override
+  String get gamificationMonday => 'Lunes';
+
+  @override
+  String get gamificationTuesday => 'Martes';
+
+  @override
+  String get gamificationWednesday => 'Miércoles';
+
+  @override
+  String get gamificationThursday => 'Jueves';
+
+  @override
+  String get gamificationFriday => 'Viernes';
+
+  @override
+  String get gamificationSaturday => 'Sábado';
+
+  @override
+  String get gamificationSunday => 'Domingo';
+
+  @override
+  String gamificationCompletedCount(Object count, Object s) {
+    return '$count completado$s';
+  }
+
+  @override
+  String get gamificationNoChangeFromLastWeek =>
+      'Sin cambios respecto a la semana anterior';
+
+  @override
+  String gamificationBetterThanLastWeek(Object progress) {
+    return '$progress% mejor que la semana anterior';
+  }
+
+  @override
+  String gamificationWorseThanLastWeek(Object progress) {
+    return '$progress% peor que la semana anterior';
+  }
+
+  @override
+  String gamificationStartJourney(Object habits) {
+    return '¡Comienza tu jornada! Tienes $habits hábitos por completar hoy.';
+  }
+
+  @override
+  String gamificationDoingWell(Object habits, Object s) {
+    return '¡Vas bien! Solo $habits hábito$s más para tu meta.';
+  }
+
+  @override
+  String get gamificationPerfectDay =>
+      '¡Perfecto! Has completado todos tus hábitos hoy. ¡Sigue así!';
+
+  @override
+  String get gamificationCreateFirstHabit =>
+      'Crea tu primer hábito para comenzar tu viaje de progreso.';
+
+  @override
+  String get gamificationLoadingProgress => 'Cargando tu progreso...';
+
+  @override
+  String get gamificationErrorOccurred => 'Ha ocurrido un error';
+
+  @override
+  String get gamificationBadgeTypeStreakMaster => 'Maestro de Rachas';
+
+  @override
+  String get gamificationBadgeTypeConsistencyChampion =>
+      'Campeón de la Constancia';
+
+  @override
+  String get gamificationBadgeTypeWeeklyWarrior => 'Guerrero Semanal';
+
+  @override
+  String get gamificationBadgeTypeMilestoneMaster => 'Maestro de Hitos';
+
+  @override
+  String get gamificationBadgeTypePerfectWeek => 'Semana Perfecta';
+
+  @override
+  String get gamificationBadgeRarityCommon => 'Común';
+
+  @override
+  String get gamificationBadgeRarityUncommon => 'Poco Común';
+
+  @override
+  String get gamificationBadgeRarityRare => 'Raro';
+
+  @override
+  String get gamificationBadgeRarityEpic => 'Épico';
+
+  @override
+  String get gamificationBadgeRarityLegendary => 'Legendario';
+
+  @override
+  String get gamificationLevelTitle1 => 'Principiante';
+
+  @override
+  String get gamificationLevelTitle2 => 'Novato';
+
+  @override
+  String get gamificationLevelTitle3 => 'Aprendiz';
+
+  @override
+  String get gamificationLevelTitle4 => 'Practicante';
+
+  @override
+  String get gamificationLevelTitle5 => 'Dedicado';
+
+  @override
+  String get gamificationLevelTitle6 => 'Comprometido';
+
+  @override
+  String get gamificationLevelTitle7 => 'Experto';
+
+  @override
+  String get gamificationLevelTitle8 => 'Maestro';
+
+  @override
+  String get gamificationLevelTitle9 => 'Gran Maestro';
+
+  @override
+  String get gamificationLevelTitle10 => 'Leyenda';
+
+  @override
+  String get gamificationBadgeNameGettingHot => 'En Caliente';
+
+  @override
+  String get gamificationBadgeNamePerfectWeek => 'Semana Perfecta';
+
+  @override
+  String get gamificationBadgeNameLegendMonth => 'Mes de Leyenda';
+
+  @override
+  String get gamificationBadgeNameCentury => 'Centuria';
+
+  @override
+  String get gamificationBadgeNameConsistent => 'Constante';
+
+  @override
+  String get gamificationBadgeNameVeryConsistent => 'Muy Constante';
+
+  @override
+  String get gamificationBadgeNameUnbreakable => 'Inquebrantable';
+
+  @override
+  String get gamificationBadgeNameProductiveWeek => 'Semana Productiva';
+
+  @override
+  String get gamificationBadgeNameIntenseWeek => 'Semana Intensa';
+
+  @override
+  String get gamificationBadgeNameEpicWeek => 'Semana Épica';
+
+  @override
+  String get gamificationBadgeNameFirstSteps => 'Primeros Pasos';
+
+  @override
+  String get gamificationBadgeNameHalfway => 'Medio Camino';
+
+  @override
+  String get gamificationBadgeNameCenturion => 'Centurión';
+
+  @override
+  String get gamificationBadgeNameHabitMaster => 'Maestro de Hábitos';
+
+  @override
+  String get gamificationBadgeNamePerfectWeek3 => 'Semana Perfecta (3)';
+
+  @override
+  String get gamificationBadgeNamePerfectWeek5 => 'Semana Perfecta (5)';
+
+  @override
+  String get gamificationBadgeDescriptionGettingHot =>
+      'Completa hábitos 3 días seguidos';
+
+  @override
+  String get gamificationBadgeDescriptionPerfectWeek =>
+      'Completa hábitos 7 días seguidos';
+
+  @override
+  String get gamificationBadgeDescriptionLegendMonth =>
+      'Completa hábitos 30 días seguidos';
+
+  @override
+  String get gamificationBadgeDescriptionCentury =>
+      'Completa hábitos 100 días seguidos';
+
+  @override
+  String get gamificationBadgeDescriptionConsistent =>
+      'Completa hábitos al menos 7 días en un mes';
+
+  @override
+  String get gamificationBadgeDescriptionVeryConsistent =>
+      'Completa hábitos al menos 20 días en un mes';
+
+  @override
+  String get gamificationBadgeDescriptionUnbreakable =>
+      'Completa hábitos todos los días de un mes';
+
+  @override
+  String get gamificationBadgeDescriptionProductiveWeek =>
+      'Completa 5 hábitos en una semana';
+
+  @override
+  String get gamificationBadgeDescriptionIntenseWeek =>
+      'Completa 10 hábitos en una semana';
+
+  @override
+  String get gamificationBadgeDescriptionEpicWeek =>
+      'Completa 20 hábitos en una semana';
+
+  @override
+  String get gamificationBadgeDescriptionFirstSteps =>
+      'Completa 10 hábitos en total';
+
+  @override
+  String get gamificationBadgeDescriptionHalfway =>
+      'Completa 50 hábitos en total';
+
+  @override
+  String get gamificationBadgeDescriptionCenturion =>
+      'Completa 100 hábitos en total';
+
+  @override
+  String get gamificationBadgeDescriptionHabitMaster =>
+      'Completa 500 hábitos en total';
+
+  @override
+  String get gamificationBadgeDescriptionPerfectWeek3 =>
+      'Completa todos tus hábitos durante una semana (3+ hábitos)';
+
+  @override
+  String get gamificationBadgeDescriptionPerfectWeek5 =>
+      'Completa todos tus hábitos durante una semana (5+ hábitos)';
+
+  @override
+  String get gamificationSupremeLegend => 'Leyenda Suprema';
 }

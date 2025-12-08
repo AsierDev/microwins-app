@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:lottie/lottie.dart';
 import '../../domain/entities/habit.dart';
 
@@ -22,14 +23,18 @@ class HabitCard extends StatefulWidget {
   State<HabitCard> createState() => _HabitCardState();
 }
 
-class _HabitCardState extends State<HabitCard> with SingleTickerProviderStateMixin {
+class _HabitCardState extends State<HabitCard>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   bool _showConfetti = false;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this, duration: const Duration(seconds: 2));
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    );
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
         setState(() => _showConfetti = false);
@@ -57,7 +62,11 @@ class _HabitCardState extends State<HabitCard> with SingleTickerProviderStateMix
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final lastDate = widget.habit.lastCompletedDate!;
-    final lastCompletedDay = DateTime(lastDate.year, lastDate.month, lastDate.day);
+    final lastCompletedDay = DateTime(
+      lastDate.year,
+      lastDate.month,
+      lastDate.day,
+    );
     return lastCompletedDay.isAtSameMomentAs(today);
   }
 
@@ -67,39 +76,72 @@ class _HabitCardState extends State<HabitCard> with SingleTickerProviderStateMix
       children: [
         Card(
           margin: const EdgeInsets.only(bottom: 12),
-          child: ListTile(
-            leading: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primaryContainer,
-                shape: BoxShape.circle,
+          child: Semantics(
+            button: true,
+            label:
+                'Hábito: ${widget.habit.name}, Duración: ${widget.habit.durationMinutes} minutos, Racha actual: ${widget.habit.currentStreak}, Estado: ${isCompletedToday ? "completado hoy" : "pendiente"}',
+            child: ListTile(
+              leading: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                  shape: BoxShape.circle,
+                ),
+                child: Text(
+                  widget.habit.icon,
+                  style: const TextStyle(fontSize: 24),
+                  semanticsLabel: 'Icono del hábito ${widget.habit.name}',
+                ),
               ),
-              child: Text(widget.habit.icon, style: const TextStyle(fontSize: 24)),
-            ),
-            title: Text(widget.habit.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-            subtitle: Text(
-              '${widget.habit.durationMinutes} min • Streak: ${widget.habit.currentStreak} 🔥',
-            ),
-            trailing: widget.showDragHandle
-                ? Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      _AnimatedCheckButton(
+              title: Text(
+                widget.habit.name,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+                semanticsLabel: 'Nombre del hábito: ${widget.habit.name}',
+              ),
+              subtitle: Text(
+                '${widget.habit.durationMinutes} min • Racha: ${widget.habit.currentStreak} 🔥',
+                semanticsLabel:
+                    'Duración: ${widget.habit.durationMinutes} minutos, Racha actual: ${widget.habit.currentStreak} días',
+              ),
+              trailing: widget.showDragHandle
+                  ? Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Semantics(
+                          button: true,
+                          label: isCompletedToday
+                              ? 'Hábito ya completado hoy'
+                              : 'Completar hábito',
+                          child: _AnimatedCheckButton(
+                            isCompleted: isCompletedToday,
+                            onTap: isCompletedToday ? null : _handleComplete,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Semantics(
+                          label: 'Arrastrar para reordenar hábito',
+                          child: ReorderableDragStartListener(
+                            index: widget.index ?? 0,
+                            child: const Icon(
+                              Icons.drag_indicator,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                  : Semantics(
+                      button: true,
+                      label: isCompletedToday
+                          ? 'Hábito ya completado hoy'
+                          : 'Completar hábito',
+                      child: _AnimatedCheckButton(
                         isCompleted: isCompletedToday,
                         onTap: isCompletedToday ? null : _handleComplete,
                       ),
-                      const SizedBox(width: 8),
-                      ReorderableDragStartListener(
-                        index: widget.index ?? 0,
-                        child: const Icon(Icons.drag_indicator, color: Colors.grey),
-                      ),
-                    ],
-                  )
-                : _AnimatedCheckButton(
-                    isCompleted: isCompletedToday,
-                    onTap: isCompletedToday ? null : _handleComplete,
-                  ),
-            onTap: widget.onTap,
+                    ),
+              onTap: widget.onTap,
+            ),
           ),
         ),
         if (_showConfetti)
@@ -139,7 +181,10 @@ class _AnimatedCheckButtonState extends State<_AnimatedCheckButton>
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 200));
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 200),
+    );
     _scaleAnimation = Tween<double>(
       begin: 1.0,
       end: 0.8,
@@ -162,19 +207,32 @@ class _AnimatedCheckButtonState extends State<_AnimatedCheckButton>
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: widget.isCompleted ? null : _handleTap,
-      child: ScaleTransition(
-        scale: _scaleAnimation,
-        child: Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: widget.isCompleted ? Colors.green : Colors.transparent,
-            border: widget.isCompleted ? null : Border.all(color: Colors.grey.shade400, width: 2),
+    return Semantics(
+      button: true,
+      label: widget.isCompleted ? 'Hábito completado' : 'Completar hábito',
+      child: GestureDetector(
+        onTap: widget.isCompleted
+            ? null
+            : () {
+                HapticFeedback.lightImpact();
+                _handleTap();
+              },
+        child: ScaleTransition(
+          scale: _scaleAnimation,
+          child: Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: widget.isCompleted ? Colors.green : Colors.transparent,
+              border: widget.isCompleted
+                  ? null
+                  : Border.all(color: Colors.grey.shade400, width: 2),
+            ),
+            child: widget.isCompleted
+                ? const Icon(Icons.check, color: Colors.white, size: 24)
+                : null,
           ),
-          child: widget.isCompleted ? const Icon(Icons.check, color: Colors.white, size: 24) : null,
         ),
       ),
     );

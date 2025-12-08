@@ -763,6 +763,528 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Go to Settings'**
   String get goToSettings;
+
+  /// No description provided for @gamificationBadgesAndLevels.
+  ///
+  /// In en, this message translates to:
+  /// **'Badges and Levels'**
+  String get gamificationBadgesAndLevels;
+
+  /// No description provided for @gamificationExperience.
+  ///
+  /// In en, this message translates to:
+  /// **'Experience: {exp} EXP'**
+  String gamificationExperience(Object exp);
+
+  /// No description provided for @gamificationExpToNextLevel.
+  ///
+  /// In en, this message translates to:
+  /// **'{exp} EXP to next level'**
+  String gamificationExpToNextLevel(Object exp);
+
+  /// No description provided for @gamificationStatistics.
+  ///
+  /// In en, this message translates to:
+  /// **'Statistics'**
+  String get gamificationStatistics;
+
+  /// No description provided for @gamificationCurrentStreak.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Streak'**
+  String get gamificationCurrentStreak;
+
+  /// No description provided for @gamificationBestStreak.
+  ///
+  /// In en, this message translates to:
+  /// **'Best Streak'**
+  String get gamificationBestStreak;
+
+  /// No description provided for @gamificationTotalCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Completed'**
+  String get gamificationTotalCompleted;
+
+  /// No description provided for @gamificationAchievementCollection.
+  ///
+  /// In en, this message translates to:
+  /// **'Achievement Collection'**
+  String get gamificationAchievementCollection;
+
+  /// No description provided for @gamificationUnlockedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{unlocked}/{total} unlocked'**
+  String gamificationUnlockedCount(Object total, Object unlocked);
+
+  /// No description provided for @gamificationLoadingAchievements.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading your achievements...'**
+  String get gamificationLoadingAchievements;
+
+  /// No description provided for @gamificationErrorLoadingAchievements.
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading achievements'**
+  String get gamificationErrorLoadingAchievements;
+
+  /// No description provided for @gamificationRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get gamificationRetry;
+
+  /// No description provided for @gamificationAchievementUnlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Achievement Unlocked!'**
+  String get gamificationAchievementUnlocked;
+
+  /// No description provided for @gamificationNewAchievementUnlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'New Achievement Unlocked!'**
+  String get gamificationNewAchievementUnlocked;
+
+  /// No description provided for @gamificationViewAchievements.
+  ///
+  /// In en, this message translates to:
+  /// **'View Achievements'**
+  String get gamificationViewAchievements;
+
+  /// No description provided for @gamificationActiveHabits.
+  ///
+  /// In en, this message translates to:
+  /// **'Active habits'**
+  String get gamificationActiveHabits;
+
+  /// No description provided for @gamificationWeeklyProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly progress'**
+  String get gamificationWeeklyProgress;
+
+  /// No description provided for @gamificationMonday.
+  ///
+  /// In en, this message translates to:
+  /// **'Monday'**
+  String get gamificationMonday;
+
+  /// No description provided for @gamificationTuesday.
+  ///
+  /// In en, this message translates to:
+  /// **'Tuesday'**
+  String get gamificationTuesday;
+
+  /// No description provided for @gamificationWednesday.
+  ///
+  /// In en, this message translates to:
+  /// **'Wednesday'**
+  String get gamificationWednesday;
+
+  /// No description provided for @gamificationThursday.
+  ///
+  /// In en, this message translates to:
+  /// **'Thursday'**
+  String get gamificationThursday;
+
+  /// No description provided for @gamificationFriday.
+  ///
+  /// In en, this message translates to:
+  /// **'Friday'**
+  String get gamificationFriday;
+
+  /// No description provided for @gamificationSaturday.
+  ///
+  /// In en, this message translates to:
+  /// **'Saturday'**
+  String get gamificationSaturday;
+
+  /// No description provided for @gamificationSunday.
+  ///
+  /// In en, this message translates to:
+  /// **'Sunday'**
+  String get gamificationSunday;
+
+  /// No description provided for @gamificationCompletedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} completed'**
+  String gamificationCompletedCount(Object count, Object s);
+
+  /// No description provided for @gamificationNoChangeFromLastWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'No change from last week'**
+  String get gamificationNoChangeFromLastWeek;
+
+  /// No description provided for @gamificationBetterThanLastWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'{progress}% better than last week'**
+  String gamificationBetterThanLastWeek(Object progress);
+
+  /// No description provided for @gamificationWorseThanLastWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'{progress}% worse than last week'**
+  String gamificationWorseThanLastWeek(Object progress);
+
+  /// No description provided for @gamificationStartJourney.
+  ///
+  /// In en, this message translates to:
+  /// **'Start your journey! You have {habits} habits to complete today.'**
+  String gamificationStartJourney(Object habits);
+
+  /// No description provided for @gamificationDoingWell.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re doing well! Only {habits} habit{s} more to your goal.'**
+  String gamificationDoingWell(Object habits, Object s);
+
+  /// No description provided for @gamificationPerfectDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Perfect! You\'ve completed all your habits today. Keep it up!'**
+  String get gamificationPerfectDay;
+
+  /// No description provided for @gamificationCreateFirstHabit.
+  ///
+  /// In en, this message translates to:
+  /// **'Create your first habit to start your progress journey.'**
+  String get gamificationCreateFirstHabit;
+
+  /// No description provided for @gamificationLoadingProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading your progress...'**
+  String get gamificationLoadingProgress;
+
+  /// No description provided for @gamificationErrorOccurred.
+  ///
+  /// In en, this message translates to:
+  /// **'An error occurred'**
+  String get gamificationErrorOccurred;
+
+  /// No description provided for @gamificationBadgeTypeStreakMaster.
+  ///
+  /// In en, this message translates to:
+  /// **'Streak Master'**
+  String get gamificationBadgeTypeStreakMaster;
+
+  /// No description provided for @gamificationBadgeTypeConsistencyChampion.
+  ///
+  /// In en, this message translates to:
+  /// **'Consistency Champion'**
+  String get gamificationBadgeTypeConsistencyChampion;
+
+  /// No description provided for @gamificationBadgeTypeWeeklyWarrior.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly Warrior'**
+  String get gamificationBadgeTypeWeeklyWarrior;
+
+  /// No description provided for @gamificationBadgeTypeMilestoneMaster.
+  ///
+  /// In en, this message translates to:
+  /// **'Milestone Master'**
+  String get gamificationBadgeTypeMilestoneMaster;
+
+  /// No description provided for @gamificationBadgeTypePerfectWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'Perfect Week'**
+  String get gamificationBadgeTypePerfectWeek;
+
+  /// No description provided for @gamificationBadgeRarityCommon.
+  ///
+  /// In en, this message translates to:
+  /// **'Common'**
+  String get gamificationBadgeRarityCommon;
+
+  /// No description provided for @gamificationBadgeRarityUncommon.
+  ///
+  /// In en, this message translates to:
+  /// **'Uncommon'**
+  String get gamificationBadgeRarityUncommon;
+
+  /// No description provided for @gamificationBadgeRarityRare.
+  ///
+  /// In en, this message translates to:
+  /// **'Rare'**
+  String get gamificationBadgeRarityRare;
+
+  /// No description provided for @gamificationBadgeRarityEpic.
+  ///
+  /// In en, this message translates to:
+  /// **'Epic'**
+  String get gamificationBadgeRarityEpic;
+
+  /// No description provided for @gamificationBadgeRarityLegendary.
+  ///
+  /// In en, this message translates to:
+  /// **'Legendary'**
+  String get gamificationBadgeRarityLegendary;
+
+  /// No description provided for @gamificationLevelTitle1.
+  ///
+  /// In en, this message translates to:
+  /// **'Beginner'**
+  String get gamificationLevelTitle1;
+
+  /// No description provided for @gamificationLevelTitle2.
+  ///
+  /// In en, this message translates to:
+  /// **'Novice'**
+  String get gamificationLevelTitle2;
+
+  /// No description provided for @gamificationLevelTitle3.
+  ///
+  /// In en, this message translates to:
+  /// **'Apprentice'**
+  String get gamificationLevelTitle3;
+
+  /// No description provided for @gamificationLevelTitle4.
+  ///
+  /// In en, this message translates to:
+  /// **'Practitioner'**
+  String get gamificationLevelTitle4;
+
+  /// No description provided for @gamificationLevelTitle5.
+  ///
+  /// In en, this message translates to:
+  /// **'Dedicated'**
+  String get gamificationLevelTitle5;
+
+  /// No description provided for @gamificationLevelTitle6.
+  ///
+  /// In en, this message translates to:
+  /// **'Committed'**
+  String get gamificationLevelTitle6;
+
+  /// No description provided for @gamificationLevelTitle7.
+  ///
+  /// In en, this message translates to:
+  /// **'Expert'**
+  String get gamificationLevelTitle7;
+
+  /// No description provided for @gamificationLevelTitle8.
+  ///
+  /// In en, this message translates to:
+  /// **'Master'**
+  String get gamificationLevelTitle8;
+
+  /// No description provided for @gamificationLevelTitle9.
+  ///
+  /// In en, this message translates to:
+  /// **'Grand Master'**
+  String get gamificationLevelTitle9;
+
+  /// No description provided for @gamificationLevelTitle10.
+  ///
+  /// In en, this message translates to:
+  /// **'Legend'**
+  String get gamificationLevelTitle10;
+
+  /// No description provided for @gamificationBadgeNameGettingHot.
+  ///
+  /// In en, this message translates to:
+  /// **'Getting Hot'**
+  String get gamificationBadgeNameGettingHot;
+
+  /// No description provided for @gamificationBadgeNamePerfectWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'Perfect Week'**
+  String get gamificationBadgeNamePerfectWeek;
+
+  /// No description provided for @gamificationBadgeNameLegendMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Legend Month'**
+  String get gamificationBadgeNameLegendMonth;
+
+  /// No description provided for @gamificationBadgeNameCentury.
+  ///
+  /// In en, this message translates to:
+  /// **'Century'**
+  String get gamificationBadgeNameCentury;
+
+  /// No description provided for @gamificationBadgeNameConsistent.
+  ///
+  /// In en, this message translates to:
+  /// **'Consistent'**
+  String get gamificationBadgeNameConsistent;
+
+  /// No description provided for @gamificationBadgeNameVeryConsistent.
+  ///
+  /// In en, this message translates to:
+  /// **'Very Consistent'**
+  String get gamificationBadgeNameVeryConsistent;
+
+  /// No description provided for @gamificationBadgeNameUnbreakable.
+  ///
+  /// In en, this message translates to:
+  /// **'Unbreakable'**
+  String get gamificationBadgeNameUnbreakable;
+
+  /// No description provided for @gamificationBadgeNameProductiveWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'Productive Week'**
+  String get gamificationBadgeNameProductiveWeek;
+
+  /// No description provided for @gamificationBadgeNameIntenseWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'Intense Week'**
+  String get gamificationBadgeNameIntenseWeek;
+
+  /// No description provided for @gamificationBadgeNameEpicWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'Epic Week'**
+  String get gamificationBadgeNameEpicWeek;
+
+  /// No description provided for @gamificationBadgeNameFirstSteps.
+  ///
+  /// In en, this message translates to:
+  /// **'First Steps'**
+  String get gamificationBadgeNameFirstSteps;
+
+  /// No description provided for @gamificationBadgeNameHalfway.
+  ///
+  /// In en, this message translates to:
+  /// **'Halfway'**
+  String get gamificationBadgeNameHalfway;
+
+  /// No description provided for @gamificationBadgeNameCenturion.
+  ///
+  /// In en, this message translates to:
+  /// **'Centurion'**
+  String get gamificationBadgeNameCenturion;
+
+  /// No description provided for @gamificationBadgeNameHabitMaster.
+  ///
+  /// In en, this message translates to:
+  /// **'Habit Master'**
+  String get gamificationBadgeNameHabitMaster;
+
+  /// No description provided for @gamificationBadgeNamePerfectWeek3.
+  ///
+  /// In en, this message translates to:
+  /// **'Perfect Week (3)'**
+  String get gamificationBadgeNamePerfectWeek3;
+
+  /// No description provided for @gamificationBadgeNamePerfectWeek5.
+  ///
+  /// In en, this message translates to:
+  /// **'Perfect Week (5)'**
+  String get gamificationBadgeNamePerfectWeek5;
+
+  /// No description provided for @gamificationBadgeDescriptionGettingHot.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete habits 3 days in a row'**
+  String get gamificationBadgeDescriptionGettingHot;
+
+  /// No description provided for @gamificationBadgeDescriptionPerfectWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete habits 7 days in a row'**
+  String get gamificationBadgeDescriptionPerfectWeek;
+
+  /// No description provided for @gamificationBadgeDescriptionLegendMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete habits 30 days in a row'**
+  String get gamificationBadgeDescriptionLegendMonth;
+
+  /// No description provided for @gamificationBadgeDescriptionCentury.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete habits 100 days in a row'**
+  String get gamificationBadgeDescriptionCentury;
+
+  /// No description provided for @gamificationBadgeDescriptionConsistent.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete habits at least 7 days in a month'**
+  String get gamificationBadgeDescriptionConsistent;
+
+  /// No description provided for @gamificationBadgeDescriptionVeryConsistent.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete habits at least 20 days in a month'**
+  String get gamificationBadgeDescriptionVeryConsistent;
+
+  /// No description provided for @gamificationBadgeDescriptionUnbreakable.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete habits every day of a month'**
+  String get gamificationBadgeDescriptionUnbreakable;
+
+  /// No description provided for @gamificationBadgeDescriptionProductiveWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete 5 habits in a week'**
+  String get gamificationBadgeDescriptionProductiveWeek;
+
+  /// No description provided for @gamificationBadgeDescriptionIntenseWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete 10 habits in a week'**
+  String get gamificationBadgeDescriptionIntenseWeek;
+
+  /// No description provided for @gamificationBadgeDescriptionEpicWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete 20 habits in a week'**
+  String get gamificationBadgeDescriptionEpicWeek;
+
+  /// No description provided for @gamificationBadgeDescriptionFirstSteps.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete 10 habits in total'**
+  String get gamificationBadgeDescriptionFirstSteps;
+
+  /// No description provided for @gamificationBadgeDescriptionHalfway.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete 50 habits in total'**
+  String get gamificationBadgeDescriptionHalfway;
+
+  /// No description provided for @gamificationBadgeDescriptionCenturion.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete 100 habits in total'**
+  String get gamificationBadgeDescriptionCenturion;
+
+  /// No description provided for @gamificationBadgeDescriptionHabitMaster.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete 500 habits in total'**
+  String get gamificationBadgeDescriptionHabitMaster;
+
+  /// No description provided for @gamificationBadgeDescriptionPerfectWeek3.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete all your habits during a week (3+ habits)'**
+  String get gamificationBadgeDescriptionPerfectWeek3;
+
+  /// No description provided for @gamificationBadgeDescriptionPerfectWeek5.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete all your habits during a week (5+ habits)'**
+  String get gamificationBadgeDescriptionPerfectWeek5;
+
+  /// No description provided for @gamificationSupremeLegend.
+  ///
+  /// In en, this message translates to:
+  /// **'Supreme Legend'**
+  String get gamificationSupremeLegend;
 }
 
 class _AppLocalizationsDelegate

@@ -8,6 +8,7 @@ import '../../features/auth/presentation/forgot_password_screen.dart';
 import '../../features/habits/presentation/home_screen.dart';
 import '../../features/habits/presentation/create_habit_screen.dart';
 import '../../features/gamification/presentation/progress_screen.dart';
+import '../../features/gamification/presentation/badges_screen.dart';
 import '../../features/ai/presentation/discover_screen.dart';
 import '../../features/profile/presentation/profile_screen.dart';
 import '../../features/privacy/presentation/privacy_policy_screen.dart';
@@ -61,6 +62,10 @@ GoRouter goRouter(GoRouterRef ref) {
               GoRoute(
                 path: '/progress',
                 builder: (context, state) => const ProgressScreen(),
+              ),
+              GoRoute(
+                path: '/badges',
+                builder: (context, state) => const BadgesScreen(),
               ),
             ],
           ),

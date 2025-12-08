@@ -2,6 +2,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
 import '../domain/entities/habit.dart';
 import '../data/habit_provider.dart';
+import '../../gamification/data/completion_provider.dart';
+import '../../gamification/domain/services/gamification_service.dart';
 
 part 'habit_view_model.g.dart';
 
@@ -22,7 +24,9 @@ class HabitViewModel extends _$HabitViewModel {
     final existingHabits = await ref.read(habitRepositoryProvider).getHabits();
     final maxSortOrder = existingHabits.isEmpty
         ? -1
-        : existingHabits.map((h) => h.sortOrder).reduce((a, b) => a > b ? a : b);
+        : existingHabits
+              .map((h) => h.sortOrder)
+              .reduce((a, b) => a > b ? a : b);
 
     final habit = Habit(
       id: const Uuid().v4(),
@@ -53,9 +57,14 @@ class HabitViewModel extends _$HabitViewModel {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
 
+    // Verificar si ya fue completado hoy
     if (habit.lastCompletedDate != null) {
       final lastDate = habit.lastCompletedDate!;
-      final lastCompletedDay = DateTime(lastDate.year, lastDate.month, lastDate.day);
+      final lastCompletedDay = DateTime(
+        lastDate.year,
+        lastDate.month,
+        lastDate.day,
+      );
 
       if (lastCompletedDay.isAtSameMomentAs(today)) {
         // Already completed today
@@ -63,18 +72,24 @@ class HabitViewModel extends _$HabitViewModel {
       }
     }
 
-    int newStreak = 1;
-    if (habit.lastCompletedDate != null) {
-      final lastDate = habit.lastCompletedDate!;
-      final lastCompletedDay = DateTime(lastDate.year, lastDate.month, lastDate.day);
-      final yesterday = today.subtract(const Duration(days: 1));
+    // Crear registro de completion
+    final completion = GamificationService.recordCompletion(
+      habitId: id,
+      completedAt: now,
+    );
+    await ref.read(completionRepositoryProvider).createCompletion(completion);
 
-      if (lastCompletedDay.isAtSameMomentAs(yesterday)) {
-        newStreak = habit.currentStreak + 1;
-      }
-    }
+    // Obtener todas las completiones para calcular streaks correctamente
+    final allCompletions = await ref
+        .read(completionRepositoryProvider)
+        .getCompletionsForHabit(id);
 
-    final newBestStreak = newStreak > habit.bestStreak ? newStreak : habit.bestStreak;
+    final newStreak = GamificationService.calculateCurrentStreak(
+      allCompletions,
+    );
+    final newBestStreak = newStreak > habit.bestStreak
+        ? newStreak
+        : habit.bestStreak;
 
     final updatedHabit = habit.copyWith(
       currentStreak: newStreak,

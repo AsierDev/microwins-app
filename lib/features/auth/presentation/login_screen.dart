@@ -141,8 +141,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           context,
                         )!.pleaseEnterPassword;
                       }
-                      if (value.length < 6)
+                      if (value.length < 6) {
                         return AppLocalizations.of(context)!.passwordTooShort;
+                      }
                       return null;
                     },
                   ),
