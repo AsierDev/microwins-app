@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Enum para los diferentes tipos de badges
+/// Enum for different badge types
 enum BadgeType {
   streak('Streak Master', Icons.local_fire_department, Colors.orange),
   consistency('Consistency Champion', Icons.calendar_today, Colors.blue),
@@ -14,7 +14,7 @@ enum BadgeType {
   final Color color;
 }
 
-/// Enum para la rareza de los badges
+/// Enum for badge rarity
 enum BadgeRarity {
   common('Común', Colors.grey, 1.0),
   uncommon('Poco Común', Colors.green, 1.2),
@@ -28,7 +28,7 @@ enum BadgeRarity {
   final double multiplier;
 }
 
-/// Modelo para representar un badge/logro
+/// Model representing a badge/achievement
 class Badge {
   final String id;
   final String name;
@@ -73,7 +73,7 @@ class Badge {
   }
 }
 
-/// Modelo para representar el nivel del usuario
+/// Model representing user level
 class UserLevel {
   final int level;
   final int currentExp;
@@ -108,7 +108,7 @@ class UserLevel {
   }
 }
 
-/// Servicio que maneja la lógica de logros, niveles y badges
+/// Service that handles logic for achievements, levels and badges
 class AchievementService {
   static const List<String> _levelTitles = [
     'Principiante',
@@ -123,7 +123,7 @@ class AchievementService {
     'Leyenda',
   ];
 
-  /// Obtiene todos los badges disponibles
+  /// Gets all available badges
   static List<Badge> getAllBadges() {
     return [
       // Badges de Streak
@@ -252,12 +252,12 @@ class AchievementService {
     ];
   }
 
-  /// Calcula el nivel del usuario basado en su experiencia total
+  /// Calculates user level based on total experience
   static UserLevel calculateLevel(int totalExp) {
-    // Fórmula: cada nivel requiere 100 * nivel EXP
-    // Nivel 1: 0-99 EXP
-    // Nivel 2: 100-299 EXP
-    // Nivel 3: 300-599 EXP
+    // Formula: each level requires 100 * level EXP
+    // Level 1: 0-99 EXP
+    // Level 2: 100-299 EXP
+    // Level 3: 300-599 EXP
     // etc.
 
     int level = 1;
@@ -269,7 +269,7 @@ class AchievementService {
       expForCurrentLevel = expForNextLevel;
       expForNextLevel += 100 * level;
 
-      if (level > 10) break; // Nivel máximo
+      if (level > 10) break; // Max level
     }
 
     final currentExpInLevel = totalExp - expForCurrentLevel;
@@ -288,29 +288,29 @@ class AchievementService {
     );
   }
 
-  /// Calcula la experiencia ganada por completar un hábito
+  /// Calculates experience gained by completing a habit
   static int calculateExpGained({
     required int streak,
     required bool isFirstCompletionToday,
     required bool isPerfectWeek,
   }) {
-    int baseExp = 10; // EXP base por completar un hábito
+    int baseExp = 10; // Base EXP for completing a habit
 
-    // Bonificación por streak
+    // Streak bonus
     if (streak >= 30) {
-      baseExp += 20; // +20 EXP por streak de 30+
+      baseExp += 20; // +20 EXP for streak of 30+
     } else if (streak >= 7) {
-      baseExp += 10; // +10 EXP por streak de 7+
+      baseExp += 10; // +10 EXP for streak of 7+
     } else if (streak >= 3) {
-      baseExp += 5; // +5 EXP por streak de 3+
+      baseExp += 5; // +5 EXP for streak of 3+
     }
 
-    // Bonificación por primera completación del día
+    // Bonus for first completion of the day
     if (isFirstCompletionToday) {
       baseExp += 5;
     }
 
-    // Bonificación por semana perfecta
+    // Bonus for perfect week
     if (isPerfectWeek) {
       baseExp += 15;
     }
@@ -318,7 +318,7 @@ class AchievementService {
     return baseExp;
   }
 
-  /// Verifica qué badges se han desbloqueado
+  /// Checks which badges have been unlocked
   static List<Badge> checkUnlockedBadges({
     required int currentStreak,
     required int bestStreak,
@@ -358,7 +358,7 @@ class AchievementService {
           break;
         case 'consistency_month':
           isUnlocked =
-              monthlyCompletions >= 28; // Asumiendo mes de 28 días mínimo
+              monthlyCompletions >= 28; // Assuming month of at least 28 days
           break;
 
         // Weekly badges
@@ -405,7 +405,7 @@ class AchievementService {
     return unlockedBadges;
   }
 
-  /// Obtiene badges nuevos (no desbloqueados anteriormente)
+  /// Gets new badges (not previously unlocked)
   static List<Badge> getNewBadges(
     List<Badge> allBadges,
     List<Badge> previouslyUnlocked,

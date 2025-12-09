@@ -389,7 +389,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String gamificationUnlockedCount(Object total, Object unlocked) {
-    return '$unlocked/$total débloqués';
+    return '$total/$unlocked débloqués';
   }
 
   @override
@@ -449,12 +449,12 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String gamificationBetterThanLastWeek(Object progress) {
-    return '$progress% mieux que la semaine dernière';
+    return '$progress% mieux vs même période semaine dernière';
   }
 
   @override
   String gamificationWorseThanLastWeek(Object progress) {
-    return '$progress% pire que la semaine dernière';
+    return '$progress% pire vs même période semaine dernière';
   }
 
   @override

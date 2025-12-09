@@ -1,11 +1,11 @@
 import 'package:uuid/uuid.dart';
 import '../../../gamification/data/models/habit_completion_model.dart';
 
-/// Servicio que maneja la lógica de gamificación y seguimiento de progreso
+/// Service that handles gamification logic and progress tracking
 class GamificationService {
   static const Uuid _uuid = Uuid();
 
-  /// Registra una nueva completación de hábito
+  /// Records a new habit completion
   static HabitCompletionModel recordCompletion({
     required String habitId,
     required DateTime completedAt,
@@ -16,11 +16,11 @@ class GamificationService {
     );
   }
 
-  /// Calcula el streak actual basado en el historial de completiones
+  /// Calculates current streak based on completion history
   static int calculateCurrentStreak(List<HabitCompletionModel> completions) {
     if (completions.isEmpty) return 0;
 
-    // Ordenar completiones por fecha (más reciente primero)
+    // Sort completions by date (most recent first)
     final sortedCompletions = List<HabitCompletionModel>.from(completions)
       ..sort((a, b) => b.completedAt.compareTo(a.completedAt));
 
@@ -35,7 +35,7 @@ class GamificationService {
       );
 
       if (currentDate == null) {
-        // Primera completación, verificar si es hoy o ayer
+        // First completion, check if it's today or yesterday
         final now = DateTime.now();
         final today = DateTime(now.year, now.month, now.day);
         final yesterday = today.subtract(const Duration(days: 1));
@@ -45,10 +45,10 @@ class GamificationService {
           streak = 1;
           currentDate = completionDate;
         } else {
-          break; // No hay streak activo
+          break; // No active streak
         }
       } else {
-        // Verificar si es el día anterior al actual
+        // Check if it's the day before the current one
         final expectedPreviousDay = currentDate.subtract(
           const Duration(days: 1),
         );
@@ -57,20 +57,20 @@ class GamificationService {
           streak++;
           currentDate = completionDate;
         } else if (completionDate.isBefore(expectedPreviousDay)) {
-          break; // Rompió el streak
+          break; // Streak broken
         }
-        // Si es posterior, continuamos (múltiples completiones del mismo día)
+        // If newer (same day), continue (multiple completions on the same day)
       }
     }
 
     return streak;
   }
 
-  /// Calcula el mejor streak histórico
+  /// Calculates the best historical streak
   static int calculateBestStreak(List<HabitCompletionModel> completions) {
     if (completions.isEmpty) return 0;
 
-    // Agrupar completiones por día
+    // Group completions by day
     final Map<DateTime, List<HabitCompletionModel>> dailyCompletions = {};
 
     for (final completion in completions) {
@@ -86,7 +86,7 @@ class GamificationService {
       dailyCompletions[day]!.add(completion);
     }
 
-    // Ordenar los días
+    // Sort days
     final sortedDays = dailyCompletions.keys.toList()
       ..sort((a, b) => a.compareTo(b));
 
@@ -116,7 +116,7 @@ class GamificationService {
     return bestStreak;
   }
 
-  /// Obtiene las completiones de la semana actual agrupadas por día
+  /// Gets current week completions grouped by day
   static Map<int, int> getWeeklyCompletions(
     List<HabitCompletionModel> completions,
   ) {
@@ -132,7 +132,7 @@ class GamificationService {
     return weeklyCompletions;
   }
 
-  /// Verifica si un hábito fue completado hoy
+  /// Checks if a habit was completed today
   static bool isCompletedToday(
     List<HabitCompletionModel> completions,
     String habitId,
@@ -146,7 +146,7 @@ class GamificationService {
     );
   }
 
-  /// Obtiene el número de hábitos completados hoy
+  /// Gets the count of habits completed today
   static int getCompletedTodayCount(List<HabitCompletionModel> completions) {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
@@ -155,19 +155,21 @@ class GamificationService {
         .where((completion) => completion.isForDate(today))
         .toList();
 
-    // Contar hábitos únicos (no completiones múltiples del mismo hábito)
+    // Count unique habits (ignore multiple completions of the same habit)
     final uniqueHabitIds = todayCompletions.map((c) => c.habitId).toSet();
     return uniqueHabitIds.length;
   }
 
-  /// Compara el progreso con la semana anterior
+  /// Compares progress with the previous week (same elapsed days)
+  /// For example, if today is Wednesday, compare M-T-W of this week
+  /// with M-T-W of last week for a fair comparison.
   static double getWeeklyProgressComparison(
     List<HabitCompletionModel> allCompletions,
   ) {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
 
-    // Esta semana (lunes a domingo actual)
+    // This week (Monday to today)
     final thisMonday = today.subtract(Duration(days: today.weekday - 1));
     final thisWeekCompletions = allCompletions.where((c) {
       final completionDate = DateTime(
@@ -179,9 +181,9 @@ class GamificationService {
           !completionDate.isAfter(today);
     }).length;
 
-    // Semana pasada (lunes a domingo anterior)
+    // Last week: same period (from Monday to the same day of the week)
     final lastMonday = thisMonday.subtract(const Duration(days: 7));
-    final lastSunday = thisMonday.subtract(const Duration(days: 1));
+    final lastWeekSameDay = today.subtract(const Duration(days: 7));
     final lastWeekCompletions = allCompletions.where((c) {
       final completionDate = DateTime(
         c.completedAt.year,
@@ -189,7 +191,7 @@ class GamificationService {
         c.completedAt.day,
       );
       return !completionDate.isBefore(lastMonday) &&
-          !completionDate.isAfter(lastSunday);
+          !completionDate.isAfter(lastWeekSameDay);
     }).length;
 
     if (lastWeekCompletions == 0) return thisWeekCompletions > 0 ? 100.0 : 0.0;

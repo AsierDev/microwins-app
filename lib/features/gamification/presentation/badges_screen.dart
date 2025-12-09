@@ -47,17 +47,17 @@ class _BadgesScreenState extends ConsumerState<BadgesScreen> {
 
           final completions = completionsSnapshot.data ?? [];
 
-          // Calcular estadísticas del usuario
+          // Calculate user statistics
           final totalCompletions = completions.length;
           final userLevel = achievement.AchievementService.calculateLevel(
             totalCompletions,
           );
 
-          // Calcular streaks por hábito
+          // Calculate streaks by habit
           final Map<String, int> habitStreaks = {};
           final Map<String, int> habitBestStreaks = {};
 
-          // Agrupar completiones por hábito
+          // Group completions by habit
           final Map<String, List<HabitCompletionModel>> completionsByHabit = {};
           for (final completion in completions) {
             if (!completionsByHabit.containsKey(completion.habitId)) {
@@ -66,7 +66,7 @@ class _BadgesScreenState extends ConsumerState<BadgesScreen> {
             completionsByHabit[completion.habitId]!.add(completion);
           }
 
-          // Calcular streaks para cada hábito
+          // Calculate streaks for each habit
           for (final entry in completionsByHabit.entries) {
             final currentStreak = GamificationService.calculateCurrentStreak(
               entry.value,
@@ -86,7 +86,7 @@ class _BadgesScreenState extends ConsumerState<BadgesScreen> {
               ? 0
               : habitStreaks.values.reduce((a, b) => a > b ? a : b);
 
-          // Verificar badges desbloqueados
+          // Check unlocked badges
           final unlockedBadges =
               achievement.AchievementService.checkUnlockedBadges(
                 currentStreak: currentStreak,
@@ -102,7 +102,7 @@ class _BadgesScreenState extends ConsumerState<BadgesScreen> {
 
           return RefreshIndicator(
             onRefresh: () async {
-              // Refrescar datos al hacer pull-to-refresh
+              // Refresh data on pull-to-refresh
               ref.invalidate(completionRepositoryProvider);
             },
             child: LayoutBuilder(
@@ -116,11 +116,11 @@ class _BadgesScreenState extends ConsumerState<BadgesScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Sección de nivel del usuario optimizada
+                      // Optimized user level section
                       _buildUserLevelCard(context, userLevel, totalCompletions),
                       const SizedBox(height: 24),
 
-                      // Sección de estadísticas con diseño responsivo
+                      // Statistics section with responsive design
                       _buildStatsCard(
                         context,
                         currentStreak,
@@ -130,7 +130,7 @@ class _BadgesScreenState extends ConsumerState<BadgesScreen> {
                       ),
                       const SizedBox(height: 24),
 
-                      // Sección de badges con grid responsivo
+                      // Badges section with responsive grid
                       _buildBadgesSection(
                         context,
                         allBadges,
@@ -139,7 +139,7 @@ class _BadgesScreenState extends ConsumerState<BadgesScreen> {
                         isSmallScreen,
                       ),
 
-                      // Espacio adicional para scroll en pantallas pequeñas
+                      // Additional scroll space on small screens
                       if (isSmallScreen) const SizedBox(height: 20),
                     ],
                   ),
@@ -274,7 +274,7 @@ class _BadgesScreenState extends ConsumerState<BadgesScreen> {
             ),
             const SizedBox(height: 16),
 
-            // Grid responsivo para estadísticas
+            // Responsive grid for statistics
             GridView.count(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
@@ -366,7 +366,7 @@ class _BadgesScreenState extends ConsumerState<BadgesScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Header con contador de progreso
+        // Header with progress counter
         Row(
           children: [
             Expanded(
@@ -385,8 +385,8 @@ class _BadgesScreenState extends ConsumerState<BadgesScreen> {
               ),
               child: Text(
                 AppLocalizations.of(context)!.gamificationUnlockedCount(
-                  allBadges.length,
                   unlockedBadges.length,
+                  allBadges.length,
                 ),
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: Theme.of(context).colorScheme.onPrimaryContainer,
@@ -398,7 +398,7 @@ class _BadgesScreenState extends ConsumerState<BadgesScreen> {
         ),
         const SizedBox(height: 16),
 
-        // Agrupar badges por tipo con grid responsivo
+        // Group badges by type with responsive grid
         ...achievement.BadgeType.values.map((type) {
           final typeBadges = allBadges.where((b) => b.type == type).toList();
           if (typeBadges.isEmpty) return const SizedBox.shrink();
@@ -448,21 +448,39 @@ class _BadgesScreenState extends ConsumerState<BadgesScreen> {
       width: 100,
       height: 100,
       decoration: BoxDecoration(
-        color: isUnlocked
-            ? badge.rarity.color.withOpacity(0.1)
-            : Colors.grey.withOpacity(0.1),
+        // Glassmorphism: semi-transparent background with gradient
+        gradient: isUnlocked
+            ? LinearGradient(
+                colors: [
+                  badge.rarity.color.withValues(alpha: 0.25),
+                  badge.rarity.color.withValues(alpha: 0.15),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              )
+            : null,
+        color: isUnlocked ? null : Colors.grey.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
+        // Shiny border for glassmorphism
         border: Border.all(
           color: isUnlocked
-              ? badge.rarity.color.withOpacity(0.5)
-              : Colors.grey.withOpacity(0.3),
-          width: 2,
+              ? badge.rarity.color.withValues(alpha: 0.6)
+              : Colors.grey.withValues(alpha: 0.3),
+          width: isUnlocked ? 2.5 : 2,
         ),
+        // Stronger shadow with color for glassmorphism
         boxShadow: isUnlocked
             ? [
                 BoxShadow(
-                  color: badge.rarity.color.withOpacity(0.2),
+                  color: badge.rarity.color.withValues(alpha: 0.4),
+                  blurRadius: 16,
+                  spreadRadius: 2,
+                  offset: const Offset(0, 4),
+                ),
+                BoxShadow(
+                  color: badge.rarity.color.withValues(alpha: 0.2),
                   blurRadius: 8,
+                  spreadRadius: -2,
                   offset: const Offset(0, 2),
                 ),
               ]
@@ -471,27 +489,57 @@ class _BadgesScreenState extends ConsumerState<BadgesScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          // Icon with glow effect for unlocked badges
           Icon(
             isUnlocked ? badge.type.icon : Icons.help_outline,
-            size: 32,
-            color: isUnlocked ? badge.rarity.color : Colors.grey,
+            size: 36,
+            color: isUnlocked ? Colors.white : Colors.grey,
+            shadows: isUnlocked
+                ? [
+                    Shadow(color: badge.rarity.color, blurRadius: 12),
+                    Shadow(
+                      color: badge.rarity.color.withValues(alpha: 0.5),
+                      blurRadius: 24,
+                    ),
+                  ]
+                : null,
           ),
           const SizedBox(height: 8),
           Text(
             badge.name,
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: isUnlocked ? badge.rarity.color : Colors.grey,
+              color: isUnlocked
+                  ? Colors.white.withValues(alpha: 0.95)
+                  : Colors.grey,
               fontWeight: FontWeight.bold,
+              shadows: isUnlocked
+                  ? [
+                      Shadow(
+                        color: badge.rarity.color.withValues(alpha: 0.5),
+                        blurRadius: 4,
+                      ),
+                    ]
+                  : null,
             ),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
+          const SizedBox(height: 4),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
             decoration: BoxDecoration(
               color: badge.rarity.color,
               borderRadius: BorderRadius.circular(8),
+              boxShadow: isUnlocked
+                  ? [
+                      BoxShadow(
+                        color: badge.rarity.color.withValues(alpha: 0.5),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ]
+                  : null,
             ),
             child: Text(
               badge.rarity.displayName,
@@ -527,7 +575,7 @@ class _BadgesScreenState extends ConsumerState<BadgesScreen> {
       );
       final totalWeekly = weeklyCompletions.values.fold(0, (a, b) => a + b);
 
-      // Si completó hábitos todos los días de la semana (7 días)
+      // If completed habits every day of the week (7 days)
       if (totalWeekly >= 7) {
         return true;
       }
@@ -535,7 +583,7 @@ class _BadgesScreenState extends ConsumerState<BadgesScreen> {
     return false;
   }
 
-  /// Widget de estado de carga optimizado
+  /// Optimized loading state widget
   Widget _buildLoadingState(BuildContext context) {
     return Center(
       child: Column(
@@ -556,7 +604,7 @@ class _BadgesScreenState extends ConsumerState<BadgesScreen> {
     );
   }
 
-  /// Widget de estado de error con opción de reintentar
+  /// Error state widget with retry option
   Widget _buildErrorState(
     BuildContext context,
     Object error,

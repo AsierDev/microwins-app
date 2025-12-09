@@ -35,27 +35,27 @@ class ProgressScreen extends ConsumerWidget {
             data: (completions) {
               final totalHabits = habits.length;
 
-              // Usar el nuevo sistema de historial para cálculos precisos
+              // Use new history system for precise calculations
               final completedToday = GamificationService.getCompletedTodayCount(
                 completions,
               );
               final weeklyCompletions =
                   GamificationService.getWeeklyCompletions(completions);
 
-              // Calcular estadísticas comparativas
+              // Calculate comparative statistics
               final weeklyProgress =
                   GamificationService.getWeeklyProgressComparison(completions);
               final isPositiveProgress = weeklyProgress >= 0;
 
               return RefreshIndicator(
                 onRefresh: () async {
-                  // Refrescar los datos al hacer pull-to-refresh
+                  // Refresh data on pull-to-refresh
                   ref.invalidate(completionsStreamProvider);
                   ref.invalidate(habitViewModelProvider);
                 },
                 child: LayoutBuilder(
                   builder: (context, constraints) {
-                    // Optimizar para diferentes tamaños de pantalla
+                    // Optimize for different screen sizes
                     final isSmallScreen = constraints.maxWidth < 600;
                     final cardCrossAxisCount = isSmallScreen ? 1 : 2;
 
@@ -65,7 +65,7 @@ class ProgressScreen extends ConsumerWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Grid de tarjetas de resumen
+                          // Summary cards grid
                           GridView.count(
                             shrinkWrap: true,
                             physics: const NeverScrollableScrollPhysics(),
@@ -74,7 +74,7 @@ class ProgressScreen extends ConsumerWidget {
                             mainAxisSpacing: 16,
                             crossAxisSpacing: 16,
                             children: [
-                              // Tarjeta de hábitos totales
+                              // Total habits card
                               _buildSummaryCard(
                                 context,
                                 AppLocalizations.of(context)!.totalHabits,
@@ -84,7 +84,7 @@ class ProgressScreen extends ConsumerWidget {
                                   context,
                                 )!.gamificationActiveHabits,
                               ),
-                              // Tarjeta de progreso diario
+                              // Daily progress card
                               _buildProgressCard(
                                 context,
                                 AppLocalizations.of(context)!.completedToday,
@@ -103,7 +103,7 @@ class ProgressScreen extends ConsumerWidget {
                           ),
                           const SizedBox(height: 16),
 
-                          // Tarjeta de comparación semanal
+                          // Weekly comparison card
                           _buildComparisonCard(
                             context,
                             AppLocalizations.of(
@@ -114,7 +114,7 @@ class ProgressScreen extends ConsumerWidget {
                           ),
                           const SizedBox(height: 24),
 
-                          // Título de gráfico semanal con indicador de tendencia
+                          // Weekly chart title with trend indicator
                           Row(
                             children: [
                               Expanded(
@@ -138,7 +138,7 @@ class ProgressScreen extends ConsumerWidget {
                           ),
                           const SizedBox(height: 16),
 
-                          // Gráfico de barras optimizado con altura responsiva
+                          // Optimized bar chart with responsive height
                           SizedBox(
                             height: isSmallScreen ? 180 : 220,
                             child: _buildWeeklyChart(
@@ -149,14 +149,14 @@ class ProgressScreen extends ConsumerWidget {
                           ),
                           const SizedBox(height: 24),
 
-                          // Sección de motivación
+                          // Motivation section
                           _buildMotivationSection(
                             context,
                             completedToday,
                             totalHabits,
                           ),
 
-                          // Espacio adicional para scroll en pantallas pequeñas
+                          // Additional scroll space on small screens
                           if (isSmallScreen) const SizedBox(height: 20),
                         ],
                       ),
@@ -180,7 +180,7 @@ class ProgressScreen extends ConsumerWidget {
     );
   }
 
-  /// Construye el gráfico semanal optimizado
+  /// Builds the optimized weekly chart
   Widget _buildWeeklyChart(
     BuildContext context,
     Map<int, int> weeklyCompletions,
@@ -277,7 +277,10 @@ class ProgressScreen extends ConsumerWidget {
                   : 0;
               return BarTooltipItem(
                 '${dayNames[group.x.toInt()]}\n${AppLocalizations.of(context)!.gamificationCompletedCount(count, count == 1 ? '' : 's')}\n$percentage% del total',
-                const TextStyle(color: Colors.white, fontSize: 12),
+                TextStyle(
+                  color: Theme.of(context).colorScheme.onInverseSurface,
+                  fontSize: 12,
+                ),
               );
             },
           ),
@@ -298,7 +301,7 @@ class ProgressScreen extends ConsumerWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         onTap: () {
-          // Añadir feedback táctil
+          // Add haptic feedback
           HapticFeedback.lightImpact();
         },
         child: Padding(
@@ -549,7 +552,7 @@ class ProgressScreen extends ConsumerWidget {
     );
   }
 
-  /// Widget de estado de carga optimizado con animación
+  /// Optimized loading state widget with animation
   Widget _buildLoadingState(BuildContext context) {
     return Center(
       child: Column(
@@ -570,7 +573,7 @@ class ProgressScreen extends ConsumerWidget {
     );
   }
 
-  /// Widget de estado de error con opción de reintentar
+  /// Error state widget with retry option
   Widget _buildErrorState(
     BuildContext context,
     Object error,

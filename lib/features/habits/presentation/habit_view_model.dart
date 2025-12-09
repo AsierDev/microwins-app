@@ -57,7 +57,7 @@ class HabitViewModel extends _$HabitViewModel {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
 
-    // Verificar si ya fue completado hoy
+    // Check if already completed today
     if (habit.lastCompletedDate != null) {
       final lastDate = habit.lastCompletedDate!;
       final lastCompletedDay = DateTime(
@@ -72,14 +72,14 @@ class HabitViewModel extends _$HabitViewModel {
       }
     }
 
-    // Crear registro de completion
+    // Create completion record
     final completion = GamificationService.recordCompletion(
       habitId: id,
       completedAt: now,
     );
     await ref.read(completionRepositoryProvider).createCompletion(completion);
 
-    // Obtener todas las completiones para calcular streaks correctamente
+    // Get all completions to calculate streaks correctly
     final allCompletions = await ref
         .read(completionRepositoryProvider)
         .getCompletionsForHabit(id);

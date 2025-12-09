@@ -80,7 +80,9 @@ class HabitRepositoryImpl implements HabitRepository {
         .map((event) {
           return _habitBox.values.map((e) => HabitMapper.toEntity(e)).toList();
         })
-        .startWith(_habitBox.values.map((e) => HabitMapper.toEntity(e)).toList());
+        .startWith(
+          _habitBox.values.map((e) => HabitMapper.toEntity(e)).toList(),
+        );
   }
 
   @override
@@ -139,11 +141,19 @@ class HabitRepositoryImpl implements HabitRepository {
 
           await _habitBox.put(habit.id, habit);
         } catch (e) {
-          AppLogger.error('Error syncing habit ${data['id']}', tag: 'HabitRepository', error: e);
+          AppLogger.error(
+            'Error syncing habit ${data['id']}',
+            tag: 'HabitRepository',
+            error: e,
+          );
         }
       }
     } catch (e) {
-      AppLogger.error('Error syncing from cloud', tag: 'HabitRepository', error: e);
+      AppLogger.error(
+        'Error syncing from cloud',
+        tag: 'HabitRepository',
+        error: e,
+      );
     }
   }
 

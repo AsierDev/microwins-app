@@ -815,7 +815,7 @@ abstract class AppLocalizations {
   /// No description provided for @gamificationUnlockedCount.
   ///
   /// In en, this message translates to:
-  /// **'{unlocked}/{total} unlocked'**
+  /// **'{total}/{unlocked} unlocked'**
   String gamificationUnlockedCount(Object total, Object unlocked);
 
   /// No description provided for @gamificationLoadingAchievements.
@@ -923,13 +923,13 @@ abstract class AppLocalizations {
   /// No description provided for @gamificationBetterThanLastWeek.
   ///
   /// In en, this message translates to:
-  /// **'{progress}% better than last week'**
+  /// **'{progress}% better vs same period last week'**
   String gamificationBetterThanLastWeek(Object progress);
 
   /// No description provided for @gamificationWorseThanLastWeek.
   ///
   /// In en, this message translates to:
-  /// **'{progress}% worse than last week'**
+  /// **'{progress}% worse vs same period last week'**
   String gamificationWorseThanLastWeek(Object progress);
 
   /// No description provided for @gamificationStartJourney.
