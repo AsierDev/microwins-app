@@ -6,6 +6,7 @@ import 'package:hive/hive.dart';
 import '../domain/auth_repository.dart';
 
 import '../../habits/data/models/habit_model.dart';
+import '../../gamification/data/models/habit_completion_model.dart';
 
 class FirebaseAuthRepository implements AuthRepository {
   final FirebaseAuth _firebaseAuth;
@@ -78,6 +79,7 @@ class FirebaseAuthRepository implements AuthRepository {
   Future<void> signOut() async {
     // 1. Clear local Hive data
     await Hive.box<HabitModel>('habits').clear();
+    await Hive.box<HabitCompletionModel>('completions').clear();
     await Hive.box<dynamic>('settings').clear();
     await Hive.box<dynamic>('syncQueue').clear();
 
@@ -124,6 +126,7 @@ class FirebaseAuthRepository implements AuthRepository {
 
       // 2. Clear local Hive data
       await Hive.deleteBoxFromDisk('habits');
+      await Hive.deleteBoxFromDisk('completions');
       await Hive.deleteBoxFromDisk('settings');
 
       // 3. Clear WorkManager user ID

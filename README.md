@@ -11,11 +11,14 @@ A Flutter habit-tracking app focused on **micro-habits** (2-5 minutes) with gami
 - **Cloud Sync**: Firebase Firestore synchronization when online
 - **AI-Powered**: Personalized habit suggestions via OpenRouter API
 
-### Gamification
-- 🔥 **Streak Tracking**: Build momentum with daily streaks
-- 🎉 **Celebrations**: Confetti animations on habit completion
-- 📊 **Progress Dashboard**: Weekly charts and statistics
-- 🏆 **Achievements**: Unlock milestones as you progress
+### Gamification System
+- 🔥 **Streak Tracking**: Build momentum with daily consecutive streaks
+- 🎯 **Achievement System**: Unlock 15+ badges across 5 categories (Streak Master, Consistency Champion, Weekly Warrior, Milestone Master, Perfect Week)
+- 📊 **Progress Dashboard**: Interactive charts with weekly trends and comparative statistics
+- ⭐ **Level System**: Progress through 10 levels from "Beginner" to "Legend" with experience points
+- 🏆 **Badge Rarity**: 5 rarity tiers (Common, Uncommon, Rare, Epic, Legendary) with visual distinctions
+- 🎉 **Celebrations**: Confetti animations and notifications on habit completion and achievement unlocks
+- 📈 **Statistics**: Comprehensive tracking of current streak, best streak, total completions, and weekly progress
 
 ### Technical Highlights
 - **Multi-Process Notifications**: WorkManager + Firestore for reliable background tasks
@@ -114,10 +117,15 @@ lib/
 ├── core/                    # Shared utilities
 │   ├── notifications/       # WorkManager + Firestore notifications
 │   ├── sync/               # Firebase sync manager
+│   ├── local/              # Hive setup and configuration
 │   └── theme/              # App theming
 ├── features/
 │   ├── auth/               # Authentication (Firebase)
 │   ├── habits/             # Habit CRUD operations
+│   ├── gamification/       # Achievements, levels, and progress tracking
+│   │   ├── domain/         # Services (AchievementService, GamificationService)
+│   │   ├── data/           # Repository and models (HabitCompletionModel)
+│   │   └── presentation/   # UI (ProgressScreen, BadgesScreen)
 │   ├── ai_suggestions/     # OpenRouter AI integration
 │   └── profile/            # User settings
 └── firebase_options.dart   # Firebase configuration
@@ -151,6 +159,30 @@ SharedPreferences       SharedPreferences
 - ✅ Notifications arrive within 0-15 minutes of scheduled time
 
 **Trade-off:** Notifications may arrive up to 15 minutes late (Android WorkManager limitation)
+
+---
+
+## 🎮 Gamification System
+
+### Overview
+
+MicroWins features a comprehensive gamification system designed to maximize user engagement and habit consistency through psychological reinforcement mechanics.
+
+### Achievement Categories
+
+| Category | Icon | Focus | Badges |
+|----------|------|-------|---------|
+| **Streak Master** | 🔥 | Daily consecutive completions | 4 badges (3, 7, 30, 100 days) |
+| **Consistency Champion** | 📅 | Monthly completion frequency | 3 badges (7, 20, 28+ days/month) |
+| **Weekly Warrior** | 📈 | Weekly volume | 3 badges (5, 10, 20 habits/week) |
+| **Milestone Master** | 🏆 | Cumulative achievements | 4 badges (10, 50, 100, 500 total) |
+| **Perfect Week** | ⭐ | Weekly perfection | 2 badges (3+, 5+ habits) |
+
+### Level Progression
+
+- **10 Levels**: Principiante → Novato → Aprendiz → Practicante → Dedicado → Comprometido → Experto → Maestro → Gran Maestro → Leyenda
+- **EXP Formula**: Each level requires `100 * level` additional EXP
+- **Bonuses**: Streak bonuses (+5 to +20 EXP), first of day (+5 EXP), perfect week (+15 EXP)
 
 ---
 
