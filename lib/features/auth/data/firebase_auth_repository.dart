@@ -80,7 +80,15 @@ class FirebaseAuthRepository implements AuthRepository {
     // 1. Clear local Hive data
     await Hive.box<HabitModel>('habits').clear();
     await Hive.box<HabitCompletionModel>('completions').clear();
-    await Hive.box<dynamic>('settings').clear();
+    // Clear user-specific settings but preserve app-level settings (e.g., hasSeenOnboarding)
+    final settingsBox = Hive.box<dynamic>('settings');
+    final keysToPreserve = ['hasSeenOnboarding', 'theme_mode'];
+    final keysToDelete = settingsBox.keys
+        .where((key) => !keysToPreserve.contains(key))
+        .toList();
+    for (final key in keysToDelete) {
+      await settingsBox.delete(key);
+    }
     await Hive.box<dynamic>('syncQueue').clear();
 
     // 2. Clear WorkManager user ID

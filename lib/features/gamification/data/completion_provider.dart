@@ -1,5 +1,4 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../auth/data/auth_provider.dart';
 import '../../habits/data/habit_provider.dart';
 import '../domain/completion_repository.dart';
