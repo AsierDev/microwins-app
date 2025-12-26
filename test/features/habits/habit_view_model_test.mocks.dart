@@ -5,6 +5,11 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _i3;
 
+import 'package:microwins/core/sync/sync_manager.dart' as _i7;
+import 'package:microwins/features/gamification/data/models/habit_completion_model.dart'
+    as _i6;
+import 'package:microwins/features/gamification/domain/completion_repository.dart'
+    as _i5;
 import 'package:microwins/features/habits/domain/entities/habit.dart' as _i4;
 import 'package:microwins/features/habits/domain/habit_repository.dart' as _i2;
 import 'package:mockito/mockito.dart' as _i1;
@@ -108,4 +113,217 @@ class MockHabitRepository extends _i1.Mock implements _i2.HabitRepository {
         ),
         returnValue: _i3.Future<List<_i4.Habit>>.value(<_i4.Habit>[]),
       ) as _i3.Future<List<_i4.Habit>>);
+}
+
+/// A class which mocks [CompletionRepository].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockCompletionRepository extends _i1.Mock
+    implements _i5.CompletionRepository {
+  MockCompletionRepository() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i3.Future<void> createCompletion(_i6.HabitCompletionModel? completion) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #createCompletion,
+          [completion],
+        ),
+        returnValue: _i3.Future<void>.value(),
+        returnValueForMissingStub: _i3.Future<void>.value(),
+      ) as _i3.Future<void>);
+
+  @override
+  _i3.Future<void> updateCompletion(_i6.HabitCompletionModel? completion) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #updateCompletion,
+          [completion],
+        ),
+        returnValue: _i3.Future<void>.value(),
+        returnValueForMissingStub: _i3.Future<void>.value(),
+      ) as _i3.Future<void>);
+
+  @override
+  _i3.Future<void> deleteCompletion(String? id) => (super.noSuchMethod(
+        Invocation.method(
+          #deleteCompletion,
+          [id],
+        ),
+        returnValue: _i3.Future<void>.value(),
+        returnValueForMissingStub: _i3.Future<void>.value(),
+      ) as _i3.Future<void>);
+
+  @override
+  _i3.Future<List<_i6.HabitCompletionModel>> getCompletions() =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getCompletions,
+          [],
+        ),
+        returnValue: _i3.Future<List<_i6.HabitCompletionModel>>.value(
+            <_i6.HabitCompletionModel>[]),
+      ) as _i3.Future<List<_i6.HabitCompletionModel>>);
+
+  @override
+  _i3.Future<List<_i6.HabitCompletionModel>> getCompletionsForHabit(
+          String? habitId) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getCompletionsForHabit,
+          [habitId],
+        ),
+        returnValue: _i3.Future<List<_i6.HabitCompletionModel>>.value(
+            <_i6.HabitCompletionModel>[]),
+      ) as _i3.Future<List<_i6.HabitCompletionModel>>);
+
+  @override
+  _i3.Future<List<_i6.HabitCompletionModel>> getCompletionsForDateRange(
+    DateTime? startDate,
+    DateTime? endDate,
+  ) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getCompletionsForDateRange,
+          [
+            startDate,
+            endDate,
+          ],
+        ),
+        returnValue: _i3.Future<List<_i6.HabitCompletionModel>>.value(
+            <_i6.HabitCompletionModel>[]),
+      ) as _i3.Future<List<_i6.HabitCompletionModel>>);
+
+  @override
+  _i3.Stream<List<_i6.HabitCompletionModel>> watchCompletions() =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #watchCompletions,
+          [],
+        ),
+        returnValue: _i3.Stream<List<_i6.HabitCompletionModel>>.empty(),
+      ) as _i3.Stream<List<_i6.HabitCompletionModel>>);
+
+  @override
+  _i3.Stream<List<_i6.HabitCompletionModel>> watchCompletionsForHabit(
+          String? habitId) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #watchCompletionsForHabit,
+          [habitId],
+        ),
+        returnValue: _i3.Stream<List<_i6.HabitCompletionModel>>.empty(),
+      ) as _i3.Stream<List<_i6.HabitCompletionModel>>);
+
+  @override
+  _i3.Future<void> syncFromCloud() => (super.noSuchMethod(
+        Invocation.method(
+          #syncFromCloud,
+          [],
+        ),
+        returnValue: _i3.Future<void>.value(),
+        returnValueForMissingStub: _i3.Future<void>.value(),
+      ) as _i3.Future<void>);
+
+  @override
+  _i3.Future<void> markAsSynced(String? id) => (super.noSuchMethod(
+        Invocation.method(
+          #markAsSynced,
+          [id],
+        ),
+        returnValue: _i3.Future<void>.value(),
+        returnValueForMissingStub: _i3.Future<void>.value(),
+      ) as _i3.Future<void>);
+
+  @override
+  _i3.Future<List<_i6.HabitCompletionModel>> getUnsyncedCompletions() =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getUnsyncedCompletions,
+          [],
+        ),
+        returnValue: _i3.Future<List<_i6.HabitCompletionModel>>.value(
+            <_i6.HabitCompletionModel>[]),
+      ) as _i3.Future<List<_i6.HabitCompletionModel>>);
+
+  @override
+  _i3.Future<void> deleteCompletionsForHabit(String? habitId) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #deleteCompletionsForHabit,
+          [habitId],
+        ),
+        returnValue: _i3.Future<void>.value(),
+        returnValueForMissingStub: _i3.Future<void>.value(),
+      ) as _i3.Future<void>);
+}
+
+/// A class which mocks [SyncManager].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockSyncManager extends _i1.Mock implements _i7.SyncManager {
+  MockSyncManager() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i3.Future<void> queueOperation(
+    String? action,
+    Map<String, dynamic>? data,
+  ) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #queueOperation,
+          [
+            action,
+            data,
+          ],
+        ),
+        returnValue: _i3.Future<void>.value(),
+        returnValueForMissingStub: _i3.Future<void>.value(),
+      ) as _i3.Future<void>);
+
+  @override
+  _i3.Future<List<Map<String, dynamic>>> fetchHabitsFromFirestore() =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #fetchHabitsFromFirestore,
+          [],
+        ),
+        returnValue: _i3.Future<List<Map<String, dynamic>>>.value(
+            <Map<String, dynamic>>[]),
+      ) as _i3.Future<List<Map<String, dynamic>>>);
+
+  @override
+  _i3.Stream<List<Map<String, dynamic>>> watchHabitsFromFirestore() =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #watchHabitsFromFirestore,
+          [],
+        ),
+        returnValue: _i3.Stream<List<Map<String, dynamic>>>.empty(),
+      ) as _i3.Stream<List<Map<String, dynamic>>>);
+
+  @override
+  _i3.Future<List<Map<String, dynamic>>> fetchCompletionsFromFirestore() =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #fetchCompletionsFromFirestore,
+          [],
+        ),
+        returnValue: _i3.Future<List<Map<String, dynamic>>>.value(
+            <Map<String, dynamic>>[]),
+      ) as _i3.Future<List<Map<String, dynamic>>>);
+
+  @override
+  _i3.Stream<List<Map<String, dynamic>>> watchCompletionsFromFirestore() =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #watchCompletionsFromFirestore,
+          [],
+        ),
+        returnValue: _i3.Stream<List<Map<String, dynamic>>>.empty(),
+      ) as _i3.Stream<List<Map<String, dynamic>>>);
 }

@@ -2,29 +2,109 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
+import 'package:hive/hive.dart';
+import 'dart:io';
 import 'package:microwins/features/habits/domain/entities/habit.dart';
 import 'package:microwins/features/habits/domain/habit_repository.dart';
 import 'package:microwins/features/habits/data/habit_provider.dart';
 import 'package:microwins/features/habits/presentation/habit_view_model.dart';
+import 'package:microwins/features/gamification/domain/completion_repository.dart';
+import 'package:microwins/features/gamification/data/completion_provider.dart';
+import 'package:microwins/features/gamification/data/models/habit_completion_model.dart';
+import 'package:microwins/features/habits/data/models/habit_model.dart';
+import 'package:microwins/core/local/hive_setup.dart';
+import 'package:microwins/core/sync/sync_manager.dart';
 
 // Generate mocks with: flutter pub run build_runner build
-@GenerateMocks([HabitRepository])
+@GenerateMocks([HabitRepository, CompletionRepository, SyncManager])
 import 'habit_view_model_test.mocks.dart';
 
 void main() {
   group('HabitViewModel', () {
     late MockHabitRepository mockRepository;
+    late MockCompletionRepository mockCompletionRepository;
+    late MockSyncManager mockSyncManager;
     late ProviderContainer container;
+    late Directory tempDir;
 
-    setUp(() {
+    setUpAll(() async {
+      // Initialize Hive for testing with a temporary directory
+      tempDir = Directory.systemTemp.createTempSync('hive_test_');
+      Hive.init(tempDir.path);
+
+      // Register adapters
+      if (!Hive.isAdapterRegistered(0)) {
+        Hive.registerAdapter(HabitModelAdapter());
+      }
+      if (!Hive.isAdapterRegistered(1)) {
+        Hive.registerAdapter(HabitCompletionModelAdapter());
+      }
+    });
+
+    setUp(() async {
+      // Open boxes for testing (reopen if already open)
+      if (!Hive.isBoxOpen(HiveSetup.syncQueueBoxName)) {
+        await Hive.openBox<dynamic>(HiveSetup.syncQueueBoxName);
+      }
+      if (!Hive.isBoxOpen(HiveSetup.completionsBoxName)) {
+        await Hive.openBox<HabitCompletionModel>(HiveSetup.completionsBoxName);
+      }
+      if (!Hive.isBoxOpen(HiveSetup.habitsBoxName)) {
+        await Hive.openBox<HabitModel>(HiveSetup.habitsBoxName);
+      }
+
       mockRepository = MockHabitRepository();
+      mockCompletionRepository = MockCompletionRepository();
+      mockSyncManager = MockSyncManager();
+
       container = ProviderContainer(
-        overrides: [habitRepositoryProvider.overrideWithValue(mockRepository)],
+        overrides: [
+          habitRepositoryProvider.overrideWithValue(mockRepository),
+          completionRepositoryProvider.overrideWithValue(
+            mockCompletionRepository,
+          ),
+          syncManagerProvider.overrideWithValue(mockSyncManager),
+        ],
       );
     });
 
-    tearDown(() {
+    tearDown(() async {
       container.dispose();
+
+      // Clear all boxes after each test
+      if (Hive.isBoxOpen(HiveSetup.syncQueueBoxName)) {
+        await Hive.box<dynamic>(HiveSetup.syncQueueBoxName).clear();
+      }
+      if (Hive.isBoxOpen(HiveSetup.completionsBoxName)) {
+        await Hive.box<HabitCompletionModel>(
+          HiveSetup.completionsBoxName,
+        ).clear();
+      }
+      if (Hive.isBoxOpen(HiveSetup.habitsBoxName)) {
+        await Hive.box<HabitModel>(HiveSetup.habitsBoxName).clear();
+      }
+    });
+
+    tearDownAll(() async {
+      // Close all boxes and delete from disk
+      if (Hive.isBoxOpen(HiveSetup.syncQueueBoxName)) {
+        await Hive.box<dynamic>(HiveSetup.syncQueueBoxName).close();
+      }
+      if (Hive.isBoxOpen(HiveSetup.completionsBoxName)) {
+        await Hive.box<HabitCompletionModel>(
+          HiveSetup.completionsBoxName,
+        ).close();
+      }
+      if (Hive.isBoxOpen(HiveSetup.habitsBoxName)) {
+        await Hive.box<HabitModel>(HiveSetup.habitsBoxName).close();
+      }
+
+      await Hive.deleteFromDisk();
+
+      // Clean up temporary directory
+      if (tempDir.existsSync()) {
+        tempDir.deleteSync(recursive: true);
+      }
     });
 
     test('addHabit should create habit with correct sortOrder', () async {
@@ -52,11 +132,18 @@ void main() {
       ];
 
       when(mockRepository.getHabits()).thenAnswer((_) async => existingHabits);
-      when(mockRepository.createHabit(any)).thenAnswer((_) async => Future.value());
+      when(
+        mockRepository.createHabit(any),
+      ).thenAnswer((_) async => Future.value());
 
       final notifier = container.read(habitViewModelProvider.notifier);
 
-      await notifier.addHabit(name: 'Read', icon: '📚', category: 'Learning', durationMinutes: 20);
+      await notifier.addHabit(
+        name: 'Read',
+        icon: '📚',
+        category: 'Learning',
+        durationMinutes: 20,
+      );
 
       verify(mockRepository.getHabits()).called(1);
       verify(mockRepository.createHabit(any)).called(1);
@@ -97,7 +184,9 @@ void main() {
       ];
 
       when(mockRepository.getHabits()).thenAnswer((_) async => habits);
-      when(mockRepository.updateHabitsOrder(any)).thenAnswer((_) async => Future.value());
+      when(
+        mockRepository.updateHabitsOrder(any),
+      ).thenAnswer((_) async => Future.value());
 
       final notifier = container.read(habitViewModelProvider.notifier);
 
@@ -127,7 +216,17 @@ void main() {
       );
 
       when(mockRepository.getHabits()).thenAnswer((_) async => [habit]);
-      when(mockRepository.updateHabit(any)).thenAnswer((_) async => Future.value());
+      when(
+        mockRepository.updateHabit(any),
+      ).thenAnswer((_) async => Future.value());
+
+      // Mock completion repository methods
+      when(
+        mockCompletionRepository.createCompletion(any),
+      ).thenAnswer((_) async => Future.value());
+      when(
+        mockCompletionRepository.getCompletionsForHabit('1'),
+      ).thenAnswer((_) async => []);
 
       final notifier = container.read(habitViewModelProvider.notifier);
 
@@ -135,10 +234,14 @@ void main() {
 
       verify(mockRepository.getHabits()).called(1);
       verify(mockRepository.updateHabit(any)).called(1);
+      verify(mockCompletionRepository.createCompletion(any)).called(1);
+      verify(mockCompletionRepository.getCompletionsForHabit('1')).called(1);
     });
 
     test('deleteHabit should remove habit and cancel notification', () async {
-      when(mockRepository.deleteHabit('1')).thenAnswer((_) async => Future.value());
+      when(
+        mockRepository.deleteHabit('1'),
+      ).thenAnswer((_) async => Future.value());
 
       final notifier = container.read(habitViewModelProvider.notifier);
 
