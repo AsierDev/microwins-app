@@ -217,12 +217,12 @@
   "gamificationBadgeDescriptionPerfectWeek5": "Complétez toutes vos habitudes pendant une semaine (5+ habitudes)",
   "gamificationSupremeLegend": "Légende Suprême",
 
-  "themeLabel": "Thème de l'App",
+  "themeLabel": "Thème de l'application",
   "themeSystem": "Système par défaut",
   "themeLight": "Clair",
   "themeDark": "Sombre",
   "themeSystemSubtitle": "Suit les paramètres de l'appareil",
 
-  "sendFeedbackLabel": "Envoyer des Commentaires",
+  "sendFeedbackLabel": "Envoyer des commentaires",
   "sendFeedbackSubtitle": "Signaler des problèmes ou suggérer des fonctionnalités"
 }

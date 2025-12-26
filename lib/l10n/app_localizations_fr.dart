@@ -659,7 +659,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get gamificationSupremeLegend => 'Légende Suprême';
 
   @override
-  String get themeLabel => 'Thème de l\'App';
+  String get themeLabel => 'Thème de l\'application';
 
   @override
   String get themeSystem => 'Système par défaut';
@@ -674,7 +674,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get themeSystemSubtitle => 'Suit les paramètres de l\'appareil';
 
   @override
-  String get sendFeedbackLabel => 'Envoyer des Commentaires';
+  String get sendFeedbackLabel => 'Envoyer des commentaires';
 
   @override
   String get sendFeedbackSubtitle =>
