@@ -6,7 +6,9 @@ import '../../../core/local/hive_setup.dart';
 import '../../../l10n/app_localizations.dart';
 
 class OnboardingScreen extends ConsumerStatefulWidget {
-  const OnboardingScreen({super.key});
+  final bool isRevisit;
+
+  const OnboardingScreen({super.key, this.isRevisit = false});
 
   @override
   ConsumerState<OnboardingScreen> createState() => _OnboardingScreenState();
@@ -49,10 +51,20 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     }
   }
 
+  void _skipOnboarding() {
+    _finishOnboarding();
+  }
+
   void _finishOnboarding() {
-    final settingsBox = Hive.box<dynamic>(HiveSetup.settingsBoxName);
-    settingsBox.put('hasSeenOnboarding', true);
-    context.go('/login');
+    if (widget.isRevisit) {
+      // When revisiting from Settings, just go back
+      context.pop();
+    } else {
+      // First-time user: mark as seen and navigate to login
+      final settingsBox = Hive.box<dynamic>(HiveSetup.settingsBoxName);
+      settingsBox.put('hasSeenOnboarding', true);
+      context.go('/login');
+    }
   }
 
   @override
@@ -61,6 +73,17 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: widget.isRevisit
+            ? IconButton(icon: const Icon(Icons.close), onPressed: () => context.pop())
+            : null,
+        actions: [
+          if (!widget.isRevisit)
+            TextButton(onPressed: _skipOnboarding, child: Text(l10n.skipButton)),
+        ],
+      ),
       body: SafeArea(
         child: Column(
           children: [
@@ -95,9 +118,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                         decoration: BoxDecoration(
                           color: _currentPage == index
                               ? Theme.of(context).colorScheme.primary
-                              : Theme.of(
-                                  context,
-                                ).colorScheme.surfaceContainerHighest,
+                              : Theme.of(context).colorScheme.surfaceContainerHighest,
                           borderRadius: BorderRadius.circular(4),
                         ),
                       ),
@@ -106,11 +127,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   // Next/Done Button
                   FilledButton(
                     onPressed: _nextPage,
-                    child: Text(
-                      _currentPage == pages.length - 1
-                          ? l10n.getStartedButton
-                          : 'Next',
-                    ),
+                    child: Text(_currentPage == pages.length - 1 ? l10n.getStartedButton : 'Next'),
                   ),
                 ],
               ),
@@ -130,8 +147,7 @@ class OnboardingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Check if device is in landscape mode
-    final isLandscape =
-        MediaQuery.of(context).orientation == Orientation.landscape;
+    final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
 
     return SingleChildScrollView(
       child: Padding(
@@ -172,9 +188,5 @@ class OnboardingPageData {
   final String description;
   final IconData icon;
 
-  OnboardingPageData({
-    required this.title,
-    required this.description,
-    required this.icon,
-  });
+  OnboardingPageData({required this.title, required this.description, required this.icon});
 }

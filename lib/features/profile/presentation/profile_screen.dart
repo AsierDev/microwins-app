@@ -38,16 +38,11 @@ class ProfileScreen extends ConsumerWidget {
                   CircleAvatar(
                     radius: 40,
                     backgroundColor: Theme.of(context).colorScheme.primary,
-                    backgroundImage: user?.photoURL != null
-                        ? NetworkImage(user!.photoURL!)
-                        : null,
+                    backgroundImage: user?.photoURL != null ? NetworkImage(user!.photoURL!) : null,
                     child: user?.photoURL == null
                         ? Text(
                             _getInitial(user),
-                            style: const TextStyle(
-                              fontSize: 32,
-                              color: Colors.white,
-                            ),
+                            style: const TextStyle(fontSize: 32, color: Colors.white),
                           )
                         : null,
                   ),
@@ -59,9 +54,7 @@ class ProfileScreen extends ConsumerWidget {
                   const SizedBox(height: 4),
                   Text(
                     user?.email ?? '',
-                    style: Theme.of(
-                      context,
-                    ).textTheme.bodyMedium?.copyWith(color: Colors.grey),
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey),
                   ),
                 ],
               ),
@@ -82,9 +75,7 @@ class ProfileScreen extends ConsumerWidget {
                 data: (habits) {
                   final totalHabits = habits.length;
                   final bestStreak = habits.isNotEmpty
-                      ? habits
-                            .map((h) => h.bestStreak)
-                            .reduce((a, b) => a > b ? a : b)
+                      ? habits.map((h) => h.bestStreak).reduce((a, b) => a > b ? a : b)
                       : 0;
 
                   return Row(
@@ -118,9 +109,7 @@ class ProfileScreen extends ConsumerWidget {
               child: ListTile(
                 leading: const Icon(Icons.bug_report, color: Colors.orange),
                 title: const Text('🧪 Test Worker Now'),
-                subtitle: const Text(
-                  'Trigger notification check in 10 seconds',
-                ),
+                subtitle: const Text('Trigger notification check in 10 seconds'),
                 onTap: () async {
                   await Workmanager().registerOneOffTask(
                     'debug_test',
@@ -158,20 +147,14 @@ class ProfileScreen extends ConsumerWidget {
                     // Check actual permission status from system
                     future: NotificationService().checkPermissionStatus(),
                     builder: (context, snapshot) {
-                      final actualStatus =
-                          snapshot.data ?? settings.notificationsEnabled;
+                      final actualStatus = snapshot.data ?? settings.notificationsEnabled;
                       return SwitchListTile(
-                        title: Text(
-                          AppLocalizations.of(context)!.notificationsLabel,
-                        ),
-                        subtitle: Text(
-                          AppLocalizations.of(context)!.receiveDailyReminders,
-                        ),
+                        title: Text(AppLocalizations.of(context)!.notificationsLabel),
+                        subtitle: Text(AppLocalizations.of(context)!.receiveDailyReminders),
                         value: actualStatus,
                         onChanged: (value) async {
                           if (value) {
-                            final status = await Permission.notification
-                                .request();
+                            final status = await Permission.notification.request();
                             if (status.isGranted) {
                               await ref
                                   .read(settingsNotifierProvider.notifier)
@@ -198,12 +181,8 @@ class ProfileScreen extends ConsumerWidget {
                     },
                   ),
                   loading: () => SwitchListTile(
-                    title: Text(
-                      AppLocalizations.of(context)!.notificationsLabel,
-                    ),
-                    subtitle: Text(
-                      AppLocalizations.of(context)!.receiveDailyReminders,
-                    ),
+                    title: Text(AppLocalizations.of(context)!.notificationsLabel),
+                    subtitle: Text(AppLocalizations.of(context)!.receiveDailyReminders),
                     value: true,
                     onChanged: null,
                   ),
@@ -213,9 +192,7 @@ class ProfileScreen extends ConsumerWidget {
                 settingsAsync.when(
                   data: (settings) => ListTile(
                     leading: const Icon(Icons.access_time),
-                    title: Text(
-                      AppLocalizations.of(context)!.reminderTimeLabel,
-                    ),
+                    title: Text(AppLocalizations.of(context)!.reminderTimeLabel),
                     subtitle: Text(
                       _formatTime(settings.dailyReminderTime),
                       style: TextStyle(color: Colors.grey[600]),
@@ -260,12 +237,8 @@ class ProfileScreen extends ConsumerWidget {
                 const Divider(height: 1),
                 ListTile(
                   leading: const Icon(Icons.battery_alert),
-                  title: Text(
-                    AppLocalizations.of(context)!.optimizeNotifications,
-                  ),
-                  subtitle: Text(
-                    AppLocalizations.of(context)!.disableBatteryRestrictions,
-                  ),
+                  title: Text(AppLocalizations.of(context)!.optimizeNotifications),
+                  subtitle: Text(AppLocalizations.of(context)!.disableBatteryRestrictions),
                   trailing: const Icon(Icons.open_in_new, size: 16),
                   onTap: () {
                     showDialog<void>(
@@ -309,11 +282,17 @@ class ProfileScreen extends ConsumerWidget {
                 ),
                 const Divider(height: 1),
                 ListTile(
+                  leading: const Icon(Icons.school_outlined),
+                  title: Text(AppLocalizations.of(context)!.viewTutorialLabel),
+                  subtitle: Text(AppLocalizations.of(context)!.viewTutorialSubtitle),
+                  trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                  onTap: () => context.push('/onboarding?revisit=true'),
+                ),
+                const Divider(height: 1),
+                ListTile(
                   leading: const Icon(Icons.feedback_outlined),
                   title: Text(AppLocalizations.of(context)!.sendFeedbackLabel),
-                  subtitle: Text(
-                    AppLocalizations.of(context)!.sendFeedbackSubtitle,
-                  ),
+                  subtitle: Text(AppLocalizations.of(context)!.sendFeedbackSubtitle),
                   trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                   onTap: () => _launchFeedbackEmail(context),
                 ),
@@ -321,51 +300,28 @@ class ProfileScreen extends ConsumerWidget {
                 if (user != null && !user.isAnonymous) ...[
                   const Divider(height: 1),
                   ListTile(
-                    leading: const Icon(
-                      Icons.delete_forever,
-                      color: Colors.red,
-                    ),
+                    leading: const Icon(Icons.delete_forever, color: Colors.red),
                     title: Text(
                       AppLocalizations.of(context)!.deleteAccountLabel,
                       style: const TextStyle(color: Colors.red),
                     ),
-                    subtitle: const Text(
-                      'Permanently delete your account and data',
-                    ),
-                    trailing: const Icon(
-                      Icons.arrow_forward_ios,
-                      size: 16,
-                      color: Colors.red,
-                    ),
+                    subtitle: const Text('Permanently delete your account and data'),
+                    trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.red),
                     onTap: () async {
                       final shouldDelete = await showDialog<bool>(
                         context: context,
                         builder: (context) => AlertDialog(
-                          title: Text(
-                            AppLocalizations.of(
-                              context,
-                            )!.deleteAccountDialogTitle,
-                          ),
-                          content: Text(
-                            AppLocalizations.of(
-                              context,
-                            )!.deleteAccountDialogMessage,
-                          ),
+                          title: Text(AppLocalizations.of(context)!.deleteAccountDialogTitle),
+                          content: Text(AppLocalizations.of(context)!.deleteAccountDialogMessage),
                           actions: [
                             TextButton(
                               onPressed: () => Navigator.pop(context, false),
-                              child: Text(
-                                AppLocalizations.of(context)!.cancelButton,
-                              ),
+                              child: Text(AppLocalizations.of(context)!.cancelButton),
                             ),
                             FilledButton(
-                              style: FilledButton.styleFrom(
-                                backgroundColor: Colors.red,
-                              ),
+                              style: FilledButton.styleFrom(backgroundColor: Colors.red),
                               onPressed: () => Navigator.pop(context, true),
-                              child: Text(
-                                AppLocalizations.of(context)!.confirmButton,
-                              ),
+                              child: Text(AppLocalizations.of(context)!.confirmButton),
                             ),
                           ],
                         ),
@@ -373,9 +329,7 @@ class ProfileScreen extends ConsumerWidget {
 
                       if (shouldDelete == true && context.mounted) {
                         try {
-                          await ref
-                              .read(authRepositoryProvider)
-                              .deleteAccount();
+                          await ref.read(authRepositoryProvider).deleteAccount();
                           if (context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
@@ -388,10 +342,7 @@ class ProfileScreen extends ConsumerWidget {
                         } catch (e) {
                           if (context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Error: $e'),
-                                backgroundColor: Colors.red,
-                              ),
+                              SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
                             );
                           }
                         }
@@ -487,11 +438,7 @@ class ProfileScreen extends ConsumerWidget {
     }
   }
 
-  void _showThemeSelector(
-    BuildContext context,
-    WidgetRef ref,
-    ThemeMode currentMode,
-  ) {
+  void _showThemeSelector(BuildContext context, WidgetRef ref, ThemeMode currentMode) {
     final l10n = AppLocalizations.of(context)!;
     showModalBottomSheet<void>(
       context: context,
@@ -501,25 +448,17 @@ class ProfileScreen extends ConsumerWidget {
           children: [
             Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Text(
-                l10n.themeLabel,
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
+              child: Text(l10n.themeLabel, style: Theme.of(context).textTheme.titleLarge),
             ),
             ListTile(
               leading: const Icon(Icons.brightness_auto),
               title: Text(l10n.themeSystem),
               subtitle: Text(l10n.themeSystemSubtitle),
               trailing: currentMode == ThemeMode.system
-                  ? Icon(
-                      Icons.check,
-                      color: Theme.of(context).colorScheme.primary,
-                    )
+                  ? Icon(Icons.check, color: Theme.of(context).colorScheme.primary)
                   : null,
               onTap: () {
-                ref
-                    .read(themeModeNotifierProvider.notifier)
-                    .setThemeMode(ThemeMode.system);
+                ref.read(themeModeNotifierProvider.notifier).setThemeMode(ThemeMode.system);
                 Navigator.pop(context);
               },
             ),
@@ -527,15 +466,10 @@ class ProfileScreen extends ConsumerWidget {
               leading: const Icon(Icons.light_mode),
               title: Text(l10n.themeLight),
               trailing: currentMode == ThemeMode.light
-                  ? Icon(
-                      Icons.check,
-                      color: Theme.of(context).colorScheme.primary,
-                    )
+                  ? Icon(Icons.check, color: Theme.of(context).colorScheme.primary)
                   : null,
               onTap: () {
-                ref
-                    .read(themeModeNotifierProvider.notifier)
-                    .setThemeMode(ThemeMode.light);
+                ref.read(themeModeNotifierProvider.notifier).setThemeMode(ThemeMode.light);
                 Navigator.pop(context);
               },
             ),
@@ -543,15 +477,10 @@ class ProfileScreen extends ConsumerWidget {
               leading: const Icon(Icons.dark_mode),
               title: Text(l10n.themeDark),
               trailing: currentMode == ThemeMode.dark
-                  ? Icon(
-                      Icons.check,
-                      color: Theme.of(context).colorScheme.primary,
-                    )
+                  ? Icon(Icons.check, color: Theme.of(context).colorScheme.primary)
                   : null,
               onTap: () {
-                ref
-                    .read(themeModeNotifierProvider.notifier)
-                    .setThemeMode(ThemeMode.dark);
+                ref.read(themeModeNotifierProvider.notifier).setThemeMode(ThemeMode.dark);
                 Navigator.pop(context);
               },
             ),
@@ -579,16 +508,15 @@ class ProfileScreen extends ConsumerWidget {
     final uri = Uri(
       scheme: 'mailto',
       path: email,
-      query:
-          'subject=${Uri.encodeComponent(subject)}&body=${Uri.encodeComponent(body)}',
+      query: 'subject=${Uri.encodeComponent(subject)}&body=${Uri.encodeComponent(body)}',
     );
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri);
     } else {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Could not open email client')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Could not open email client')));
       }
     }
   }
@@ -599,11 +527,7 @@ class _StatItem extends StatelessWidget {
   final String value;
   final IconData icon;
 
-  const _StatItem({
-    required this.label,
-    required this.value,
-    required this.icon,
-  });
+  const _StatItem({required this.label, required this.value, required this.icon});
 
   @override
   Widget build(BuildContext context) {
@@ -613,17 +537,10 @@ class _StatItem extends StatelessWidget {
         const SizedBox(height: 8),
         Text(
           value,
-          style: Theme.of(
-            context,
-          ).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
+          style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 4),
-        Text(
-          label,
-          style: Theme.of(
-            context,
-          ).textTheme.bodySmall?.copyWith(color: Colors.grey),
-        ),
+        Text(label, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey)),
       ],
     );
   }

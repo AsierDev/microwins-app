@@ -29,53 +29,34 @@ GoRouter goRouter(GoRouterRef ref) {
       GoRoute(path: '/', builder: (context, state) => const SplashScreen()),
       GoRoute(
         path: '/onboarding',
-        builder: (context, state) => const OnboardingScreen(),
+        builder: (context, state) {
+          final isRevisit = state.uri.queryParameters['revisit'] == 'true';
+          return OnboardingScreen(isRevisit: isRevisit);
+        },
       ),
       GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
-      GoRoute(
-        path: '/forgot-password',
-        builder: (context, state) => const ForgotPasswordScreen(),
-      ),
+      GoRoute(path: '/forgot-password', builder: (context, state) => const ForgotPasswordScreen()),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return ScaffoldWithNavBar(navigationShell: navigationShell);
         },
         branches: [
           StatefulShellBranch(
+            routes: [GoRoute(path: '/home', builder: (context, state) => const HomeScreen())],
+          ),
+          StatefulShellBranch(
             routes: [
-              GoRoute(
-                path: '/home',
-                builder: (context, state) => const HomeScreen(),
-              ),
+              GoRoute(path: '/discover', builder: (context, state) => const DiscoverScreen()),
             ],
           ),
           StatefulShellBranch(
             routes: [
-              GoRoute(
-                path: '/discover',
-                builder: (context, state) => const DiscoverScreen(),
-              ),
+              GoRoute(path: '/progress', builder: (context, state) => const ProgressScreen()),
+              GoRoute(path: '/badges', builder: (context, state) => const BadgesScreen()),
             ],
           ),
           StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: '/progress',
-                builder: (context, state) => const ProgressScreen(),
-              ),
-              GoRoute(
-                path: '/badges',
-                builder: (context, state) => const BadgesScreen(),
-              ),
-            ],
-          ),
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: '/profile',
-                builder: (context, state) => const ProfileScreen(),
-              ),
-            ],
+            routes: [GoRoute(path: '/profile', builder: (context, state) => const ProfileScreen())],
           ),
         ],
       ),

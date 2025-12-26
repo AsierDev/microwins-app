@@ -224,5 +224,9 @@
   "themeSystemSubtitle": "Segue as configurações do dispositivo",
 
   "sendFeedbackLabel": "Enviar Feedback",
-  "sendFeedbackSubtitle": "Relatar problemas ou sugerir recursos"
+  "sendFeedbackSubtitle": "Relatar problemas ou sugerir recursos",
+
+  "skipButton": "Pular",
+  "viewTutorialLabel": "Ver Tutorial",
+  "viewTutorialSubtitle": "Rever o guia de introdução"
 }

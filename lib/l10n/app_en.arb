@@ -224,5 +224,9 @@
   "themeSystemSubtitle": "Follows device settings",
 
   "sendFeedbackLabel": "Send Feedback",
-  "sendFeedbackSubtitle": "Report issues or suggest features"
+  "sendFeedbackSubtitle": "Report issues or suggest features",
+
+  "skipButton": "Skip",
+  "viewTutorialLabel": "View Tutorial",
+  "viewTutorialSubtitle": "Revisit the onboarding guide"
 }

@@ -1327,6 +1327,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Report issues or suggest features'**
   String get sendFeedbackSubtitle;
+
+  /// No description provided for @skipButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get skipButton;
+
+  /// No description provided for @viewTutorialLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'View Tutorial'**
+  String get viewTutorialLabel;
+
+  /// No description provided for @viewTutorialSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Revisit the onboarding guide'**
+  String get viewTutorialSubtitle;
 }
 
 class _AppLocalizationsDelegate

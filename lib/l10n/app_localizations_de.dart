@@ -677,4 +677,13 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get sendFeedbackSubtitle =>
       'Probleme melden oder Funktionen vorschlagen';
+
+  @override
+  String get skipButton => 'Überspringen';
+
+  @override
+  String get viewTutorialLabel => 'Tutorial ansehen';
+
+  @override
+  String get viewTutorialSubtitle => 'Einführungsanleitung erneut ansehen';
 }

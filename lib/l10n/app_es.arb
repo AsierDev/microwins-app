@@ -224,5 +224,9 @@
   "themeSystemSubtitle": "Sigue la configuración del dispositivo",
 
   "sendFeedbackLabel": "Enviar Comentarios",
-  "sendFeedbackSubtitle": "Reportar problemas o sugerir funciones"
+  "sendFeedbackSubtitle": "Reportar problemas o sugerir funciones",
+
+  "skipButton": "Omitir",
+  "viewTutorialLabel": "Ver Tutorial",
+  "viewTutorialSubtitle": "Revisa la guía de introducción"
 }
