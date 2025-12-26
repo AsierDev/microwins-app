@@ -215,5 +215,14 @@
   "gamificationBadgeDescriptionHabitMaster": "Erledige insgesamt 500 Gewohnheiten",
   "gamificationBadgeDescriptionPerfectWeek3": "Erledige alle deine Gewohnheiten während einer Woche (3+ Gewohnheiten)",
   "gamificationBadgeDescriptionPerfectWeek5": "Erledige alle deine Gewohnheiten während einer Woche (5+ Gewohnheiten)",
-  "gamificationSupremeLegend": "Oberste Legende"
+  "gamificationSupremeLegend": "Oberste Legende",
+
+  "themeLabel": "App-Thema",
+  "themeSystem": "Systemstandard",
+  "themeLight": "Hell",
+  "themeDark": "Dunkel",
+  "themeSystemSubtitle": "Folgt den Geräteeinstellungen",
+
+  "sendFeedbackLabel": "Feedback senden",
+  "sendFeedbackSubtitle": "Probleme melden oder Funktionen vorschlagen"
 }

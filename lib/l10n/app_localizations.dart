@@ -1285,6 +1285,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Supreme Legend'**
   String get gamificationSupremeLegend;
+
+  /// No description provided for @themeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'App Theme'**
+  String get themeLabel;
+
+  /// No description provided for @themeSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'System Default'**
+  String get themeSystem;
+
+  /// No description provided for @themeLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get themeLight;
+
+  /// No description provided for @themeDark.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get themeDark;
+
+  /// No description provided for @themeSystemSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Follows device settings'**
+  String get themeSystemSubtitle;
+
+  /// No description provided for @sendFeedbackLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Send Feedback'**
+  String get sendFeedbackLabel;
+
+  /// No description provided for @sendFeedbackSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Report issues or suggest features'**
+  String get sendFeedbackSubtitle;
 }
 
 class _AppLocalizationsDelegate

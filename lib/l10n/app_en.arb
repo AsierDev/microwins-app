@@ -215,5 +215,14 @@
   "gamificationBadgeDescriptionHabitMaster": "Complete 500 habits in total",
   "gamificationBadgeDescriptionPerfectWeek3": "Complete all your habits during a week (3+ habits)",
   "gamificationBadgeDescriptionPerfectWeek5": "Complete all your habits during a week (5+ habits)",
-  "gamificationSupremeLegend": "Supreme Legend"
+  "gamificationSupremeLegend": "Supreme Legend",
+
+  "themeLabel": "App Theme",
+  "themeSystem": "System Default",
+  "themeLight": "Light",
+  "themeDark": "Dark",
+  "themeSystemSubtitle": "Follows device settings",
+
+  "sendFeedbackLabel": "Send Feedback",
+  "sendFeedbackSubtitle": "Report issues or suggest features"
 }

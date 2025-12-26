@@ -652,4 +652,25 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get gamificationSupremeLegend => 'Lenda Suprema';
+
+  @override
+  String get themeLabel => 'Tema do App';
+
+  @override
+  String get themeSystem => 'Padrão do Sistema';
+
+  @override
+  String get themeLight => 'Claro';
+
+  @override
+  String get themeDark => 'Escuro';
+
+  @override
+  String get themeSystemSubtitle => 'Segue as configurações do dispositivo';
+
+  @override
+  String get sendFeedbackLabel => 'Enviar Feedback';
+
+  @override
+  String get sendFeedbackSubtitle => 'Relatar problemas ou sugerir recursos';
 }
