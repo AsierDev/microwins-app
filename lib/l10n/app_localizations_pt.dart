@@ -682,4 +682,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get viewTutorialSubtitle => 'Rever o guia de introdução';
+
+  @override
+  String get nextButton => 'Próximo';
+
+  @override
+  String get deleteAccountSubtitle =>
+      'Excluir permanentemente sua conta e dados';
 }

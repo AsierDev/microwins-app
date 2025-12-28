@@ -678,4 +678,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get viewTutorialSubtitle => 'Revisit the onboarding guide';
+
+  @override
+  String get nextButton => 'Next';
+
+  @override
+  String get deleteAccountSubtitle =>
+      'Permanently delete your account and data';
 }

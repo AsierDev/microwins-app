@@ -686,4 +686,10 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get viewTutorialSubtitle => 'Einführungsanleitung erneut ansehen';
+
+  @override
+  String get nextButton => 'Weiter';
+
+  @override
+  String get deleteAccountSubtitle => 'Konto und Daten dauerhaft löschen';
 }

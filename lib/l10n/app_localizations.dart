@@ -1345,6 +1345,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Revisit the onboarding guide'**
   String get viewTutorialSubtitle;
+
+  /// No description provided for @nextButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get nextButton;
+
+  /// No description provided for @deleteAccountSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Permanently delete your account and data'**
+  String get deleteAccountSubtitle;
 }
 
 class _AppLocalizationsDelegate

@@ -228,5 +228,8 @@
 
   "skipButton": "Skip",
   "viewTutorialLabel": "View Tutorial",
-  "viewTutorialSubtitle": "Revisit the onboarding guide"
+  "viewTutorialSubtitle": "Revisit the onboarding guide",
+
+  "nextButton": "Next",
+  "deleteAccountSubtitle": "Permanently delete your account and data"
 }

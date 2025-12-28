@@ -228,5 +228,8 @@
 
   "skipButton": "Pular",
   "viewTutorialLabel": "Ver Tutorial",
-  "viewTutorialSubtitle": "Rever o guia de introdução"
+  "viewTutorialSubtitle": "Rever o guia de introdução",
+
+  "nextButton": "Próximo",
+  "deleteAccountSubtitle": "Excluir permanentemente sua conta e dados"
 }

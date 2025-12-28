@@ -688,4 +688,11 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get viewTutorialSubtitle => 'Revoir le guide d\'introduction';
+
+  @override
+  String get nextButton => 'Suivant';
+
+  @override
+  String get deleteAccountSubtitle =>
+      'Supprimer définitivement votre compte et vos données';
 }

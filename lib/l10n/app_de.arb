@@ -228,5 +228,8 @@
 
   "skipButton": "Überspringen",
   "viewTutorialLabel": "Tutorial ansehen",
-  "viewTutorialSubtitle": "Einführungsanleitung erneut ansehen"
+  "viewTutorialSubtitle": "Einführungsanleitung erneut ansehen",
+
+  "nextButton": "Weiter",
+  "deleteAccountSubtitle": "Konto und Daten dauerhaft löschen"
 }

@@ -51,9 +51,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     }
   }
 
-  void _skipOnboarding() {
-    _finishOnboarding();
-  }
+  // _skipOnboarding removed - callers now use _finishOnboarding directly
 
   void _finishOnboarding() {
     if (widget.isRevisit) {
@@ -77,11 +75,17 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: widget.isRevisit
-            ? IconButton(icon: const Icon(Icons.close), onPressed: () => context.pop())
+            ? IconButton(
+                icon: const Icon(Icons.close),
+                onPressed: () => context.pop(),
+              )
             : null,
         actions: [
           if (!widget.isRevisit)
-            TextButton(onPressed: _skipOnboarding, child: Text(l10n.skipButton)),
+            TextButton(
+              onPressed: _finishOnboarding,
+              child: Text(l10n.skipButton),
+            ),
         ],
       ),
       body: SafeArea(
@@ -118,7 +122,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                         decoration: BoxDecoration(
                           color: _currentPage == index
                               ? Theme.of(context).colorScheme.primary
-                              : Theme.of(context).colorScheme.surfaceContainerHighest,
+                              : Theme.of(
+                                  context,
+                                ).colorScheme.surfaceContainerHighest,
                           borderRadius: BorderRadius.circular(4),
                         ),
                       ),
@@ -127,7 +133,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   // Next/Done Button
                   FilledButton(
                     onPressed: _nextPage,
-                    child: Text(_currentPage == pages.length - 1 ? l10n.getStartedButton : 'Next'),
+                    child: Text(
+                      _currentPage == pages.length - 1
+                          ? l10n.getStartedButton
+                          : l10n.nextButton,
+                    ),
                   ),
                 ],
               ),
@@ -147,7 +157,8 @@ class OnboardingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Check if device is in landscape mode
-    final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+    final isLandscape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
 
     return SingleChildScrollView(
       child: Padding(
@@ -188,5 +199,9 @@ class OnboardingPageData {
   final String description;
   final IconData icon;
 
-  OnboardingPageData({required this.title, required this.description, required this.icon});
+  OnboardingPageData({
+    required this.title,
+    required this.description,
+    required this.icon,
+  });
 }
