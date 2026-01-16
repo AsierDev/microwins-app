@@ -1357,6 +1357,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Permanently delete your account and data'**
   String get deleteAccountSubtitle;
+
+  /// No description provided for @customReminderLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom Reminder'**
+  String get customReminderLabel;
+
+  /// No description provided for @customReminderSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Set a personalized reminder time for this habit'**
+  String get customReminderSubtitle;
+
+  /// No description provided for @useDefaultReminderTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Use default reminder ({time})'**
+  String useDefaultReminderTime(Object time);
+
+  /// No description provided for @customTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom time'**
+  String get customTime;
+
+  /// No description provided for @setReminderTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Set Reminder Time'**
+  String get setReminderTime;
+
+  /// No description provided for @noReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'No reminder'**
+  String get noReminder;
 }
 
 class _AppLocalizationsDelegate

@@ -231,5 +231,12 @@
   "viewTutorialSubtitle": "Revisa la guía de introducción",
 
   "nextButton": "Siguiente",
-  "deleteAccountSubtitle": "Eliminar permanentemente tu cuenta y datos"
+  "deleteAccountSubtitle": "Eliminar permanentemente tu cuenta y datos",
+
+  "customReminderLabel": "Recordatorio Personalizado",
+  "customReminderSubtitle": "Establece un recordatorio personalizado para este hábito",
+  "useDefaultReminderTime": "Usar recordatorio predeterminado ({time})",
+  "customTime": "Hora personalizada",
+  "setReminderTime": "Configurar Hora de Recordatorio",
+  "noReminder": "Sin recordatorio"
 }

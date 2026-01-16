@@ -685,4 +685,25 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get deleteAccountSubtitle =>
       'Permanently delete your account and data';
+
+  @override
+  String get customReminderLabel => 'Custom Reminder';
+
+  @override
+  String get customReminderSubtitle =>
+      'Set a personalized reminder time for this habit';
+
+  @override
+  String useDefaultReminderTime(Object time) {
+    return 'Use default reminder ($time)';
+  }
+
+  @override
+  String get customTime => 'Custom time';
+
+  @override
+  String get setReminderTime => 'Set Reminder Time';
+
+  @override
+  String get noReminder => 'No reminder';
 }

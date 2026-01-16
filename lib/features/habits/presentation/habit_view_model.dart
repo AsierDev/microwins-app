@@ -44,6 +44,8 @@ class HabitViewModel extends _$HabitViewModel {
     required String icon,
     required String category,
     required int durationMinutes,
+    String? customReminderTime,
+    bool reminderEnabled = true,
   }) async {
     // Get current habits to determine sortOrder
     final existingHabits = await ref.read(habitRepositoryProvider).getHabits();
@@ -62,6 +64,8 @@ class HabitViewModel extends _$HabitViewModel {
       sortOrder: maxSortOrder + 1,
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
+      customReminderTime: customReminderTime,
+      reminderEnabled: reminderEnabled,
     );
 
     await ref.read(habitRepositoryProvider).createHabit(habit);
