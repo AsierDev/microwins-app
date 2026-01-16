@@ -11,7 +11,32 @@ part 'habit_view_model.g.dart';
 class HabitViewModel extends _$HabitViewModel {
   @override
   Stream<List<Habit>> build() {
+    // Refresh streaks on load to handle missed days
+    _refreshStreaks();
     return ref.watch(habitRepositoryProvider).watchHabits();
+  }
+
+  /// Recalculates all habit streaks based on completion history.
+  /// This ensures streaks are reset to 0 when days are missed.
+  Future<void> _refreshStreaks() async {
+    final habits = await ref.read(habitRepositoryProvider).getHabits();
+    final completionRepo = ref.read(completionRepositoryProvider);
+
+    for (final habit in habits) {
+      final completions = await completionRepo.getCompletionsForHabit(habit.id);
+      final calculatedStreak = GamificationService.calculateCurrentStreak(
+        completions,
+      );
+
+      // Only update if streak has changed (e.g., dropped to 0 after missing a day)
+      if (calculatedStreak != habit.currentStreak) {
+        final updatedHabit = habit.copyWith(
+          currentStreak: calculatedStreak,
+          updatedAt: DateTime.now(),
+        );
+        await ref.read(habitRepositoryProvider).updateHabit(updatedHabit);
+      }
+    }
   }
 
   Future<void> addHabit({

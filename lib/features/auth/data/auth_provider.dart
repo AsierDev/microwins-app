@@ -9,7 +9,16 @@ AuthRepository authRepository(AuthRepositoryRef ref) {
   return FirebaseAuthRepository();
 }
 
-@riverpod
+@Riverpod(keepAlive: true)
 Stream<String?> authState(AuthStateRef ref) {
   return ref.watch(authRepositoryProvider).authStateChanges;
+}
+
+/// Tracks the previous user ID to detect user changes for data isolation
+@Riverpod(keepAlive: true)
+class PreviousUserId extends _$PreviousUserId {
+  @override
+  String? build() => null;
+
+  void update(String? userId) => state = userId;
 }

@@ -57,6 +57,12 @@ void main() {
       mockCompletionRepository = MockCompletionRepository();
       mockSyncManager = MockSyncManager();
 
+      // Default stubs for _refreshStreaks() that runs on build()
+      when(mockRepository.getHabits()).thenAnswer((_) async => []);
+      when(
+        mockCompletionRepository.getCompletionsForHabit(any),
+      ).thenAnswer((_) async => []);
+
       container = ProviderContainer(
         overrides: [
           habitRepositoryProvider.overrideWithValue(mockRepository),
@@ -145,7 +151,7 @@ void main() {
         durationMinutes: 20,
       );
 
-      verify(mockRepository.getHabits()).called(1);
+      verify(mockRepository.getHabits()).called(greaterThanOrEqualTo(1));
       verify(mockRepository.createHabit(any)).called(1);
     });
 
@@ -193,7 +199,7 @@ void main() {
       // Move item from index 0 to index 2
       await notifier.reorderHabits(0, 2);
 
-      verify(mockRepository.getHabits()).called(1);
+      verify(mockRepository.getHabits()).called(greaterThanOrEqualTo(1));
       verify(mockRepository.updateHabitsOrder(any)).called(1);
     });
 
@@ -232,10 +238,12 @@ void main() {
 
       await notifier.completeHabit('1');
 
-      verify(mockRepository.getHabits()).called(1);
-      verify(mockRepository.updateHabit(any)).called(1);
+      verify(mockRepository.getHabits()).called(greaterThanOrEqualTo(1));
+      verify(mockRepository.updateHabit(any)).called(greaterThanOrEqualTo(1));
       verify(mockCompletionRepository.createCompletion(any)).called(1);
-      verify(mockCompletionRepository.getCompletionsForHabit('1')).called(1);
+      verify(
+        mockCompletionRepository.getCompletionsForHabit('1'),
+      ).called(greaterThanOrEqualTo(1));
     });
 
     test('deleteHabit should remove habit and cancel notification', () async {
