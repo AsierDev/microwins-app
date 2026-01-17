@@ -716,4 +716,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get noReminder => 'No reminder';
+
+  @override
+  String get usingDefault => 'Using default';
 }

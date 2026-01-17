@@ -710,4 +710,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get noReminder => 'Sin recordatorio';
+
+  @override
+  String get usingDefault => 'Predeterminado';
 }

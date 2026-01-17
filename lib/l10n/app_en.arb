@@ -238,5 +238,6 @@
   "useDefaultReminderTime": "Use default reminder ({time})",
   "customTime": "Custom time",
   "setReminderTime": "Set Reminder Time",
-  "noReminder": "No reminder"
+  "noReminder": "No reminder",
+  "usingDefault": "Using default"
 }

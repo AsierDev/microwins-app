@@ -280,7 +280,7 @@ class _CreateHabitScreenState extends ConsumerState<CreateHabitScreen> {
                               _reminderEnabled
                                   ? (_customReminderTime != null
                                         ? '${AppLocalizations.of(context)!.customTime}: ${_formatTime(_customReminderTime!)}'
-                                        : 'Using default (${_formatTime(defaultTime)})')
+                                        : '${AppLocalizations.of(context)!.usingDefault} (${_formatTime(defaultTime)})')
                                   : AppLocalizations.of(context)!.noReminder,
                             ),
                             value: _reminderEnabled,
@@ -299,7 +299,9 @@ class _CreateHabitScreenState extends ConsumerState<CreateHabitScreen> {
                               subtitle: Text(
                                 _customReminderTime != null
                                     ? AppLocalizations.of(context)!.customTime
-                                    : 'Using default',
+                                    : AppLocalizations.of(
+                                        context,
+                                      )!.usingDefault,
                               ),
                               trailing: Row(
                                 mainAxisSize: MainAxisSize.min,

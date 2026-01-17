@@ -181,7 +181,7 @@ Future<bool> checkHabitsAndNotify() async {
             .take(3)
             .map((h) => h.name)
             .join(', ');
-        final title = "Don't lose your streak! 🔥";
+        const title = "Don't lose your streak! 🔥";
         final body = count <= 3
             ? 'Complete your reminder: $habitNames'
             : 'You have $count $habitWord left today. Take 5 mins to keep your momentum!';
@@ -190,13 +190,17 @@ Future<bool> checkHabitsAndNotify() async {
         debugPrint('       Title: $title');
         debugPrint('       Body: $body');
 
-        await _showNotification(title: title, body: body);
+        // Use a unique ID based on the time to avoid overwriting notifications
+        final notificationId = reminderTime.hashCode;
+        await _showNotification(id: notificationId, title: title, body: body);
 
         // Update last notified timestamp for this specific time
         await prefs.setString(notificationKey, now.toIso8601String());
 
         totalNotificationsSent++;
-        debugPrint('    ✅ Notification sent successfully for $reminderTime');
+        debugPrint(
+          '    ✅ Notification sent successfully for $reminderTime (ID: $notificationId)',
+        );
       } else {
         debugPrint('    🎉 All habits complete for $reminderTime!');
       }
@@ -223,6 +227,7 @@ Future<bool> checkHabitsAndNotify() async {
 
 /// Show a streak-saver notification
 Future<void> _showNotification({
+  required int id,
   required String title,
   required String body,
 }) async {
@@ -239,7 +244,7 @@ Future<void> _showNotification({
   await notificationsPlugin.initialize(initializationSettings);
 
   await notificationsPlugin.show(
-    999, // Fixed ID for the daily streak notification
+    id,
     title,
     body,
     const NotificationDetails(
@@ -249,6 +254,9 @@ Future<void> _showNotification({
         channelDescription: 'Streak-saver reminder for incomplete habits',
         importance: Importance.max,
         priority: Priority.high,
+        fullScreenIntent: true, // Attempt to be more urgent
+        category: AndroidNotificationCategory.reminder,
+        visibility: NotificationVisibility.public,
         playSound: true,
         enableVibration: true,
         icon: '@drawable/ic_notification',

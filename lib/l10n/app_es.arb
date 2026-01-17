@@ -238,5 +238,6 @@
   "useDefaultReminderTime": "Usar recordatorio predeterminado ({time})",
   "customTime": "Hora personalizada",
   "setReminderTime": "Configurar Hora de Recordatorio",
-  "noReminder": "Sin recordatorio"
+  "noReminder": "Sin recordatorio",
+  "usingDefault": "Predeterminado"
 }

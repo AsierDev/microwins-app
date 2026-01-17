@@ -1393,6 +1393,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No reminder'**
   String get noReminder;
+
+  /// No description provided for @usingDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'Using default'**
+  String get usingDefault;
 }
 
 class _AppLocalizationsDelegate
