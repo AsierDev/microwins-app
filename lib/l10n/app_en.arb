@@ -231,5 +231,13 @@
   "viewTutorialSubtitle": "Revisit the onboarding guide",
 
   "nextButton": "Next",
-  "deleteAccountSubtitle": "Permanently delete your account and data"
+  "deleteAccountSubtitle": "Permanently delete your account and data",
+
+  "customReminderLabel": "Custom Reminder",
+ "customReminderSubtitle": "Set a personalized reminder time for this habit",
+  "useDefaultReminderTime": "Use default reminder ({time})",
+  "customTime": "Custom time",
+  "setReminderTime": "Set Reminder Time",
+  "noReminder": "No reminder",
+  "usingDefault": "Using default"
 }

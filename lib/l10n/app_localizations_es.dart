@@ -689,4 +689,28 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get deleteAccountSubtitle =>
       'Eliminar permanentemente tu cuenta y datos';
+
+  @override
+  String get customReminderLabel => 'Recordatorio Personalizado';
+
+  @override
+  String get customReminderSubtitle =>
+      'Establece un recordatorio personalizado para este hábito';
+
+  @override
+  String useDefaultReminderTime(Object time) {
+    return 'Usar recordatorio predeterminado ($time)';
+  }
+
+  @override
+  String get customTime => 'Hora personalizada';
+
+  @override
+  String get setReminderTime => 'Configurar Hora de Recordatorio';
+
+  @override
+  String get noReminder => 'Sin recordatorio';
+
+  @override
+  String get usingDefault => 'Predeterminado';
 }

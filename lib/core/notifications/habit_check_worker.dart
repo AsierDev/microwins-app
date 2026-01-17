@@ -23,11 +23,15 @@ Future<bool> checkHabitsAndNotify() async {
 
     // Initialize Firebase in WorkManager process
     try {
-      await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
       debugPrint('✅ Firebase initialized');
     } catch (e) {
       // Firebase might already be initialized - this is ok
-      debugPrint('⚠️ Firebase initialization: $e (might already be initialized)');
+      debugPrint(
+        '⚠️ Firebase initialization: $e (might already be initialized)',
+      );
     }
 
     // Initialize Hive for local access
@@ -45,7 +49,10 @@ Future<bool> checkHabitsAndNotify() async {
 
     if (userId == null) {
       debugPrint('⚠️ No user logged in, skipping notification check');
-      AppLogger.warning('No user logged in, skipping notification check', tag: 'HabitCheckWorker');
+      AppLogger.warning(
+        'No user logged in, skipping notification check',
+        tag: 'HabitCheckWorker',
+      );
       return Future.value(true);
     }
 
@@ -54,112 +61,158 @@ Future<bool> checkHabitsAndNotify() async {
     debugPrint('🔔 Notifications enabled: $notificationsEnabled');
     if (!notificationsEnabled) {
       debugPrint('⚠️ Notifications disabled in settings, skipping');
-      AppLogger.debug('Notifications disabled, skipping', tag: 'HabitCheckWorker');
-      return Future.value(true);
-    }
-
-    // Get daily reminder time (e.g., "20:00")
-    final dailyReminderTime = prefs.getString('daily_reminder_time') ?? '20:00';
-    final timeParts = dailyReminderTime.split(':');
-    final reminderHour = int.parse(timeParts[0]);
-    final reminderMinute = int.parse(timeParts[1]);
-    debugPrint('⏰ Configured reminder: $dailyReminderTime');
-
-    // Check if we're within the notification window (using ±30 minutes)
-    // WorkManager doesn't guarantee exact 15-min execution, so we use a wider window
-    final now = DateTime.now();
-    final currentMinutes = now.hour * 60 + now.minute;
-    final reminderMinutes = reminderHour * 60 + reminderMinute;
-    debugPrint('🕐 Current time: ${now.hour}:${now.minute} ($currentMinutes minutes)');
-    debugPrint('🎯 Reminder time: $reminderHour:$reminderMinute ($reminderMinutes minutes)');
-
-    // ± 30-minute window check (flexible for WorkManager scheduling)
-    final minuteDifference = (currentMinutes - reminderMinutes).abs();
-    final isWithinWindow = minuteDifference <= 30;
-    debugPrint('📊 Minute difference: $minuteDifference (within ±30min window: $isWithinWindow)');
-
-    if (!isWithinWindow) {
-      debugPrint('⏸️ Not within notification window, skipping');
       AppLogger.debug(
-        'Not within notification window (${now.hour}:${now.minute} vs $dailyReminderTime)',
+        'Notifications disabled, skipping',
         tag: 'HabitCheckWorker',
       );
       return Future.value(true);
     }
 
-    // Check if we already notified today
-    final lastNotifiedStr = prefs.getString('last_streak_notification_date');
+    // Get daily reminder time (default/global)
+    final globalReminderTime =
+        prefs.getString('daily_reminder_time') ?? '20:00';
+    debugPrint('⏰ Global default reminder: $globalReminderTime');
+
+    // Get current time for comparison
+    final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    debugPrint('📆 Today: $today');
-    debugPrint('📝 Last notified: $lastNotifiedStr');
 
-    if (lastNotifiedStr != null) {
-      try {
-        final lastNotified = DateTime.parse(lastNotifiedStr);
-        final lastNotifiedDay = DateTime(lastNotified.year, lastNotified.month, lastNotified.day);
-
-        if (lastNotifiedDay.isAtSameMomentAs(today)) {
-          debugPrint('✅ Already sent notification today, skipping');
-          AppLogger.debug('Already sent streak notification today', tag: 'HabitCheckWorker');
-          return Future.value(true);
-        }
-      } catch (e) {
-        debugPrint('⚠️ Could not parse last notification date: $e');
-        AppLogger.warning(
-          'Could not parse last notification date',
-          tag: 'HabitCheckWorker',
-          error: e,
-        );
-      }
-    }
-
-    // Get incomplete habits for today using repository
-    // Note: We create repository with current user context from Hive box
+    // Get all habits from Hive
     final habitBox = Hive.box<HabitModel>(HiveSetup.habitsBoxName);
     final allHabits = habitBox.values.toList();
     debugPrint('📦 Total habits in Hive: ${allHabits.length}');
 
-    // Filter out incomplete habits
-    final incompleteHabits = allHabits.where((habit) {
-      if (habit.isArchived) return false;
-      if (habit.lastCompletedDate == null) return true;
+    // Group habits by their effective reminder time
+    final Map<String, List<HabitModel>> habitsByReminderTime = {};
+    for (final habit in allHabits) {
+      // Skip archived habits or habits with notifications disabled
+      if (habit.isArchived || !habit.reminderEnabled) {
+        debugPrint(
+          '⏭️ Skipping habit "${habit.name}" (archived: ${habit.isArchived}, reminder: ${habit.reminderEnabled})',
+        );
+        continue;
+      }
 
-      final lastCompleted = DateTime(
-        habit.lastCompletedDate!.year,
-        habit.lastCompletedDate!.month,
-        habit.lastCompletedDate!.day,
+      // Determine effective reminder time (custom or default)
+      final effectiveTime = habit.customReminderTime ?? globalReminderTime;
+      habitsByReminderTime.putIfAbsent(effectiveTime, () => []).add(habit);
+    }
+
+    debugPrint(
+      '🗂️ Habits grouped by ${habitsByReminderTime.length} different reminder times',
+    );
+
+    // Check each time group and send notifications if within window
+    int totalNotificationsSent = 0;
+    for (final entry in habitsByReminderTime.entries) {
+      final reminderTime = entry.key;
+      final habitsForTime = entry.value;
+
+      // Parse reminder time
+      final timeParts = reminderTime.split(':');
+      final reminderHour = int.parse(timeParts[0]);
+      final reminderMinute = int.parse(timeParts[1]);
+
+      // Check if we're within the notification window (±30 minutes)
+      final currentMinutes = now.hour * 60 + now.minute;
+      final reminderMinutes = reminderHour * 60 + reminderMinute;
+      final minuteDifference = (currentMinutes - reminderMinutes).abs();
+      final isWithinWindow = minuteDifference <= 30;
+
+      debugPrint(
+        '  ⏰ Time $reminderTime: ${habitsForTime.length} habit(s), window: $isWithinWindow (diff: $minuteDifference min)',
       );
 
-      return !lastCompleted.isAtSameMomentAs(today);
-    }).toList();
+      if (!isWithinWindow) {
+        debugPrint('    ⏸️ Not within window, skipping this time group');
+        continue;
+      }
 
-    AppLogger.debug('Found ${incompleteHabits.length} incomplete habits', tag: 'HabitCheckWorker');
-    debugPrint('🎯 Incomplete habits: ${incompleteHabits.length}');
+      // Filter out completed habits for today
+      final incompleteHabits = habitsForTime.where((habit) {
+        if (habit.lastCompletedDate == null) return true;
 
-    // Only notify if there are incomplete habits
-    if (incompleteHabits.isNotEmpty) {
-      final count = incompleteHabits.length;
-      final habitWord = count == 1 ? 'habit' : 'habits';
-      const title = "Don't lose your streak! 🔥";
-      final body = 'You have $count $habitWord left today. Take 5 mins to keep your momentum!';
+        final lastCompleted = DateTime(
+          habit.lastCompletedDate!.year,
+          habit.lastCompletedDate!.month,
+          habit.lastCompletedDate!.day,
+        );
 
-      debugPrint('📬 Sending notification:');
-      debugPrint('   Title: $title');
-      debugPrint('   Body: $body');
+        return !lastCompleted.isAtSameMomentAs(today);
+      }).toList();
 
-      await _showNotification(title: title, body: body);
+      debugPrint(
+        '    🎯 Incomplete habits for $reminderTime: ${incompleteHabits.length}/${habitsForTime.length}',
+      );
 
-      // Update last notified date
-      await prefs.setString('last_streak_notification_date', now.toIso8601String());
+      // Send notification if there are incomplete habits
+      if (incompleteHabits.isNotEmpty) {
+        // Check if we already notified for this specific time today
+        final notificationKey =
+            'last_notification_${reminderTime.replaceAll(':', '')}';
+        final lastNotifiedStr = prefs.getString(notificationKey);
 
-      debugPrint('✅ Notification sent successfully!');
+        if (lastNotifiedStr != null) {
+          try {
+            final lastNotified = DateTime.parse(lastNotifiedStr);
+            final lastNotifiedDay = DateTime(
+              lastNotified.year,
+              lastNotified.month,
+              lastNotified.day,
+            );
+
+            if (lastNotifiedDay.isAtSameMomentAs(today)) {
+              debugPrint(
+                '    ✅ Already notified for $reminderTime today, skipping',
+              );
+              continue;
+            }
+          } catch (e) {
+            debugPrint(
+              '    ⚠️ Could not parse last notification date for $reminderTime: $e',
+            );
+          }
+        }
+
+        // Send notification
+        final count = incompleteHabits.length;
+        final habitWord = count == 1 ? 'habit' : 'habits';
+        final habitNames = incompleteHabits
+            .take(3)
+            .map((h) => h.name)
+            .join(', ');
+        const title = "Don't lose your streak! 🔥";
+        final body = count <= 3
+            ? 'Complete your reminder: $habitNames'
+            : 'You have $count $habitWord left today. Take 5 mins to keep your momentum!';
+
+        debugPrint('    📬 Sending notification for $reminderTime:');
+        debugPrint('       Title: $title');
+        debugPrint('       Body: $body');
+
+        // Use a unique ID based on the time to avoid overwriting notifications
+        final notificationId = reminderTime.hashCode;
+        await _showNotification(id: notificationId, title: title, body: body);
+
+        // Update last notified timestamp for this specific time
+        await prefs.setString(notificationKey, now.toIso8601String());
+
+        totalNotificationsSent++;
+        debugPrint(
+          '    ✅ Notification sent successfully for $reminderTime (ID: $notificationId)',
+        );
+      } else {
+        debugPrint('    🎉 All habits complete for $reminderTime!');
+      }
+    }
+
+    if (totalNotificationsSent > 0) {
       AppLogger.info(
-        'Sent streak-saver notification for $count incomplete habits',
+        'Sent $totalNotificationsSent notification(s) for different reminder times',
         tag: 'HabitCheckWorker',
       );
     } else {
-      debugPrint('🎉 All habits complete! No notification needed.');
-      AppLogger.debug('All habits complete! No notification needed.', tag: 'HabitCheckWorker');
+      AppLogger.debug('No notifications needed', tag: 'HabitCheckWorker');
     }
 
     debugPrint('═══════════════════════════════');
@@ -173,12 +226,16 @@ Future<bool> checkHabitsAndNotify() async {
 }
 
 /// Show a streak-saver notification
-Future<void> _showNotification({required String title, required String body}) async {
-  final FlutterLocalNotificationsPlugin notificationsPlugin = FlutterLocalNotificationsPlugin();
+Future<void> _showNotification({
+  required int id,
+  required String title,
+  required String body,
+}) async {
+  final FlutterLocalNotificationsPlugin notificationsPlugin =
+      FlutterLocalNotificationsPlugin();
 
-  const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings(
-    '@drawable/ic_notification',
-  );
+  const AndroidInitializationSettings initializationSettingsAndroid =
+      AndroidInitializationSettings('@drawable/ic_notification');
 
   const InitializationSettings initializationSettings = InitializationSettings(
     android: initializationSettingsAndroid,
@@ -187,7 +244,7 @@ Future<void> _showNotification({required String title, required String body}) as
   await notificationsPlugin.initialize(initializationSettings);
 
   await notificationsPlugin.show(
-    999, // Fixed ID for the daily streak notification
+    id,
     title,
     body,
     const NotificationDetails(
@@ -197,6 +254,9 @@ Future<void> _showNotification({required String title, required String body}) as
         channelDescription: 'Streak-saver reminder for incomplete habits',
         importance: Importance.max,
         priority: Priority.high,
+        fullScreenIntent: true, // Attempt to be more urgent
+        category: AndroidNotificationCategory.reminder,
+        visibility: NotificationVisibility.public,
         playSound: true,
         enableVibration: true,
         icon: '@drawable/ic_notification',

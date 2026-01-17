@@ -19,5 +19,7 @@ class Habit with _$Habit {
     DateTime? lastCompletedDate,
     DateTime? lastNotifiedDate,
     @Default(false) bool isSynced,
+    String? customReminderTime,
+    @Default(true) bool reminderEnabled,
   }) = _Habit;
 }

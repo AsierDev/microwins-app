@@ -46,6 +46,12 @@ class HabitModel extends HiveObject {
   @HiveField(15)
   DateTime? lastNotifiedDate;
 
+  @HiveField(16)
+  String? customReminderTime;
+
+  @HiveField(17)
+  late bool reminderEnabled;
+
   HabitModel({
     required this.id,
     required this.name,
@@ -61,5 +67,7 @@ class HabitModel extends HiveObject {
     this.isSynced = false,
     this.lastCompletedDate,
     this.lastNotifiedDate,
+    this.customReminderTime,
+    this.reminderEnabled = true,
   });
 }

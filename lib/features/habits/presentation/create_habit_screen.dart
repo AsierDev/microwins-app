@@ -6,6 +6,7 @@ import '../domain/entities/habit.dart';
 import '../data/habit_provider.dart';
 import 'habit_view_model.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../settings/data/settings_provider.dart';
 
 class CreateHabitScreen extends ConsumerStatefulWidget {
   final Habit? habitToEdit;
@@ -45,6 +46,8 @@ class _CreateHabitScreenState extends ConsumerState<CreateHabitScreen> {
   ];
 
   bool _isLoading = false;
+  bool _reminderEnabled = true;
+  String? _customReminderTime;
 
   @override
   void initState() {
@@ -55,6 +58,8 @@ class _CreateHabitScreenState extends ConsumerState<CreateHabitScreen> {
       _selectedIcon = habit.icon;
       _selectedCategory = habit.category;
       _durationMinutes = habit.durationMinutes;
+      _reminderEnabled = habit.reminderEnabled;
+      _customReminderTime = habit.customReminderTime;
     }
   }
 
@@ -79,10 +84,13 @@ class _CreateHabitScreenState extends ConsumerState<CreateHabitScreen> {
             category: _selectedCategory,
             durationMinutes: _durationMinutes,
             updatedAt: DateTime.now(),
+            customReminderTime: _customReminderTime,
+            reminderEnabled: _reminderEnabled,
           );
           await ref.read(habitRepositoryProvider).updateHabit(updatedHabit);
         } else {
-          // Create mode
+          // Create mode - need to view habit_view_model to see addHabit signature
+          // For now, we need to update the addHabit method to accept these fields
           await ref
               .read(habitViewModelProvider.notifier)
               .addHabit(
@@ -90,6 +98,8 @@ class _CreateHabitScreenState extends ConsumerState<CreateHabitScreen> {
                 icon: _selectedIcon,
                 category: _selectedCategory,
                 durationMinutes: _durationMinutes,
+                customReminderTime: _customReminderTime,
+                reminderEnabled: _reminderEnabled,
               );
         }
 
@@ -129,6 +139,15 @@ class _CreateHabitScreenState extends ConsumerState<CreateHabitScreen> {
         }
       }
     }
+  }
+
+  String _formatTime(String time24) {
+    final parts = time24.split(':');
+    final hour = int.parse(parts[0]);
+    final minute = parts[1];
+    final period = hour >= 12 ? 'PM' : 'AM';
+    final hour12 = hour > 12 ? hour - 12 : (hour == 0 ? 12 : hour);
+    return '$hour12:$minute $period';
   }
 
   @override
@@ -239,6 +258,98 @@ class _CreateHabitScreenState extends ConsumerState<CreateHabitScreen> {
                   );
                 }).toList(),
               ),
+            ),
+            const SizedBox(height: 24),
+
+            // Custom Reminder Section
+            Consumer(
+              builder: (context, ref, _) {
+                final settingsAsync = ref.watch(settingsNotifierProvider);
+                return settingsAsync.when(
+                  data: (settings) {
+                    final defaultTime = settings.dailyReminderTime;
+                    return Card(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SwitchListTile(
+                            title: Text(
+                              AppLocalizations.of(context)!.customReminderLabel,
+                            ),
+                            subtitle: Text(
+                              _reminderEnabled
+                                  ? (_customReminderTime != null
+                                        ? '${AppLocalizations.of(context)!.customTime}: ${_formatTime(_customReminderTime!)}'
+                                        : '${AppLocalizations.of(context)!.usingDefault} (${_formatTime(defaultTime)})')
+                                  : AppLocalizations.of(context)!.noReminder,
+                            ),
+                            value: _reminderEnabled,
+                            onChanged: (value) =>
+                                setState(() => _reminderEnabled = value),
+                          ),
+                          if (_reminderEnabled) ...[
+                            const Divider(height: 1),
+                            ListTile(
+                              leading: const Icon(Icons.access_time),
+                              title: Text(
+                                _customReminderTime != null
+                                    ? _formatTime(_customReminderTime!)
+                                    : _formatTime(defaultTime),
+                              ),
+                              subtitle: Text(
+                                _customReminderTime != null
+                                    ? AppLocalizations.of(context)!.customTime
+                                    : AppLocalizations.of(
+                                        context,
+                                      )!.usingDefault,
+                              ),
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  if (_customReminderTime != null)
+                                    IconButton(
+                                      icon: const Icon(Icons.clear, size: 20),
+                                      onPressed: () => setState(
+                                        () => _customReminderTime = null,
+                                      ),
+                                      tooltip: 'Reset to default',
+                                    ),
+                                  const Icon(Icons.edit, size: 16),
+                                ],
+                              ),
+                              onTap: () async {
+                                final currentTime =
+                                    _customReminderTime ?? defaultTime;
+                                final timeParts = currentTime.split(':');
+                                final initialTime = TimeOfDay(
+                                  hour: int.parse(timeParts[0]),
+                                  minute: int.parse(timeParts[1]),
+                                );
+
+                                final picked = await showTimePicker(
+                                  context: context,
+                                  initialTime: initialTime,
+                                );
+
+                                if (picked != null) {
+                                  final timeString =
+                                      '${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}';
+                                  setState(
+                                    () => _customReminderTime = timeString,
+                                  );
+                                }
+                              },
+                            ),
+                          ],
+                        ],
+                      ),
+                    );
+                  },
+                  loading: () =>
+                      const Card(child: ListTile(title: Text('Loading...'))),
+                  error: (_, __) => const SizedBox.shrink(),
+                );
+              },
             ),
             const SizedBox(height: 24),
 

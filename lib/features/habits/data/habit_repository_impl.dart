@@ -35,6 +35,8 @@ class HabitRepositoryImpl implements HabitRepository {
       'updatedAt': model.updatedAt.toIso8601String(),
       'lastCompletedDate': model.lastCompletedDate?.toIso8601String(),
       'lastNotifiedDate': model.lastNotifiedDate?.toIso8601String(),
+      'customReminderTime': model.customReminderTime,
+      'reminderEnabled': model.reminderEnabled,
     });
   }
 
@@ -58,6 +60,8 @@ class HabitRepositoryImpl implements HabitRepository {
       'updatedAt': model.updatedAt.toIso8601String(),
       'lastCompletedDate': model.lastCompletedDate?.toIso8601String(),
       'lastNotifiedDate': model.lastNotifiedDate?.toIso8601String(),
+      'customReminderTime': model.customReminderTime,
+      'reminderEnabled': model.reminderEnabled,
     });
   }
 
@@ -137,6 +141,8 @@ class HabitRepositoryImpl implements HabitRepository {
             lastNotifiedDate: data['lastNotifiedDate'] != null
                 ? DateTime.parse(data['lastNotifiedDate'])
                 : null,
+            customReminderTime: data['customReminderTime'] as String?,
+            reminderEnabled: data['reminderEnabled'] as bool? ?? true,
           );
 
           await _habitBox.put(habit.id, habit);

@@ -18,6 +18,8 @@ class HabitMapper {
       lastCompletedDate: model.lastCompletedDate,
       lastNotifiedDate: model.lastNotifiedDate,
       isSynced: model.isSynced,
+      customReminderTime: model.customReminderTime,
+      reminderEnabled: model.reminderEnabled,
     );
   }
 
@@ -37,6 +39,8 @@ class HabitMapper {
       lastCompletedDate: entity.lastCompletedDate,
       lastNotifiedDate: entity.lastNotifiedDate,
       isSynced: entity.isSynced,
+      customReminderTime: entity.customReminderTime,
+      reminderEnabled: entity.reminderEnabled,
     );
   }
 }
