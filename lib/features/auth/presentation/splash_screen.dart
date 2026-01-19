@@ -12,13 +12,17 @@ class SplashScreen extends ConsumerStatefulWidget {
   ConsumerState<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends ConsumerState<SplashScreen> with SingleTickerProviderStateMixin {
+class _SplashScreenState extends ConsumerState<SplashScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this, duration: const Duration(seconds: 3));
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 3),
+    );
 
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
@@ -37,8 +41,11 @@ class _SplashScreenState extends ConsumerState<SplashScreen> with SingleTickerPr
     if (!mounted) return;
 
     // Check Onboarding
-    final settingsBox = Hive.box(HiveSetup.settingsBoxName);
-    final bool hasSeenOnboarding = settingsBox.get('hasSeenOnboarding', defaultValue: false);
+    final settingsBox = Hive.box<dynamic>(HiveSetup.settingsBoxName);
+    final bool hasSeenOnboarding = settingsBox.get(
+      'hasSeenOnboarding',
+      defaultValue: false,
+    );
 
     if (!hasSeenOnboarding) {
       context.go('/onboarding');
@@ -46,8 +53,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen> with SingleTickerPr
     }
 
     // Check Auth
-    final authRepo = ref.read(authRepositoryProvider);
-    final user = authRepo.currentUser;
+    // Wait for Firebase to restore persisted session
+    final user = await ref.read(authStateProvider.future);
 
     if (user != null) {
       context.go('/home');
@@ -79,7 +86,11 @@ class _SplashScreenState extends ConsumerState<SplashScreen> with SingleTickerPr
             //     _controller.forward();
             //   },
             // ),
-            const Icon(Icons.check_circle_outline, size: 100, color: Colors.green),
+            const Icon(
+              Icons.check_circle_outline,
+              size: 100,
+              color: Colors.green,
+            ),
             const SizedBox(height: 20),
             Text(
               'MicroWins',

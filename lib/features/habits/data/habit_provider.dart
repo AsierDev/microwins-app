@@ -26,8 +26,10 @@ HabitRepository habitRepository(HabitRepositoryRef ref) {
     Hive.box<HabitModel>(HiveSetup.habitsBoxName).clear();
   }
 
-  // Update previous user ID tracker
-  ref.read(previousUserIdProvider.notifier).update(currentUserId);
+  // Update previous user ID tracker (deferred to avoid modifying during build)
+  Future.microtask(() {
+    ref.read(previousUserIdProvider.notifier).update(currentUserId);
+  });
 
   final syncManager = ref.watch(syncManagerProvider);
   final repository = HabitRepositoryImpl(syncManager);
