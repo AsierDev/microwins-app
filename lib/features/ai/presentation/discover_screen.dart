@@ -148,7 +148,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Text(
-                      'Error: $err\n\nMake sure OPENROUTER_API_KEY is set in .env',
+                      'Error: $err\n\nAI suggestions are temporarily unavailable.',
                       textAlign: TextAlign.center,
                       style: const TextStyle(color: Colors.red),
                     ),

@@ -1,86 +1,64 @@
 import 'dart:convert';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import 'package:uuid/uuid.dart';
 import '../../habits/domain/entities/habit.dart';
 
 class OpenRouterService {
-  static const String _baseUrl = 'https://openrouter.ai/api/v1/chat/completions';
+  static const String _proxyUrl = String.fromEnvironment('AI_PROXY_URL');
 
   Future<List<Habit>> generateHabits(String goal) async {
-    final apiKey = dotenv.env['OPENROUTER_API_KEY'];
-
-    if (apiKey == null || apiKey.isEmpty) {
-      throw Exception('OPENROUTER_API_KEY not found in .env');
+    if (_proxyUrl.isEmpty) {
+      throw Exception(
+        'AI service is not configured. Provide AI_PROXY_URL via --dart-define.',
+      );
     }
 
-    final prompt =
-        '''
-You are a habit formation expert. User goal: "$goal"
-
-Generate 3 micro-routines (2-5 minutes each) that are:
-1. Specific and actionable
-2. Doable anywhere without equipment
-3. Progressive in difficulty
-
-Return ONLY valid JSON array with this structure:
-[
-  {
-    "name": "string (max 50 chars)",
-    "duration": 2,
-    "steps": ["step 1", "step 2"],
-    "category": "Health",
-    "difficulty": "Beginner",
-    "icon": "✅"
-  }
-]
-Valid categories: Health, Productivity, Wellness, Learning, Fitness
-''';
-
     try {
+      final token = await FirebaseAuth.instance.currentUser?.getIdToken();
+      final endpoint = Uri.parse('$_proxyUrl/ai/habits');
+      final headers = <String, String>{'Content-Type': 'application/json'};
+      if (token != null && token.isNotEmpty) {
+        headers['Authorization'] = 'Bearer $token';
+      }
+
       final response = await http.post(
-        Uri.parse(_baseUrl),
-        headers: {
-          'Authorization': 'Bearer $apiKey',
-          'Content-Type': 'application/json',
-          'HTTP-Referer': 'https://microwins.app',
-          'X-Title': 'MicroWins',
-        },
-        body: jsonEncode({
-          'model': 'google/gemini-2.5-flash-lite',
-          'messages': [
-            {'role': 'user', 'content': prompt},
-          ],
-        }),
+        endpoint,
+        headers: headers,
+        body: jsonEncode({'goal': goal}),
       );
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        final content = data['choices'][0]['message']['content'];
-        return _parseHabits(content);
-      } else {
-        throw Exception('Failed to generate habits: ${response.statusCode} ${response.body}');
+        if (data is List<dynamic>) {
+          return _parseHabits(data);
+        }
+        if (data is Map<String, dynamic> && data['habits'] is List<dynamic>) {
+          return _parseHabits(data['habits'] as List<dynamic>);
+        }
+        throw Exception('Invalid AI response format');
       }
+
+      throw Exception(
+        'Failed to generate habits: ${response.statusCode} ${response.body}',
+      );
     } catch (e) {
-      throw Exception('Error calling OpenRouter: $e');
+      throw Exception('Error calling AI backend: $e');
     }
   }
 
-  List<Habit> _parseHabits(String content) {
+  List<Habit> _parseHabits(List<dynamic> jsonList) {
     try {
-      // Clean up markdown code blocks if present
-      final jsonString = content.replaceAll('```json', '').replaceAll('```', '').trim();
-      final List<dynamic> jsonList = jsonDecode(jsonString);
-
       return jsonList.map((json) {
+        final item = json as Map<String, dynamic>;
         return Habit(
           id: const Uuid().v4(),
-          name: json['name'],
-          icon: json['icon'] ?? '✅',
-          category: json['category'] ?? 'Wellness',
-          durationMinutes: json['duration'] is int
-              ? json['duration']
-              : int.tryParse(json['duration'].toString()) ?? 2,
+          name: item['name'] as String,
+          icon: (item['icon'] as String?) ?? '✅',
+          category: (item['category'] as String?) ?? 'Wellness',
+          durationMinutes: item['duration'] is int
+              ? item['duration'] as int
+              : int.tryParse(item['duration'].toString()) ?? 2,
           createdAt: DateTime.now(),
           updatedAt: DateTime.now(),
         );
