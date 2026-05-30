@@ -245,6 +245,31 @@ Expected output:
 ### Runtime Configuration
 - `AI_PROXY_URL` (`--dart-define`) - Backend endpoint for AI suggestions
 
+### Secure AI Backend (Cloud Functions)
+1. Install dependencies:
+```bash
+cd functions
+npm install
+cd ..
+```
+
+2. Set the OpenRouter secret in Firebase Secret Manager:
+```bash
+firebase functions:secrets:set OPENROUTER_API_KEY
+```
+
+3. Deploy functions:
+```bash
+firebase deploy --only functions
+```
+
+4. Configure app runtime with your function base URL:
+```bash
+flutter run --dart-define=AI_PROXY_URL=https://europe-west1-<your-project-id>.cloudfunctions.net/api
+```
+
+The app calls `POST /ai/habits` on that backend URL.
+
 ### Android Permissions
 Required permissions in `AndroidManifest.xml`:
 - `INTERNET` - Network access

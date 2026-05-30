@@ -16,7 +16,10 @@ class OpenRouterService {
 
     try {
       final token = await FirebaseAuth.instance.currentUser?.getIdToken();
-      final endpoint = Uri.parse('$_proxyUrl/ai/habits');
+      final baseUrl = _proxyUrl.endsWith('/')
+          ? _proxyUrl.substring(0, _proxyUrl.length - 1)
+          : _proxyUrl;
+      final endpoint = Uri.parse('$baseUrl/ai/habits');
       final headers = <String, String>{'Content-Type': 'application/json'};
       if (token != null && token.isNotEmpty) {
         headers['Authorization'] = 'Bearer $token';
